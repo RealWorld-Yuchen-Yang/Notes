@@ -18,6 +18,7 @@
 
   3.6 git diff, view difference in working directory
       git diff --cached, view difference in staging area(files added, but not committed)
+      git diff COMMIT^ COMMIT, view the committed difference, COMMIT is the COMMIT_HASH which can be found by "git log"
 
   3.6 git config --global color.ui true, will make git command colorful
 
