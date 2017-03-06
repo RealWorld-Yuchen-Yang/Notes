@@ -1,0 +1,39 @@
+1. Strategy Pattern
+  1.1. Avoid Interfaces that Just Force Action
+  1.2. The way of implementing strategy pattern is by defining Interface type field in a superclass
+    so that in the subclasses, they can insert behavioral implementation of that Interface type field
+  1.3 Another explanation of strategy pattern:
+    Define a family of algorithms(behaviors), encapsulate each one, and make them interchangeable.
+    The strategy pattern lets the algorithm vary independently from client that use it.
+  1.4. This decoupling technique is called composition instead of hard-coded inheritance
+  1.5 When to use Strategy Pattern:
+    1.5.1: When you want to define a class that will have one behavior that is similar to other behaviors in a list
+    1.5.2: When you need to use one of several behaviors dynamica lly
+  1.6 Benefits
+    1.6.1 Often reduces long list of conditionals
+    1.6.2 Avoid duplicate code
+    1.6.3 Keeps class changes from forcing other class changes
+    1.6.4 Can hide complicated/secret code from the user
+  1.7 Negatives:
+    1.7.1 Increased Number of Objects/Classes
+
+2. Observer Pattern
+  2.1 When do you need observer pattern?
+    When you need many other objects to receive an update when another object changes
+  2.2 The subject(publisher) does not need to know any information of the Observers
+  2.3 Negatives: The subject may send updates that don't matter to the Observer(subscriber)
+  2.4 We can register the Observer into the Subject, whose reference are stored as a list in the subject
+      The subject notifies the registered observers automatically of any state changes, usually by calling one of their methods.
+  2.5 The observer can also store a reference to its subject, so that it can call methods of the object that it is observing
+
+3. Factory Pattern
+  3.1 When to use a factory pattern?
+    When we would like to use a method to produce several different class instances, and these classes share a common parent
+  3.2 One advantage of using the factory pattern is that it can eliminate the (if-else/switch-case) statements.
+    This is not totally remove the (if-else/switch-case),
+    They are just moved into the factory.
+    The advantage of doing so is that
+      3.2.1 we hide the implementation from user
+      3.2.2 we concentrate the object creation logic to one place, which increases maintainability
+
+4. Abstract Factory Pattern
