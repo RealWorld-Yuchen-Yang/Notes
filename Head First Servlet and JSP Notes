@@ -1,0 +1,384 @@
+Chapter1 Why use Servlet and JSPs: an introduction
+1. **htdocs** is the directory that is the root for all of the server's web application
+2. **Web Server** only serves **static page**
+3. **Web Application** can server **Dynamically Created page**,
+   such created page will be sent to the server so as to get served to the client
+   Note: Diynamic means that the page does not exist before the client's request
+4. Also it is the web application's responsibility to communicate with the db, instead of the server
+5. web.xml is called the DD(deployment descriptor)
+sample:
+<?xml version="1.0" encoding="ISO-8851-1" ?>
+<web-app
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+  <servlet>
+    <servlet-name>Chapter1 Servlet</servlet-name><!--ties the servlet element to the servlet mapping element-->
+    <servlet-class>Ch1Servlet</servlet-class><!--servlet's java class-->
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Chapter1 Servlet</servlet-name>
+    <url-pattern>/Serv1</url-pattern><!--the url name that the client uses for the request, "/" is the context root-->
+  </servlet-mapping>
+</web-app>
+
+6. Manual compile project command:
+  javac -classpath /TOMCAT_DIR/tomcat/common/lib/servlet-api.jar -d classes src/SERVLET1.java
+
+7. For a servlet SERVLET1 on a web application APP1, the Tomcat deployment structure should be:
+/TOMCAT_DIRECTORY/webapps/APP1/WEB-INF/classes/PACKAGE_NAME/SERVLET1.class
+                                      /web.xml
+
+and the corresponding launch directory is
+http://localhost:8080/APP1/SERVLET1
+
+8. JSP = Java inside HTML
+   Note: by using tag <%= JAVA CODES %>
+
+Chapter2. Web App Architecture: high-level Overview
+1. Apache is a web server
+2. Tomcat is a web container, where servlets should be deployed
+3. Container's support
+  Communication Support: between web server and web app
+  Lifecycle Management
+  Multithreading Support: servlet's life and death, but it does not guarantee thread safety
+  Declarative Security: Manage and change security without touching and recompiling Java source files
+  JSP Support: translate JSP(Java inside HTML) code into real Java
+4. URL can be a link to a static page, or a link to a servlet
+5. One servlet has three names:
+  Client-known URL name **<url-pattern>**: the name written in HTML, which will be included in the HTTP request, logical
+  Deployer-known secret internal name **<servlet-name>**: known only to the deployer/others in the real operational environment, logical
+  Actual file name **<servlet-class>**: the servlet class's full-qualified name, includes className and packageName
+    path to the servlet is the package directory structure lives on the server
+
+6. MVC(Modle-View-Controller)
+  Controller(Servlet) -- > View (JSP)
+                      -- > Model(POJO, Plain Old Java Object) -- > DB
+7. A J2EE application server includes both a web container and an EJB Container
+   web container: manages Servlet and JSP
+   EJB container: manages Enterprise JavaBeans(business object)
+
+   Stand alone web container: Tomcat (open source), usually used together with web server Apache
+   J2EE Server(webContainer+EJBContainer): JBoss (open source)
+
+Chapter3. Mini MVC Tutorail: hands-in MVC
+1. Development environment
+/PROJECT_NAME: can have multiple apps
+  /APP_NAME/
+    /etc: contains configuration files, e.g. **web.xml**
+    /lib: 3rd party JAR files
+    /web: contains view components
+          both dynamic(.jsp) and static(.html)
+    /src: java code
+      /packages: reversed company url, e.g. com.example
+        /web: contains controller java files(Servlets)
+        /model: contains model java files(java beans)
+    /classes: contains compiled and copied over .class files
+      sub directory is the same as /src
+
+
+2. Deployment environment
+Deploying a web app involves both Container-specific rules and requirements of the servlets and JSP specifications
+(Here, we are conforming Tomcat container)
+****************************
+Tomcat specific:
+/TOMCAT_HOME/
+  /webapps
+    /APP_NAME: also represents the "context root", which Tomcat uses when resolving URLs
+****************************
+Servlet and JSP specific: the following is container independent
+      /: contains view components both dynamic(.jsp) and static(.html), same contents as /web directory during development
+      /WEB-INF
+        /web.xml: Deployment Descriptor
+        /lib: 3rd party jars
+        /classes: .class files, same substructure as its corresponding src directory in the development environment
+                  one exception is when deploying .class files in a JAR
+****************************
+
+3. Conclude developmen steps(iterative development):
+  iterate
+  {
+    1. build and test HTML
+    2. build and test version1 of the controller servlet
+    3. build a test class for "model" class(model's unit tests)
+       ,build and test model
+    5. upgrade the servlet to version2, link the "servlet" with the "model"
+    6. build the JSP(respond page to the user)
+  }
+
+4. Complile the servlet
+under the development project root:
+javac -classpath /Applications/apache-tomcat-9.0.0.M9/lib/servlet-api.jar:classes:. -d classes  src/com/example/web/BeerSelect.java
+
+5. Servlet pass the computation result to its corresponding JSP page by using the request object
+   JSP page have reference to the request, from which it can retrieve the result passed from the servlet
+
+6. We do not need to compile the JSP page, however, the container does that at first request
+
+Chapter4: Being a Servlet: request and response
+1. **HttpServletRequest** is used to:
+    1.1 retrieve HTML form parameters
+    1.2 retrieve HTML request header
+    1.3 retrieve cookie
+2. **HttpServletResponse** is used to:
+    2.1 set HTTP response header
+    2.2 set response content
+    2.3 redirect to another URL
+    2.4 add cookie to response
+3. Purpose and event sequence of servlet lifecycle:
+    3.1 servlet class loading
+    3.2 servlet instantiation
+    3.3 call init()
+    3.4 call service()
+    3.5 call destroy()
+
+4. Servlet is singleton. Each JVM can have only one servlet instance for each servlet class
+   However, the servlet container allocates one thread, inside which servlet is manipulated, for each client request
+
+5. ServletConfig and ServletContext
+ServeltConfig:
+  one SerletConfig boject per servlet
+  use it to access ServletContext
+  Configured in Deployment Descriptor
+
+ServletContext:
+  One ServeltContext per web app.(Actually is AppContext)
+  it is used to access web app parameters, also configured in Deployment Descriptor
+
+6. doGet() method in Servlet should be idempotent,
+  means we should design it in a way such that each time calling this method will not cause negative side effects on the server
+
+7. On HTML, how to determine a request is get/post
+  7.1 a simple hyperlink(marked by <a>) always means a get
+  7.2 if you specify a form's method as POST, then it is a post
+  7.3 form's default action is GET
+
+8. If we want to support both GET and POST from a single servlet
+   developers usually put real logic in doGet(),
+   then let doPost() call doGet()
+
+9. the servlet's getServerPort(), getLocalPort(), getRemotePort()
+  **getRemotePort()**'s remote means the client, since currently I am on the server side
+  **getServerPort()**, returns the port the request originally come at.
+  **getLocalPort()**, return the port that the request End-up.
+  Note:
+    the reason that request in some cases are redirected is because
+    in this way the app can handle multiple client at the same time
+10.I should always set the contentType first in the response object,
+   then I can do other operations like writing to the output stream
+
+11. meaning of redirect and dispatch
+    redirect（browser does the work）:
+      When the response from the servlet is a redirect,
+      it is the browser who will send a new request to the new URL
+      so in this way, the URL on the browser address bar will change
+
+    redirect 可以到绝对的URL： http://www.xxx.com/APP_NAME/PATH
+             也可以到相对的URL，container开到相对的URL后， 会自动补齐缺失的http://www.XXX.com这一部分
+             有两种相对的URL， 不以'/'开头的， 和以'/'开头的
+                不以'/'开头的： 表示URL是相对当前Servlet URL-Pattern所在的directory
+                以'/'开头的： 表示相对网络应用的根目录的directory， 即container将URL补齐后应该为http://www.xxx.com/APP_NAME/DIRECTORY
+             记住， 永远都是先redirect， 再往response里写东西， 顺序反了不行
+    dispatch (server does the work):
+      servlet decide that the request should go to another part of the webapp,
+      since the browser gets the response in the usual way,
+      the location in the browser address bar does not change
+
+12. The most commonly used response methods are: setContentType() and getWriter()
+
+Chapter5: Being a Web App: attributes and listeners
+1. Both servletConfig and servletContext are init parameters,
+   we should think of these init parameters as deploy-time constants
+   you can get them at runtime, but you can't set them.
+2. ServletContext is actually a dictionary, which I can store a string as a key and store any type object/value as the value
+3. I can getInitParameters from the servletContext, type string
+     can get/setAttributes in the servletContext, type object
+4. After ServletContext is initialized,
+   Container creates a new instance of MyServletContextListener Class(which is defined in web.xml)
+   Container calls the listener's contextInitialized() method, passing a new ServletContextEvent
+   The event object has a reference to the ServletContext, so the event handling code can get the context from the event.
+   and get the context init parameter from the context(which is initialized when the ServletContext is created)
+
+5. Where there's a lifecycle moment, there's usually a listener to hear about it.
+   Besides context events, you can listen for events related to context attributes, servlet requests and attributes,
+   and HTTP sessions and session attributes.
+
+6. Three scopes:
+  Context
+  Session
+  Request
+
+7. To prevent multiple clients accessing the context attribute at the same time,
+   instead of locking(synchronizing) the servlet method,
+   it is more practical to synchronize the context itself
+   which is implemented in doGet()/doPost() as **synchronized(getServletContext)
+
+8. Session is not thread safe either,
+   for users can access the same session by using different browser windows.
+   To protect the session attributes, we should synchronize on the HttpSession
+
+9. SingleThreadMode(Deprecated) is designed to protect instance variables
+  you are guaranteed by the container that only one thread will execute  the servlet's service() method
+  To declare a servlet as single thread mode, I should mark it to implement the SingleThreadMode interface
+  However, depends on whether the container uses queuling/polling servlets, the thread safety is not guaranteed
+
+10. What does single instance servlet mean??
+    each servlet class is has only one instance which is created at deployment time
+    this servlet instance is managed by the container and shared among requests
+
+11. Only Request attribute and local variables are thread safe
+    so do not assign request or session scoped data as servlet instance variables, but just as method local variables
+
+12. ReqeuestDispatcher
+    The servlet asks the HttpRequest for a RequestDispatcher,
+    passing in a relative path to the view JSP
+
+    request.setAttribute("key", valueObject);//constructing the request, adding data into it
+    RequestDispatcher view = request.getRequestDispatcher("result.jsp");//get the view dispatcher
+    view.forward(request, response);//forward the request & response to the view
+
+13. RequestDispatcher can be gotten from ServletRequest or ServletContext,
+    From ServletRequest, the forwarding path can be either absolute or relative to the original request
+    From ServletContext, the forwarding path has to be absolute
+
+14. Attribute scopes:
+
+    ServletContext:
+      thread safety: not thread safe,
+      accessibility:  any part of the app can see it
+                      including servlets, JSPs, ServletContextListeners, ServletContextAttributeListeners
+      scope: same as the life of the deployed app.
+      good for: Resources you want the entire application to share,
+                including database connection, JNDI lookup, names, email address, etc.
+
+    HttpSession:
+      thread safety: not thread safe
+      accessibility: Any servlet or JSP with access to this particular session.
+                     can span multiple requests by the same client.
+                     requests by the same client could go to different servlets
+      scope: can be destroyed programmatically or simply time-out
+      good for: data and resources related to this client's session,
+                something that requires an ongoing conversation with the client.
+                e.g. A shopping cart
+
+   Request:
+     thread safety: thread safe
+     accessibility: any part of the application that has direct access to the Request object.
+                    mostly means only the servlets and JSPs to which the request is forwarded using a RequestDispatcher
+                    Also Request-related listeners.
+     scope: the life of the request,
+            which means until the Servlet's service() method completes.
+            life of the thread handling this request
+     good for: passing model info from the controller to the view,
+               or any other data specific to a single client request
+               e.g. query parameters
+
+15. in servlet's service() method,
+    an IllegalStateException is caused when a response has already been committed(flush, write, etc.)
+    to the client
+
+chapter6: Conversational state, session management
+1. cookie contains session id, which is created by the container on the first request, and it is behind the scene
+2. how to get/generate the session: HttpSession session = request.getSession();
+3. An alternative way of getting the session is from the SessionEvent passed in the SessionEvent listener
+4. If the client disabled cookie, it will never send back the sessionId (which supposed to be in the cookie)
+   the fall back solution is URL rewriting,
+   Syntax: URL+;jsessionid=XXXXX
+   , which sticks the session to the end of URL
+   stripping off the extra part of the URL is done by the container
+5. URL rewriting kicks in only if cookies fail, and only if you tell the response to encode the URL
+6. I should use Servlet API to manipulate cookie,
+   cookie is a Cookie[] array list, instead of a hashMap,
+   in order to get one cookie's value, I have to loop through the list
+7. SessionBindingListener listens the change of session attributes,
+   instead of the life cycle event of a session
+   we do not declare it in the web.xml,
+   instead, we let the desired attribute class to implement the HttpSessionBindingListener
+
+8. In a distributed environment, where there are multiple JVMs
+   Only **HttpSession objects(and their attributes) move from one VM to another.
+   There is one ServletContext per VM
+   There is one ServletConfig per Servlet，per VM
+   but there is only one HttpSession Object for a given session ID per web app,
+   regardless of how many VM's the app is distributed across.
+
+9. A session whose timeout period has been set to -1 will never expire
+
+Chapter7: Being a JSP: using JSP
+1. A directive is a way for you to give special instructions to the container at page translation time.
+   there are three flavors: page, include, taglib
+2. page directive: <%@ page import="foo.*, bar.*" %>
+
+3. differnt jsp syntaxes
+ 3.1 Scriptlet, normal java code, <% %>
+ 3.2 Directvie, container translation instructions, <%@ %>
+ 3.3 Expression, prints out result between tags, <%= %>, note there is no tailing ";"
+
+4. All scriptlet and expression code lands in a service() method in the translated servlet
+  That means varialbes declared in a scriptlet are always Local variables
+
+5. The jsp generated(by Tomcat container) servlet is in directory:
+   /TOMCAT_HOME/work/Catalina/SERVER_NAME/WEB_APP_NAME/org/apache/jsp
+   e.g. /Applications/apache-tomcat-9.0.0.M9/work/Catalina/localhost/manager/org/apache/jsp/WEB_002dINF/jsp
+
+6. JSP Declarations: <%! %>, note in the tag, ";" should be pended in the end
+   Declarations are for declaring members(variables & methods) of generated servlet class
+   this is added outside the generated service() method,
+   which means you can declare both static variables and methods
+
+7. in the jsp generated servlet, we should also care about the servlet life cycle methods
+   jspInit(), _jspService, jspDestroy(),
+   and you can override jspInit() & jspDestroy()
+
+8. Comments:
+   HTML Comment: <!-- -->
+   JSP Comment: <%-- --%>
+
+9.  configure the servlet init parameters for JSP files:
+      also configure them in the web.xml file
+      the only difference is that adding an additional element <jsp-file> into the <servlet> element
+
+10. Jsp Implicit Objects has 4 scopes:
+      request, session, application and page
+    (
+      Note:
+      1. Servlet only has the previous 3 scopes: request, session, application
+      2. You usually won't need(or care about) page scope unless you're developing custom tags.
+    )
+
+    JSP implicit Objects:
+    API                            Implicit Object
+    JspWriter                      out
+    HttpServletRequest             request
+    HttpServletResponse            response
+    HttpSession                    session
+    ServletContext                 application
+    ServletConfig                  config
+    Throwable                      exception
+    PageContext                    pageContext
+
+    Note: **PageContext** encapsulates other implicit objects,
+          If you give some helper object  a PageContext reference,
+          the helper can use that reference to
+          get reference to the other implicit objects and attributes from all scopes
+
+11. Over the generated jspInit() method, in the jsp file:
+    <%! //note override the jspInit() method using a declaration
+      public void jspInit()
+      {
+          //inside this method, the ServletConfig and ServletContext are all already initialized
+      }
+    %>
+
+12. Three types of directives:
+    12.1 page directive: defines page-specific properties
+      e.g. <%@  page import="foo.*" session="false" %>
+    12.2 taglib directive: defines tag libraries available to the JSP
+      e.g. <%@ taglib tagdir="/WEB-INF/tags/XXX" prefix="XXX" %>
+    12.3 include directive: defines text and code that gets added into the current page
+      e.g. <%@ include file="XXX.html" %>
+      This lets you build reusable chunks(like a standard page heading or navigation bar)
+      that can be added to each page without having to duplicate all that code in each JSP
