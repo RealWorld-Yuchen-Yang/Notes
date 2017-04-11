@@ -382,3 +382,11 @@ Chapter7: Being a JSP: using JSP
       e.g. <%@ include file="XXX.html" %>
       This lets you build reusable chunks(like a standard page heading or navigation bar)
       that can be added to each page without having to duplicate all that code in each JSP
+
+  13. It is bad to write Java code in JSP,
+      to avoid this, we should write EL in the JSP pages and use it to call Java method somewhere else.
+      JSP EL syntax: ${ }
+
+  14. page directive have higher priority than the web.xml
+
+  15. 
