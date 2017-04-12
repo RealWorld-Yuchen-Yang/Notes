@@ -389,4 +389,82 @@ Chapter7: Being a JSP: using JSP
 
   14. page directive have higher priority than the web.xml
 
-  15. 
+  15. There are six types of JSP elements:
+      scriptlets, directives, declarations, Java expressions, EL and actions
+
+      Actions:
+        standard actions: e.g. <jsp:include page="xxx.jsp" />
+        Other actions: e.g. <c:set var="rate" value=32 />
+
+Chapter8. Script-free pages: scriptless JSP
+1. Implicit EL varialbes:
+  pageScope, requestScope, sessionScope, applicationScope,
+  param, paramValues,
+  header, headerValues,
+  cookies, initParam
+  pageContext
+
+2. Standard Actions dealing with beans, with attributes: 'id', 'scope', 'type', 'class':
+  **jsp:useBean**, used to declare and initialize the actual bean object you are using in <jsp:get/setProperty>
+      e.g. **<jsp:useBean id="person" type="foo.Person" class="foo.Employee" scope="request" />**,
+           id: declares the identifier for the bean object,
+               This corresponds to the **name** used when the servlet code said:
+               request.setAttribute("person", p)
+      Note:
+        1. <jsp:useBean> will create a bean if the one requested does not exist
+        2. with a <jsp:useBean> body, you can have code that runs conditionally
+           Only if the bean attribute can't be found and a new bean is created
+        3. **class attribute**:
+             the real bean type
+           **type attribute**:
+             optional, used to declare the bean's reference type,
+             can be classes|interfaces in the higher hierarchy of the inheritance chain
+             if type attribute is not specified, the bean reference will be the same as real type,
+             which is defined by "class attribute"
+
+  **jsp:getProperty**
+    e.g. <jsp:getProperty name="person" property="name" />
+        name: identifies the actual bean object,
+              this will **match the "id" value** from the <jsp:useBean> tag
+        property: identifies the property we would like to get from the JavaBean
+  **jsp:setProperty**
+
+3. Standard Actions:
+  3.1 jsp:include
+  3.2 jsp:forward
+  3.3 jsp:param
+
+4. appropriate inclusion mechanism,
+   "include directive <%@ include file="XXX.html" %>" or <jsp:include>
+
+5. Java Bean (which is not EJB)
+  5.1 property is determined by the naming of getter&setter,
+      not from a member of a class
+  5.2 For use JSPs, the property type should be a type that
+      either **String** or **primitive**.
+      If it isn't, it can still be a legal bean,
+      but you won't be able to rely on standard actions,
+      and you might have to use scripting
+  5.3 must have a public & non-argument constructor
+
+6. scripting can even be inside a standard action(even though it is bad)
+   by assigning value attribute with "<%= %>"
+   e.g. <jsp:setProperty name="person" property="name" value="<%= request.getParameter("userName") %>">
+
+7. JSP EL can get direct access to the following two categories of objects
+  7.1 EL Implicit objects:
+      pageScope, requestScope, sessionScope, applicationScope
+      param, paramValues, header, headerValues, cookie, initParam,
+      pageContext
+      Note, EL implicit objects are not the same as the implicit objects
+  7.2 Attributes in: pageScope, requestScope, sessionScope, applicationScope
+
+8. More about JSP EL
+  8.1 if the expression has a variable followed by a dot,
+      the left-hand variable must be a Map or a bean
+  8.2 the thing to the right of the "." must be a map key or a bean property
+  8.3 the [ ] operator is like the ".", however, the thing on the right can be a map, a bean, a list or an array
+  8.4 you can use nested expressions inside the [ ] operator, which will be evaluated from the inner most
+  8.5 EL renders raw text, including HTML
+  
+9.
