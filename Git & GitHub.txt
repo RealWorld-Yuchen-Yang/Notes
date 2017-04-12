@@ -1,0 +1,147 @@
+1. Commit is a concept of taking a "snapshot of changes" which I would like to record into local reopositry
+
+2. In order to use git on one computer, I should firstly do global configuration:
+  2.1 git config --global user.name "USER_NAME"
+  2.2 git config --global user.email "USER_EMAIL"
+
+3. When firstly have a project and would like git to manage it:
+  3.1 cd to the project's root folder: git init
+
+  3.2 git status, will tell you git's information
+
+  3.3 git rm --cached FILE_NAME, 将add到staging area的file取下
+
+  3.4 git commit -m "MESSAGE", 将staging area上的file照相， 表示已被当前local branch记录
+
+  3.5 git log, 用来查看commit日志等信息
+      git log --oneline，用一行显示git的信息
+
+  3.6 git diff, view difference in working directory
+      git diff --cached, view difference in staging area(files added, but not committed)
+      git diff COMMIT^ COMMIT, view the committed difference, COMMIT is the COMMIT_HASH which can be found by "git log"
+
+  3.6 git config --global color.ui true, will make git command colorful
+
+  3.7 git remote add REMOTE_REPO_NAME(通常叫origin) REMOTE_REPO_URL
+
+  3.8 git push -u REMOTE_REPO_NAME REMOTE_BRANCH_NAME, 将local的change推到远端对应的branch上
+
+4. 之前的操作都是在local进行的， 而GitHub是远端的repository
+
+5. SSH Key， 是一种authentication机制， 让你可以通过安全的https协议与GitHub沟通
+   每个计算机都可以generate出它特有的SSH key,
+   SSH key分为公钥(id_rsa.pub)和私钥（id_rsa）, 如果不为这两个钥匙命名， 那么之前是他们的默认名字
+   我们需要将生成的公钥id_rsa.pub上传到GitHub上
+
+   生成SSH Key的方法为：
+   5.1 检查当前用户的根目录下是否有.ssh文件夹， 如果有， 最好先做保存，以防新生车的SSH将原有数据覆盖
+   5.2 生成SSH Key：
+    ssh-keygen -t rsa -C "EMAIL_ADDRESS"
+    其中
+      5.2.1 -t: 表示key type, 这里指定的key的形式就是rsakey
+      5.2.2 -C： 表示comment， 这里使用EMAIL_ADDRESS为这个SSH Key注释
+   5.3 生成SSH Key时， 设置的SSH Key的密码， 在用户使用SSH协议（如push， pull）时， 都会被问及这个密码
+   5.4 验证上传的SSH Key是否成功：
+    ssh -T git@githum.com， 并输入之前定义的SSH Key‘s PASSWORD
+
+6. git config --get OBJECT.PROPERTY1.PROPERTY2..., 从.git/config文件中读取相关属性
+   如检查remote repository的url: git config --get remote.REMOTE_REPO.url, 将返回之前定义的url
+
+7. branch 和 merge 的概念
+  7.1 branch并不是真正的copy， 而是git handle的version metadata
+
+  7.2 cloning: allow other developers get a copy of your code from a remote repository
+              如果有人pull from git, 表示这个人在clone远端的git repository
+
+  7.3 Forking： 不是一个git的术语， 而是一个GitHub的术语，
+                表示如果我想将别人的project完全复制过来， 那么我可以Fork这个project
+                GitHub上会显示这个project是我Fork过来的
+                同时， 如果我在这个project上的改动想在原project上有所体现， 那么我应该申请一个pull request
+                这个pull request会出现在原project作者的repository中， 他可以选择comment， accept或者reject
+
+8. branch的命名， 通常：
+    8.1 Release的版本叫： vX.0
+    8.2 平时正在开发的版本叫： vX.X
+
+9. Merge branch A into branch B, 表示：
+   Put changes from branch A into branch B
+
+10. 远端Repository的创建需要在GitHub中才能执行， local的bash命令因为只是客户端， 所以不能用来创建Remote Repo
+    并且只有在创建完远端repository才能得到他的ssh URL,
+    将这个URL注册在本地添加到git配置， 从而git push 才有意义
+
+11. 在git bash(local)中
+    11.1 git branch, 显示local repo中的所有branch
+    11.2 git branch NEW_BRANCH_NAME, 在local创建新branch
+    11.3 git push -u REMOTE_NAME NEW_BRANCH_NAME, 将新创建的branch推到远端
+    11.4 git checkout NEW_BRANCH_NAME, 切换到这个新创建的branch上工作
+
+12. Clone remote repository
+    git clone "SSH_URL"
+
+13. git merge BRANCH_NAME, 表示将声明的BRANCH_NAME merge到当前的工作branch
+
+14. Merge Conflict:
+    在两个文件有冲突(例如两个人同时改了同一个文件一样的行)的时候， git 不知道如何解决这样的冲突， 它更不会随便做任何胡乱的merge
+    git在这时只是将两个文件冲突的地方以如下格式标识出来：
+    <<<<<<<<<<<< HEAD
+    本地文件code(<<<<<<<, 表示本地文件)
+    =================
+    别人文件code(>>>>>>>, 表示其他地方来的文件）
+    >>>>>>>>>>>> COMING_BRANCH_NAME
+
+    面对冲突， 作为程序员， 我们需要手动的修改冲突， 然后手动删除git添加的注释(<<<<<<, =======, >>>>>)
+
+15. 如果远端变化了， 我们可以使用git pull获得远端的变化
+    一个很好的习惯就是在push之前都要先执行git pull
+    GitHub只是版本控制系统， 并不会对build进行控制， 所以当push到远端时， 信息被直接merge了， 并不会报错
+    这样随便push很可能改坏原来的程序
+
+    15.1 git pull, 表示将local repository与远端的repository同步
+                   这样的同步有两个作用
+                  15.1.1 merge当前工作branch对应的远端branch到它之中
+                  15.1.2 更新其他所有branch的版本metadata信息， 与远端保持一致， 但并不会merge这些branch
+    15.2 git pull REMOTE_NAME BRANCH_NAME, pull指定远端的指定branch
+
+16. 即使是clone过来的project， 我们在local更改， 并第一次想要提交时， 还是要configure这个project的远端信息(即URL)
+
+17. After pulling a remote repository, merge conflict can appear in local branch
+    17.1 git pull : 等于(git fetch) + (git merge)
+    17.2 git pull --rebase: 等于(git fetch) + (git rebase)
+    Note: git fetch表示将远端的改变先存储到一个临时空间， 并不与local merge
+
+18. git merge 与 git rebase的区别
+    git merge， merge conflict时， 冲突标记永远是将自己的branch在前， 别人merge进来的branch在后，不关心他们的时间顺序
+    git rebase， 关心merge的顺序， mereg conflict标记永远是最新的commit在前， 之前的commit在后，
+                并且为了保证先后顺序， rebase会修改commit的历史， 在你的local history中， 如果别人在你之前commit了，
+                他的commit会在你的commit之前插入
+
+19. Tagging: The ability to tag (commit/snapshot) specific points in the (commit) history
+             Example would be to tag al release points(version 1.0, etc.)
+
+    19.1 我们应该在最后一次希望看到变化的commit之后， 紧跟git tag语句：
+            git tag -a TAG_ANNOTATION -n MESSAGE
+            Note:
+                -a, 表示之后声明Annotation， 这个Annotation就是声明的tag名字
+                -m, 表示之后声明Message，
+
+    19.2 git tag, 用于查看已经声明的所有tag
+
+    19.3 git show TAG_ANNOTATION, 用于查看指定tag的详细信息
+
+    19.4 我还可以push tag到远端
+         git push REMOTE_NAME TAG_ANNOTATION, push一个指定的TAG_ANNOTATION到远端
+         git push --tag, push所有TAG_ANNOTATION 到远端
+
+    19.5 checkout不但可以checkout branch， 还可以checkout TAG_ANNOTATION或TAG_HASH
+         git checkout TAG_ANNOTATION
+         git checkout TAG_HASH
+         checkout 的作用只是可以让我看到之前的commit的情形， 也就是说权限为可读的， 而不能将当前branch改为这个checkout的时候
+         如果想"时光倒流"， 则要使用git reset/revert
+
+  20.git reset与git revert的区别
+    20.1 git reset --hard, will reset the working tree and the commit index.
+                            只有当没有publish任何project信息时， 才可以使用， 因为他会重写历史
+                            非常不好
+    20.2 git revert, 是首选， 它不会修改历史，
+                     但是使用git revert的时候不能跳着走， 也就是说他必须从最近的一次commit开始一步一步的revert
