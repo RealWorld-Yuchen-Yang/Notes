@@ -558,3 +558,23 @@ Chapter9: Custom tags are useful, using JSTL
   14.4 inside a sub-directory of META-INF inside a JAR file that's inside WEB-INF/lib
 
 Chapter 10, custom tag development
+1. tag directive in the .tag file:
+  <%@ attribute name="ATTR_NAME" required="true|false" rtexprvalue="true|false" %>
+  Note: the **rtexprvalue** specifies whether the value of the attribute should be a string literal or can be an expression
+
+2. tag directive
+  <%@ tag body-content=" " %>
+
+3. web container auto search directories for custom tags
+  /WEB-INF/tags, and its subdirectories
+  /META-INF/tags and it subdirectories inside  a JAR file in /WEB-INF/tags
+  Note:
+    a tag file MUST have a TLD if it's deployed in a JAR,
+    but if it's put directly into the webapp (in WEB-INF/tags or its subdirectories),
+    it does not need a TLD
+
+4. a '.tag file' will eventually end up in a '.jsp file'
+      so it has access to the implicit objects that any jsp file have
+    Note: one difference is that the .tag has JspContext instead of ServletContext
+
+Chapter11. deploying your app
