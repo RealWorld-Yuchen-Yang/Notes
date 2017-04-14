@@ -466,5 +466,95 @@ Chapter8. Script-free pages: scriptless JSP
   8.3 the [ ] operator is like the ".", however, the thing on the right can be a map, a bean, a list or an array
   8.4 you can use nested expressions inside the [ ] operator, which will be evaluated from the inner most
   8.5 EL renders raw text, including HTML
-  
-9.
+
+9. Deploying an app with static functions
+  the xxx.tld(tag library descriptor) has to be somewhere within WEB-INF or one of the subdirectories
+
+10. the taglib directive in JSP
+  <%@ taglib prefix="PREFIX_NAME" uri="URI_NAME"%>
+  Note that the uri should match what is defined inside the XXX.tld file
+
+11. you can use EL inside a tag, even for tag property values.
+    e.g.
+    <jsp:useBean class="foo.Dog" id="myDog">
+      <jsp:setProperty name="myDog" property="name" value="${list[2]}"
+    </jsp;useBean>
+
+12. EL is null-friendly. It handles unknown or null values so that the page will still display
+    Even if it can't find an attribute/property/key with the name in the expression
+    In arithmetic:
+      EL treats null as **0**
+    In logical expressions:
+      EL treats null as **false**
+
+13. Two different include mechanisms in JSP:
+  their result and way of usage are often the same, however
+  the include directive happens at translation time,
+  <jsp:include> happens at runtime
+  Note: the XXX.jsp file to be included **should not** contain <html>, <head>, <body> tags.
+
+  13.1 the include directive: e.g. <%@ include file="Header.jsp"%>
+  13.2 <jsp:include> standard action: e.g. <jsp:include page="Header.jsp">
+14. <jsp:param> element can be specified in <jsp:include> directive,
+    which can later on be extracted by using ${param.PARAM_NAME}
+15. If the request parameter name is different from the property name,
+    but you want to set the value of the property equal to the request parameter value,
+    you can use the "param" attribute in the <jsp:setPorperty> tag
+16. The included resource has some limitations:
+    it cannot change the response status code or set headers
+17. standard action: <jsp:forward page="view.jsp">
+
+Chapter9: Custom tags are useful, using JSTL
+1. JSTL: JSP Standard Tag Library
+2. To use JSTL, we should put two files:
+   jstl.jar & standard.jar into the WEB-INF/lib directory
+3. HTML entities:
+     <, &lt;
+     >, &gt;
+     &, &amp;
+     ', &#039;
+     ", &#034;
+
+4. <c:out value='' [escapeXml='true|false'] [default='DEFAULT_OUTPUT']>,
+  using the <c:out> tag can prevent cross-site hacking
+  Note: cross-site hacking/scripting: the attack is sent from one user to another user's browser
+        using webapp as the delivery mechanism
+
+5. Looping without scripting: <c:forEach var=" " items="COLLECTION_VARIALBE" [varStatus=""]> LOOP_CONTENT </c:forEach>
+
+6. It is the convention(not must) for JSTL tag's to be prefixed with then name 'c', which means "Core"
+
+7. <c:if test="CONDITION"> </c:if>
+
+8. JSTL does not have if/else combo,
+   but it has
+    <c:choose>
+      <c:when test="CONDITION"> <!-- There can be multiple whens -->
+      </c:when>
+      ...
+      <c:otherwise> <!-- Otherwise is used as a default condition -->
+      </c:otherwise>
+    </c:choose>
+
+9. <c:set> compared with <jsp:setProperties>
+  <jsp: setProperties>, can do only one thing, set the property of a bean
+  <c:set var="" scope="" value="">, sets attribute
+  <c:set target="" property="" value="">, sets bean properties or Map values
+
+10. <c:remove var=" " scope=" ">, used to remove elements inside a scope
+
+11. <c:import url=" ">, the third way of including content into the current page
+    it is dynamic include, very much like <jsp:include>, but much powerful
+    it can include resource outside the web container
+
+12. <c:url value=" ">, is used to do URL fall back technique
+
+13. To use a custom tag library, you must read the TLD
+
+14. 4 places the container looks for TLDs
+  14.1 /WEB-INF
+  14.2 /WEB-INF's sub-directories
+  14.3 inside the META-INF directory inside a JAR file that is inside /WEB-INF/lib
+  14.4 inside a sub-directory of META-INF inside a JAR file that's inside WEB-INF/lib
+
+Chapter 10, custom tag development
