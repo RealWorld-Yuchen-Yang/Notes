@@ -1,0 +1,11 @@
+Navigation
+  1. In Linux, filenames and commands are case sensitive
+
+Exploring The System
+  1. file
+      determine file type
+  2. ls
+      list files of certain directory, can take multiple directories as input
+  3. linux command line options:
+      short version: -x
+      long version: --x
