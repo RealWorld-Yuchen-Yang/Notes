@@ -625,3 +625,103 @@ Chapter11. deploying your app
   7.7 <mime-mapping>
 
 12 Web app security, keep it secret, keep it safe
+  1. Servlet security boils down to 4 main concepts:
+    authentication,
+    authorization, have certain right to do something, HTTP Unauthorized status code: 401
+    confidentiality,
+    data integrity
+
+  2. How container do authentication and authorization
+    Note: HTTP is stateless, so 2 request are required
+    2.1 request1:
+      2.1.1 Having received the request, the container finds the URL in the "security table"
+      2.1.2 If the Container finds the URL in the security table,
+            it checks to see whether the requested resource is constrained.
+            If it is, the Container return 401
+
+    2.2 request2:
+      2.2.1 When the Container receives a request with a username and password,
+            it checks the URL in the security table
+      2.2.2 If it finds the URL in the security table
+            (and sees that it's constrained),
+            it checks the username and password information to make sure that they match
+      2.2.3 If the username and password are OK,
+            the container checks to see if the user has been assigned
+            the correct 'role' to access this resource (i.e. authorization)
+            If so, the resource is returned to the client
+
+    3. Keep security out of the code!
+       For most webapps, most of the time, the webapp's security constraints should be handled declaritively
+       in the deployment descriptor
+
+    4. LDAP: Lightweight  Directory Access Protocol
+
+    5. Head First Servlets and JSP's page 688(book page 665) describes the security config in web.xml in detail
+       The purpose of the <web-resource-collection> sub-element in <securituy-constraint> is to tell the container
+       which resources and HTTP method combinations should be constrained in such a way
+       that they can be accessed only by the roles in the corresponding <auth-constraint> tag
+
+    6. When two different non-empty <auth-constraint> elements apply to the same constrained resource,
+       access is granted to the union of all roles from both of the <auth-constraint> elements
+
+    7. In the security configuration section, even though in the situation "NOBODY" can access some resource.
+       It means that nobody from the client side that can access the resource.
+       However, other part of the web app can still access them.
+
+    8. The deployment descriptor has a mechanism for mapping hard-coded role names in a servlet
+       to the "official" <security-role> declarations in your Container.
+
+      In DD
+        <web-app>
+          <servlet-role-ref>
+            <role-name>NAME_IN_SERVLET
+            <role-link>NAME_IN_TOMCAT
+
+          <security-role>
+            <role-link>NAME_IN_TOMCAT
+
+    9. Declaring authentication in  DD
+      <web-app>
+        <login-config>
+          <auth-method>BASIC|DIGEST|CLIENT-CERT|FORM
+
+    10. Data Integrity:  data that arrives is the same as the data that was sent.
+
+    11. Confidentiality: nobody can see the data along the way
+
+    12. Implementing data confidentiality and integrity sparingly and declaratively
+      <web-app>
+        <security-constraint>
+          <user-data-constraint>
+            <transport-guarantee>
+              CONFIDENTIAL|NONE|INTEGRAL
+          <!-- SHOULD USE THE ABOVE TOGETHER WIHT THE FOLLOWING -->
+          <web-resource-collection>
+          <auth-constraint>
+
+    13. The mechanism of **CONFIDENTIALITY** transport(Head First Servlets and JSP P710(687))
+      The browser makes 3 requests in total in the whole process
+      13.1 client request(**1st**) a constrained resource with a transport guarantee.
+           the container sees that this constrained resource has a transport guarantee.
+           the container sees that the request did not come in securely
+      13.2 The container sends a **301**(redirect) response to the client,
+           that tells the browser to redirect the request using a secure transport
+      13.3 The browser makes the same resource request again(2nd time), but this time, over a secure connenction
+           In other words, the resource stays the same, but the protocol is now HTTPS
+      13.4 The container sees that the resource is constrained. And that this user has not authenticated.
+           So now the container starts the **authentication** process by sending a **401**(unauthorized) to the browser
+      13.5 The browser makes the same request again(**3rd time**).
+           but this time, the request has the user's login data in the HEADER
+           and the request comes over using a secure connection.
+           So this time the client's login data is transmitted securely.
+
+    14. If you want to use your own custom form page, say it is named loginPage.html
+        which is deployed directly at the root of the web app,
+        and you want "loginError.html" to be displayed if the client cannot be authenticated.
+        The following should be configured in web.xml
+          <web-app>
+            <login-config>
+              <auth-method>FORM
+              <form-login-config>
+                <form-login-page>/loginPage.html
+                <form-error-page>/loginError.html
