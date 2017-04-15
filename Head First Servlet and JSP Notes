@@ -615,4 +615,13 @@ Chapter11. deploying your app
   7.3 <error-page>
         <error-code> or <exception-type>
         <location>
-        
+
+  7.4 <ejb-local-ref>, local bean means the client(e.g. a servlet) and the bean must be running in the same JVM
+
+  7.5 <ejb-ref>, reference to remote bean, client and the bean can be running in different JVMs
+
+  7.6 <env-entry>
+
+  7.7 <mime-mapping>
+
+12 Web app security, keep it secret, keep it safe
