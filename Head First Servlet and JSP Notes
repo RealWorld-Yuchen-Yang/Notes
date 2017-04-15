@@ -578,3 +578,41 @@ Chapter 10, custom tag development
     Note: one difference is that the .tag has JspContext instead of ServletContext
 
 Chapter11. deploying your app
+1. War files:
+    You jar up your entire webapp structure(minus the webapp context directory--the one that is above WEB-INF)
+2. In Tomcat, the name of the WAR file becomes the webapp name
+3. It makes no difference whether the app is deployed in/out a WAR file
+   Note: the only one difference is that,
+         when using a WAR, we can declare library dependencies
+         In the WAR file, you cna declare library dependencies in the META-INF/MANIFEST.MF,
+         which gives you a deploy-time check for whether container can find the packages and classes your app depends on.
+
+4. Resource's direct accessibility:
+      client can enter the path to the resource into his browser,
+      and server will return the resource.
+  files under /WEB-INF or /META-INF is not directly accessible
+
+5. Classes you deploy in/with the web app, by using the
+    /WEB-INF/classes
+    or
+    a JAR in /WEB-INF/lib
+   are on the classpath
+
+6. There are 3 types of servlet url mapping pattern
+  6.1 Exact match, e.g. /Beer/SelectBeer.do
+  6.2 Directory match, e.g. /Beer/*
+  6.3 Extension match, e.g. *.do
+
+7. In the DD(Deployment Descriptor, web.xml), I can configure the following stuff
+  7.1 Servlet mapping
+        <servlet>
+          <servlet-name>
+          <servlet-class>
+
+  7.2 <welcome-file-list>
+        <welcome-file>
+
+  7.3 <error-page>
+        <error-code> or <exception-type>
+        <location>
+        
