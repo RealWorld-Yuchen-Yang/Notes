@@ -75,4 +75,66 @@ Manipulating Files and Directories
         deleting the symbolic link only deletes the link, not the original item.
         if the target is deleted before the link, the link is said to be broken.
 
-Working With Commands
+Redirection
+1.
+   1.1 COMMANDS > FILE, redirect standard output to a file from the beginning
+   1.2 COMMANDS >> FILE, redirect standard output to a file by appending the content at the end
+   1.3 COMMANDS 2>, or 2>> FILE, are used to redirect standard error,
+   1.4
+       COMMANDS > FILE 2>&1, redirects both stdOutput and stdError to a FILE
+        or
+       COMMANDS &> FILE
+        or
+       COMMANDS &>> FILE
+  Note: the file descriptors as: stdInput(0), stdOutput(1), stdError(2)
+        Also, redirection operator silently creates or overwrite files
+
+
+2. silently discards outputs or errors to location: /dev/null
+   e.g. COMMAND > /dev/null
+
+3. cat, read and copy file to stdOutput
+  Note: in absence of filename arguments, cat copies standard input to standard output
+        which can be used to create short files
+        e.g. cat > FILE,
+        then beginning typing, use 'ctl+d' to end the input
+
+4. INPUT SOURCE < FILE, change the input source from stdInput to be FILE
+
+5. pipeline filters are: sort, uniq
+
+6. wc, Word Count, prints #lines, #words, #bytes
+
+7. grep PATTERN,
+      -i, ignore case
+      -v, do not match PATTERN
+
+8. tee, read from stdin and output to both stdout and 0~* files
+  This is useful for capturing a pipeline's contents at an intermediate stage of processing
+
+Seeing the World as the Shell Sees It
+1. Shell arithmetic expressions:  $((expression))
+
+2. Brace expansions: echo {PATTERN{NESTED_PATTERN}}
+
+3. echo $VARIABLE_NAME, print variable value
+
+4. Command Substitution, allow user to use output of a command as an expansion
+   Syntax: $(COMMAND_WITH_ARGUMENTS) or older version 'COMMAND_WITH_ARGUMENTS'
+
+5.Quoting:
+  5.1 Double Quote " ", text inside double quotes, all special characters used by the shell lose their special meaning
+      Exceptions are: "$", "\", and "'"
+      This means that in double quote
+        5.1.1 word-splitting, pathname expansion, ~tilde expansion and brace expression are suppressed
+        5.1.2 parameter expansion, arithmetic expansion and command substitution are still carried out
+  5.2 Single Quote ' ', all expansions are escaped inside single quote
+
+6. Escaping:
+  6.1 inside "Double Quotes", we can use \ to escape special meaning characters
+  6.2 It is possible to use characters in filenames that normally have special meaning.
+      say, "$", "!", "&", "\"
+  6.3 backslash can be additionally used to escape control characters,
+      say, "\a(Alert)", "\b(backspace)", "\n(new line)", "\r(carriage return)", "\t(tab)"
+
+7.
