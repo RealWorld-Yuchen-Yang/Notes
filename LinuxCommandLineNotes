@@ -117,7 +117,7 @@ Seeing the World as the Shell Sees It
 
 2. Brace expansions: echo {PATTERN{NESTED_PATTERN}}
 
-3. echo $VARIABLE_NAME, print variable value
+3. echo $VARIABLE_NAME, print variable value, which is parameter expansion
 
 4. Command Substitution, allow user to use output of a command as an expansion
    Syntax: $(COMMAND_WITH_ARGUMENTS) or older version 'COMMAND_WITH_ARGUMENTS'
@@ -136,5 +136,3 @@ Seeing the World as the Shell Sees It
       say, "$", "!", "&", "\"
   6.3 backslash can be additionally used to escape control characters,
       say, "\a(Alert)", "\b(backspace)", "\n(new line)", "\r(carriage return)", "\t(tab)"
-
-7.
