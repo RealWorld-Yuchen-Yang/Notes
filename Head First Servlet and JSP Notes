@@ -783,3 +783,45 @@ Chapter13: The power of filters: wrappers and filters
    }
 
 Chapter14. Enterprise Design Patterns
+1. Intercepting Filter
+2. Model-View-Controller
+3. Front Controller
+4. Service Locator
+5. Business Delegate
+6. Transfer Object
+7. Design Principles
+  7.1 Loose Coupling
+    The less two classes know about each other, the more loosely coupled they are to each other
+  7.2 Remote Proxy
+    A **remote proxy** is an object **local to the "client object"**,
+    but the proxy itself is pretending to be a remote object
+    The proxy is remote in that it is remote from the object it is emulating
+    The client object communicates with the proxy,
+    and proxy handles all the networking complexities of communicating with the actual "service object"
+  7.3 Increase Declarative Control
+    by using the web.xml Deployment Descriptor,
+    change the project by just changing the xml, instead of coding
+  7.4 Performance concern
+  7.5 Modularity,
+    so as to let different pieces of your application run on different servers at the same time
+  7.6 Flexibility, Maintainability, Extensibility
+  7.7 Code to interfaces
+  7.8 Separation of Concerns and Cohesion
+  7.9 Hide
+
+8. JNDI: Java Naming and Directory Interface
+         it gives a network centralized location to find things
+         If you have got objects that you want other programs on your network to find and access,
+         you register your object with JNDI.
+
+9. RMI: Remote Method Invocation
+        you want an object in one JVM to cause a method invocation on a remote object,
+        but you want to pretend that you are invoking a method on a local object.
+        Using RMI, you will create a proxy and you will register your object with some sort of registry
+        Any client who wants to call your method will do a lookup on the registry and get a copy of the remote proxy.
+        Then the client will make calls on the remote proxy, pretending it's the real thing.
+        The remote proxy(stub), handles all the communications detail.
+        The proxy on the server side(skeleton) does similar chores on the server side(where the remote object actually lives)
+        **client-->stub-->|NETWORK|-->skeleton-->server's remote object**
+
+10 Struts is a front controller's framework
