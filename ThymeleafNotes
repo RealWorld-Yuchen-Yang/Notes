@@ -143,8 +143,11 @@ Using Text
           Note: the conversion service (Implementation of IStandardConversionService) has to be registered in advance
 
 11. Preprocessing
-  Syntax: _NORMAL_EXPRESSION_,
+  Syntax: __NORMAL_EXPRESSION__,
+          it is done by prefix and suffix a double underscore
           Preprocessed expressions are exactly normal ones, but appear surrounded by a double underscore symbol.
           i.e. _${VARIABLE_EXPRESSION}_
           preprocessing is an execution of the expressions done before the normal ones,
           that allows for modification of the expression that will eventually be executed.
+
+          Note: the preprocessing String __ can be escaped in attributes using \_\_
