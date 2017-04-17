@@ -158,4 +158,29 @@ Advanced Keyboard Tricks
    type "exit" to end the recording
 
 Permissions
-1. 
+1. su, run a shel as another user, password is the other user's password
+
+2. sudo, execute a command as another user, password is the current user's password
+   The sudo command allows an administrator to set up a configuration file called /etc/sudoers,
+   and define specific commands that particular users are permitted to execute under an assumed identity
+   The choice of which command to use is largely determined by the Linux distribution
+
+3. /etc/shadow, holds information about the user's password
+
+4. a symbolic's accessibility(file mode) is always "rwxrwxrwx", which is a dummy value
+   the actual accessibility is determined by the file that the link is pointing to.
+
+5. program files written in scripting languages must also be set as readable to be executed,
+   so the file mode of scripts to be executed should be as least r-x
+
+6. umask [XXXX], view|set the default permissions
+   XXXX are octal values,
+   after expending the octal digits into binary,
+   where 1 appears in the mask, the corresponding permission is removed
+
+7. Typical tasks requires super user priviledge
+   * installing and updating software
+   * editing system configuration files
+   * accessing devices
+
+Processes
