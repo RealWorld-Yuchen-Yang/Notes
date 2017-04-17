@@ -136,3 +136,26 @@ Seeing the World as the Shell Sees It
       say, "$", "!", "&", "\"
   6.3 backslash can be additionally used to escape control characters,
       say, "\a(Alert)", "\b(backspace)", "\n(new line)", "\r(carriage return)", "\t(tab)"
+
+Advanced Keyboard Tricks
+1. Cursor movement:
+  1.1 ctrl+a, move to the beginning of the line
+  1.2 ctrl+e, move to the end of the line
+
+2. Cut and paste
+  2.1 ctrl+k, kill text from cursor location to the end of line
+  2.2 ctrl+u, kill text from cursor location to the beginning of line
+  2.3 ctrl+y, paste text from terminal buffer to the terminal
+
+3. History reverse incremental search: ctrl+r, then enter the text you are looking for
+   Once find the command,
+    3.1 press "ENTER" to execute
+    3.2 press ctrl+j, to copy the line from history to the current command line
+    3.3 press ctrl+r, to find the next occurrence of the text(move up the history list)
+    3.4 press ctrl+c, to end the searching
+
+4. script [FILE_NAME], used to record session command into a shell script file FILE_NAME
+   type "exit" to end the recording
+
+Permissions
+1. 
