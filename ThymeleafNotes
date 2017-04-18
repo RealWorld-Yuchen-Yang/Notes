@@ -1,4 +1,7 @@
-Thyme Leaf Notes
+Thymeleaf Notes
+Thymeleaf is a Presentation Template Engine, which is to use certain logic to finally generate HTML
+
+
 Using Text
 1.Syntax of extracting "MESSAGE" from XXX.properties files
   #{KEY}
@@ -53,7 +56,13 @@ Using Text
           This allow page writers to replicate them, pass them to other templates as arguments
           The most common use is for fragment insertion using **th:insert** or **th:replace**
           i.e.  <div th:insert="~{commons :: main}">...</div>
-
+                commons: Template name
+                main: fragment name
+      Note: there are 3 different fragment formats:
+      5.1.5.1 ~{templateName :: selector}, where selector conforms Markup Selector syntax by the AttoParser library,
+                                           practically, it can be the fragment name, like the above example. ~{templateName :: fragmentName}
+      5.1.5.2 ~{templateName}, include the whole template file
+      5.1.5.3 ~{::selector} or ~{this :: selector}, include the fragment inside the current template
   5.2 Literals
     5.2.1 Text literals: 'one text', 'Another one!', ...,
           Only ' need to be escaped by \'
@@ -151,3 +160,62 @@ Using Text
           that allows for modification of the expression that will eventually be executed.
 
           Note: the preprocessing String __ can be escaped in attributes using \_\_
+
+Setting Attribute Values
+1. Thymeleaf support for HTML5-friendly attribute and element names
+   1.1 The data-{PREFIX}-{ATTR_NAME} syntax is the standard way to write custom attributes in HTML5,
+       without requiring developers to use any namespaced names like th:*
+   1.2 There is also a syntax to specify custom tags: {PREFIX}-{ATTR_NAME},
+       which follows the W3C Custom Elements specification
+
+Iteration
+1. Iterable values
+  1.1 Any object implementing **java.util.Iterable**
+  1.2 Any object implementing **java.util.Enumeration**
+  1.3 Any object implementing **java.util.Iterator**
+  1.4 Any object implementing **java.util.Map. iter variables will be of class java.util.Map.Entry
+  1.5 Any array
+
+2. for each iter variable, Thymeleaf offer the following additional attributes
+  2.1 index, starting from 0
+  2.2 count, starting from 1
+  2.3 size
+  2.4 current, the iter variable itself
+  2.5 even/odd, first/last
+  Note:
+    1. when defining the iter varialbe, we can declare two of them,
+       one is used to extract domain value,
+       the other is used to control the iteration's display
+       they are of different names, but underneath they are the same variable
+    2. If you don't explicitly set a status variable, Thymeleaf will always create one for you
+       by **suffixing Stat** to the name of the **iteration variable**
+
+Condition Evaluation
+1. th:if, evaluation logic
+  1.1 if value is not null, the expression is true when:
+    1.1.1 if value is boolean and is true
+    1.1.2 if value is number and is non-zero
+    1.1.3 if value is a character and is non-zero
+    1.1.4 if value is a String and is not "false", "off" or "no"
+    1.1.5 if value is not a (boolean|number|character|string)
+  1.2 if value is null, null is evaluated to false
+
+2. th:unless has the opposite evaluation logic to th:if
+
+3. to negate the evaluation, in the expression, use "not"
+
+4. Thymeleaf also have attribute th:switch amd th:case presentation control logic.
+   the default value is th:case="*"
+
+Template Layout
+1. th:fragment is used to define HTML fragments used for insertion| replacement
+   th:insert|replace|include are used to "use"f fragments
+   Note: with the help of selector(AttoParser's syntax), we do not always need to use th:fragment to define fragments
+   th:insert, insert the specified fragment as the body of its host tag
+   th:replace, replaces its host tag
+   th:include, only inserts the contents of this fragment
+2. th:remove,
+    is mostly used in prototyping
+    it can take the following values: {all, tag, body, all-but-first, none}
+    Note: for prototyping, it means when creating the template, we need some mock data to present the structure of the template
+          This data should always remain in the template, and removed dynamically instead of removed after the design phase
