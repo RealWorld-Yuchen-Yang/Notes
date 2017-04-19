@@ -219,3 +219,30 @@ Template Layout
     it can take the following values: {all, tag, body, all-but-first, none}
     Note: for prototyping, it means when creating the template, we need some mock data to present the structure of the template
           This data should always remain in the template, and removed dynamically instead of removed after the design phase
+
+Local Variables
+1. define local variable with th:with
+
+Inlining
+inlining mainly means that escape the syntax of certain language
+1. Expressions inlining,
+   between [[]] or [()] are considered inlined in Thymeleaf
+  1.1 [[]], corresponds to th:text, has HTML escaping
+  1.2 [()], corresponds to th:utext, does not have HTML escaping
+  1.3 inlining is enabled by default for tag's body,
+      but not the tag itself
+      Disabling inlining by specifying th:inline="none"
+
+2. Text inlining
+  text inlining is enabled by th:inline="text"
+
+3. JavaScript inlining
+  javascript inlining is enabled by th:inline="javascript"
+
+4. CSS inlining
+  CSS inlining is enabled by th:inline="css"
+
+Static and dynamic pages
+1. static page means view the page by solely using the browser
+2. dynamic means the page has been processed first by the browser
+   and then send to the browser for presentation
