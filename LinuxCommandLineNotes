@@ -75,125 +75,233 @@ Manipulating Files and Directories
         deleting the symbolic link only deletes the link, not the original item.
         if the target is deleted before the link, the link is said to be broken.
 
-Processes
-  1. Zombie process: This is a child process that has terminated, but has not been cleaned up by its parent
+Redirection
+1.
+   1.1 COMMANDS > FILE, redirect standard output to a file from the beginning
+   1.2 COMMANDS >> FILE, redirect standard output to a file by appending the content at the end
+   1.3 COMMANDS 2>, or 2>> FILE, are used to redirect standard error,
+   1.4
+       COMMANDS > FILE 2>&1, redirects both stdOutput and stdError to a FILE
+        or
+       COMMANDS &> FILE
+        or
+       COMMANDS &>> FILE
+  Note: the file descriptors as: stdInput(0), stdOutput(1), stdError(2)
+        Also, redirection operator silently creates or overwrite files
 
-  2. Shell prompt is not returned, because the shell is waiting for the program to finish
 
-  3. If we want to get the shell prompt back without terminating the program,
-     we should place the program in the background,
-     while "terminal" is regarded as the foreground.
+2. silently discards outputs or errors to location: /dev/null
+   e.g. COMMAND > /dev/null
 
-  4. jobs, list jobs launched from the terminal
+3. cat, read and copy file to stdOutput
+  Note: in absence of filename arguments, cat copies standard input to standard output
+        which can be used to create short files
+        e.g. cat > FILE,
+        then beginning typing, use 'ctl+d' to end the input
 
-  5. fg %#JOB, WILL bring the job back to the foreground
+4. INPUT SOURCE < FILE, change the input source from stdInput to be FILE
 
-  6. ctrl+z (TSTP,terminal stop, 20), will stop(pause) a job.
-     signal STOP(19), is the corresponding stop signal to the kernel
+5. pipeline filters are: sort, uniq
 
-  7. move the stopped job to background and let it run: bg %#JOB
-     move the stopped job to the foreground and let it run: fg %#JOB
-     Note: I can not move a foreground job to the background without stopping it
+6. wc, Word Count, prints #lines, #words, #bytes
 
-  8. The benefit of launching a program from CLI instead of from GUI is
-     in this way, we can view the program's error messages
+7. grep PATTERN,
+      -i, ignore case
+      -v, do not match PATTERN
 
-  9. There are two levels of signals
-    9.1 signal to the Kernel, this is done mandatory
-    9.2 signal to the program/Terminal, the program will decide how to deal with the signal
+8. tee, read from stdin and output to both stdout and 0~* files
+  This is useful for capturing a pipeline's contents at an intermediate stage of processing
 
-  10. kill's default signal is TERM(Terminate, 15)
+Seeing the World as the Shell Sees It
+1. Shell arithmetic expressions:  $((expression))
 
-  11. continue(18), restore a process after stopping it.
+2. Brace expansions: echo {PATTERN{NESTED_PATTERN}}
 
-  12. kill -l, will list all signals
+3. echo $VARIABLE_NAME, print variable value, which is parameter expansion
 
-  13. I must have super user's priviledge to kill other people's process
+4. Command Substitution, allow user to use output of a command as an expansion
+   Syntax: $(COMMAND_WITH_ARGUMENTS) or older version 'COMMAND_WITH_ARGUMENTS'
 
-  14. pstree, display a tree of all processes
+5.Quoting:
+  5.1 Double Quote " ", text inside double quotes, all special characters used by the shell lose their special meaning
+      Exceptions are: "$", "\", and "'"
+      This means that in double quote
+        5.1.1 word-splitting, pathname expansion, ~tilde expansion and brace expression are suppressed
+        5.1.2 parameter expansion, arithmetic expansion and command substitution are still carried out
+  5.2 Single Quote ' ', all expansions are escaped inside single quote
 
-Environment
-  1. Environment contents:
-    1.1 environment variable
-    1.2 shell variables
-    1.3 alias
-    1.4 shell functions
+6. Escaping:
+  6.1 inside "Double Quotes", we can use \ to escape special meaning characters
+  6.2 It is possible to use characters in filenames that normally have special meaning.
+      say, "$", "!", "&", "\"
+  6.3 backslash can be additionally used to escape control characters,
+      say, "\a(Alert)", "\b(backspace)", "\n(new line)", "\r(carriage return)", "\t(tab)"
 
-  2. To view the environment
-    2.1 set, view both shell and environment variables
-    2.2 printenv, view only the environment varialbes
+Advanced Keyboard Tricks
+1. Cursor movement:
+  1.1 ctrl+a, move to the beginning of the line
+  1.2 ctrl+e, move to the end of the line
 
-  3. To use the environment variable, use the VARIABLE_NAME directly,
-     To use the value of the environment variable, use $VARIABLE_NAME
-     i.e view environment variable value: echo $VARIABLE_NAME
+2. Cut and paste
+  2.1 ctrl+k, kill text from cursor location to the end of line
+  2.2 ctrl+u, kill text from cursor location to the beginning of line
+  2.3 ctrl+y, paste text from terminal buffer to the terminal
 
-  4. shell script comments: #LINE
+3. History reverse incremental search: ctrl+r, then enter the text you are looking for
+   Once find the command,
+    3.1 press "ENTER" to execute
+    3.2 press ctrl+j, to copy the line from history to the current command line
+    3.3 press ctrl+r, to find the next occurrence of the text(move up the history list)
+    3.4 press ctrl+c, to end the searching
 
-  5. environment path is stored in PATH variable, and separated by ":"
+4. script [FILE_NAME], used to record session command into a shell script file FILE_NAME
+   type "exit" to end the recording
 
-  6. export PATH, tells the shell to make contents of PATH to child processes of this shell
+Permissions
+1. su, run a shel as another user, password is the other user's password
 
-  7. Using nano editor, "control commands" are issued by ctrl+KEY
-    7.1 ctrl+x, exit
-    7.2 ctrl+o, save
+2. sudo, execute a command as another user, password is the current user's password
+   The sudo command allows an administrator to set up a configuration file called /etc/sudoers,
+   and define specific commands that particular users are permitted to execute under an assumed identity
+   The choice of which command to use is largely determined by the Linux distribution
 
-Introduction to VI(VIM)
-  1. :q, gently quit VIM
-     :q!, force quit VIM
+3. /etc/shadow, holds information about the user's password
 
-  2. If you are lost in VIM, press ESC twice to focus
+4. a symbolic's accessibility(file mode) is always "rwxrwxrwx", which is a dummy value
+   the actual accessibility is determined by the file that the link is pointing to.
 
-  3. The leading "~" character indicates no text exists on the line
+5. program files written in scripting languages must also be set as readable to be executed,
+   so the file mode of scripts to be executed should be as least r-x
 
-  4. When starting up VIM, we firstly enters the command mode
+6. umask [XXXX], view|set the default permissions
+   XXXX are octal values,
+   after expending the octal digits into binary,
+   where 1 appears in the mask, the corresponding permission is removed
 
-  5. In command mode, enter "i", to enter insert mode. (Note: there is no leading ":" here)
+7. Typical tasks requires super user priviledge
+   * installing and updating software
+   * editing system configuration files
+   * accessing devices
 
-  6. Press ESC in insert mode, will let the user go back to command mode
+   Processes
+     1. Zombie process: This is a child process that has terminated, but has not been cleaned up by its parent
 
-  7. In command mode
-    7.1 enter ":w", will save the file
-    7.2 enter ":wq", will save the file and quit VIM
+     2. Shell prompt is not returned, because the shell is waiting for the program to finish
 
-  8. Usually, command#, will execute the command # times
+     3. If we want to get the shell prompt back without terminating the program,
+        we should place the program in the background,
+        while "terminal" is regarded as the foreground.
 
-  9. In command mode, press "u" will undo the last change
+     4. jobs, list jobs launched from the terminal
 
-  10. In command mode,
-    10.1 press "a", append at the next character
-    10.2 press "A(shift+a)", append at the end of current line
+     5. fg %#JOB, WILL bring the job back to the foreground
 
-  11. In command mode,
-    11.1 o, enter a new line before the current line
-    11.2 O, enter a new line after the current line
+     6. ctrl+z (TSTP,terminal stop, 20), will stop(pause) a job.
+        signal STOP(19), is the corresponding stop signal to the kernel
 
-  12. In command mode, press "x" delete the current character
+     7. move the stopped job to background and let it run: bg %#JOB
+        move the stopped job to the foreground and let it run: fg %#JOB
+        Note: I can not move a foreground job to the background without stopping it
 
-  13. Cursor moving anchors, they can either be used alone, or combined with editing commands
-    13.1 ^, beginning of the current line
-    13.2 $, end of the current line
-    13.3 G, last line of the file
+     8. The benefit of launching a program from CLI instead of from GUI is
+        in this way, we can view the program's error messages
 
-  14. d, cut commands
-    14.1 dd, cut the current line
-    14.2 d^, delete from the cursor to the first non-whitespace character in the line
-    14.3 d$, delete from the cursor to the end of the current line
+     9. There are two levels of signals
+       9.1 signal to the Kernel, this is done mandatory
+       9.2 signal to the program/Terminal, the program will decide how to deal with the signal
 
-  15. y, copy(yank) commands
+     10. kill's default signal is TERM(Terminate, 15)
 
-  16. p, paste
+     11. continue(18), restore a process after stopping it.
 
-  17. j, join(it should be issued at the end of a line, and it will join the next line with the current line)
+     12. kill -l, will list all signals
 
-  18. /PATTERN, used to search in the entire file
+     13. I must have super user's priviledge to kill other people's process
 
-  19. In command mode, switch from one file to another: press "n" or "N"
-      Note, if the file is not saved, vi will prevent the user from switching
+     14. pstree, display a tree of all processes
 
-  20. In command mode, if we are modifying multiple files
-    20.1 :buffers, list all the edited files
-    20.2 :buffer #, switch to the #th buffer
-    20.3 :e, open an additional file to the current edit session
-    20.4 :r FILE, read in the whole FILE into the cursor position
+   Environment
+     1. Environment contents:
+       1.1 environment variable
+       1.2 shell variables
+       1.3 alias
+       1.4 shell functions
 
-Package Management
+     2. To view the environment
+       2.1 set, view both shell and environment variables
+       2.2 printenv, view only the environment varialbes
+
+     3. To use the environment variable, use the VARIABLE_NAME directly,
+        To use the value of the environment variable, use $VARIABLE_NAME
+        i.e view environment variable value: echo $VARIABLE_NAME
+
+     4. shell script comments: #LINE
+
+     5. environment path is stored in PATH variable, and separated by ":"
+
+     6. export PATH, tells the shell to make contents of PATH to child processes of this shell
+
+     7. Using nano editor, "control commands" are issued by ctrl+KEY
+       7.1 ctrl+x, exit
+       7.2 ctrl+o, save
+
+   Introduction to VI(VIM)
+     1. :q, gently quit VIM
+        :q!, force quit VIM
+
+     2. If you are lost in VIM, press ESC twice to focus
+
+     3. The leading "~" character indicates no text exists on the line
+
+     4. When starting up VIM, we firstly enters the command mode
+
+     5. In command mode, enter "i", to enter insert mode. (Note: there is no leading ":" here)
+
+     6. Press ESC in insert mode, will let the user go back to command mode
+
+     7. In command mode
+       7.1 enter ":w", will save the file
+       7.2 enter ":wq", will save the file and quit VIM
+
+     8. Usually, command#, will execute the command # times
+
+     9. In command mode, press "u" will undo the last change
+
+     10. In command mode,
+       10.1 press "a", append at the next character
+       10.2 press "A(shift+a)", append at the end of current line
+
+     11. In command mode,
+       11.1 o, enter a new line before the current line
+       11.2 O, enter a new line after the current line
+
+     12. In command mode, press "x" delete the current character
+
+     13. Cursor moving anchors, they can either be used alone, or combined with editing commands
+       13.1 ^, beginning of the current line
+       13.2 $, end of the current line
+       13.3 G, last line of the file
+
+     14. d, cut commands
+       14.1 dd, cut the current line
+       14.2 d^, delete from the cursor to the first non-whitespace character in the line
+       14.3 d$, delete from the cursor to the end of the current line
+
+     15. y, copy(yank) commands
+
+     16. p, paste
+
+     17. j, join(it should be issued at the end of a line, and it will join the next line with the current line)
+
+     18. /PATTERN, used to search in the entire file
+
+     19. In command mode, switch from one file to another: press "n" or "N"
+         Note, if the file is not saved, vi will prevent the user from switching
+
+     20. In command mode, if we are modifying multiple files
+       20.1 :buffers, list all the edited files
+       20.2 :buffer #, switch to the #th buffer
+       20.3 :e, open an additional file to the current edit session
+       20.4 :r FILE, read in the whole FILE into the cursor position
+
+   Package Management

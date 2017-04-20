@@ -1,0 +1,248 @@
+Thymeleaf Notes
+Thymeleaf is a Presentation Template Engine, which is to use certain logic to finally generate HTML
+
+
+Using Text
+1.Syntax of extracting "MESSAGE" from XXX.properties files
+  #{KEY}
+  Note: this is Thymeleaf standard expression syntax, message expression
+
+2. Default property file location:
+   i.e. find message for /WEB-INF/templates/home.html in the same folder with the same name as the template, like:
+        /WEB-INF/templates/home_en.properties
+        /WEB-INF/templates/home_es.properties
+        /WEB-INF/templates/home.properties, this is the default text file if no locale is matched
+
+3. Specialized expressions in the template that are used to extract
+   request parameter,
+   request, session and application attributes
+   (from WebContext object in the controller) to presentation templates
+   ${x}, will return  a variable x stored into the Thymeleaf context or as a request attribute
+   ${param.x}, will return a request parameter called x (which might be multivalued)
+   ${session.x}, will return session attribute called x
+   ${application.x}, will return a servlet context attribute called x
+   Note the above syntax is OGNL(Object-Graph Navigation Language)
+
+4. Ask the templateEngine to process template by **name**
+  i.e. templateEngine.process("FILE_NAME", ctx, response.getWriter())
+
+5. Very important Standard Expression Syntax, page17 of usingthymeleaf.pdf
+  5.1 Simple expressions
+    5.1.1 Variable Expressions: ${ },
+          OGNI(Object-Graph Navigation Language) syntax
+
+    5.1.2 Selection Variable Expressions: *{ },
+          evaluates expressons on selected objects rather than on the whole context
+          if there is no selected object, *{ } expression degenerates to ${ } expression
+          Note: **selected** means the result of an expression using the **th:object** attributes
+                it should be used in a subelement of a **th:object** element.
+                "*"represents the parent's variable expression
+
+    5.1.3 Message Expressions: #{ }
+
+    5.1.4 Link URL Expressions: @{ }, used as value of <a href="HTML_NAME" th:href="@{ }">URL_TEXT</a>
+          Different types of URLs:
+            Absolute URLs: http://www.thymeleaf.org
+            Relative URLS:
+              page-relative: i.e. user/login.html
+              context-relative: /itemdetails?id=3 (context name in server will be added automatically), the directory structure is /webapp/WEB-INF/templates/itemdetails.html
+              server-relative: ~/billing.processInvoice (allows calling URLs in another context(application) in the same server)
+              protocol-relative: //code.jquery.com/jquery-2.0.3.min.js
+          Note: we can add parameters by using () operator at the end of URL, URL encoding will be automatically performed
+
+    5.1.5 Fragment Expressions: ~{ },
+          Fragment expressions are an easy way to represent fragments of markup(HTML, etc.)
+          and move them around templates.
+          This allow page writers to replicate them, pass them to other templates as arguments
+          The most common use is for fragment insertion using **th:insert** or **th:replace**
+          i.e.  <div th:insert="~{commons :: main}">...</div>
+                commons: Template name
+                main: fragment name
+      Note: there are 3 different fragment formats:
+      5.1.5.1 ~{templateName :: selector}, where selector conforms Markup Selector syntax by the AttoParser library,
+                                           practically, it can be the fragment name, like the above example. ~{templateName :: fragmentName}
+      5.1.5.2 ~{templateName}, include the whole template file
+      5.1.5.3 ~{::selector} or ~{this :: selector}, include the fragment inside the current template
+  5.2 Literals
+    5.2.1 Text literals: 'one text', 'Another one!', ...,
+          Only ' need to be escaped by \'
+    5.2.2 Number literals: 0, 34, 3.0, 12.3, ...
+    5.2.3 Boolean literals: true, false
+    5.2.4 Null literal: null
+    5.2.5 Literal tokens: one, sometext, main, ...
+  5.3 Text operations
+    5.3.1 String concatenation: +
+    5.3.2 Literal substitutions: |The name is ${name}|,
+          allows for an easy formatting of strings containing values from variables
+          without the need to append literals with '...' + '...'
+          Note: only *variable expression ${} is allowed inside Literal substitution |...|
+  5.4 Arithmetic operations
+    5.4.1 Binary operations: +, -, *, /, %,
+          these operators can be appliced inside OGNL variables
+    5.4.2 Minus sign (unary operator): -
+  5.5 Boolean operations:
+    5.5.1 Binary operators: and, or
+    5.5.2 Boolean negation (unary operator): !, not
+  5.6 Comparisons and equality:
+    5.6.1 Comparators: >, <, >=, <= (gt, lt, ge, le)
+    5.6.2 Equality operators: ==, != (eq, ne)
+  5.7 Conditional operators:
+    5.7.1 If-then: (if)?(then)
+    5.7.2 If-then-else: (if)?(then):(else)
+    5.7.3 Default: (value)?:(defaultValue)
+  5.8 Special tokens:
+    5.8.1 No-Operation: _,
+          the idea behind this token is to specify that the desired result for an expression is to do nothing
+
+6. The xxx.properties file is used as "data" of the presentation template.
+   The content does not need to be static,
+   which means we can specify place holders in VALUE string in the xxx.properties file
+   conforming the **java.text.MessageFormat**
+   i.e.
+    6.1 in xxx.properties file
+      home.welcome=Welcome to our <b>fantastic</b> grocery store, {0}!
+    6.2 in presentation html
+      <p th:utext="#{home.welcome(${session.user.name})}"> <!-- Note we are supplying value to the key by using ( ) operator -->
+        Welcome to our grocery store, Sebastian Pepper!
+      </p>
+    6.3 the message key itself could come from a variable
+      <p th:utext="#{${welcomeMsgKey}(${session.user.name})}">
+        Welcome to our grocery store, Sebastian Pepper!
+      </p>
+
+7. Spring MVC-enabled application OGNL will be replaced with SpringEL,
+   but its syntax is very similar to that of OGNL
+
+8. In OGNL, access to properties can also be made by using [ ],
+   and writing the name of the property as a **variable** or **between single quotes** or **index**.
+
+9. When evaluating OGNL expressions on **the context variables**, some objects are made available to expressions for higher flexibility.
+   These objects will be referenced starting with the # symbol:
+   #ctx, the context object
+   #vars, the context variables
+   #locale, the context locale
+   #request, (only in Web Context) the HttpServletRequest object
+   #response, (only in Web Context) the HttpServletResponse object
+   #session, (only in Web Context) the HttpSession object
+   #servletContext, (only in Web Context) the ServletContext object
+
+   Expression Utility Objects:
+   #execInfo, information about the template being processed
+   #message, methods for obtaining externalized messages inside variables expression,
+             in the same way as they would be obtained using #{ } syntax
+   #uris, methods for escaping parts of URLs/URIs
+   #conversions, methods for executing the configured **conversion service**(if any)
+   #dates, methods for java.util.Date objects, formatting, component extraction, etc.
+   #calendars, analogous to #dates, but for java.util.Calendar objects
+   #numbers, methods for formatting numeric objects
+   #strings, methods for String objects: contains, startsWith, prepending, appending, etc.
+   #objects, methods for objects in general
+   #bools, methods for boolean evaluation
+   #arrays, methods for arrays
+   #lists, methods for lists
+   #sets, methods for sets
+   #maps, methods for maps
+   #aggregates, methods for creating aggregates on arrays or collections
+   #ids, methods for dealing with id attributes that might be repeated(i.e. as a result of an iteration)
+
+10. Data Conversion/Formatting
+  Syntax: ${{}} or *{{}},
+          Instructs Thymeleaf to pass the result of the expression to the conversion service
+          and ask it to perform a formatting operation before writing the result.
+          Note: the conversion service (Implementation of IStandardConversionService) has to be registered in advance
+
+11. Preprocessing
+  Syntax: __NORMAL_EXPRESSION__,
+          it is done by prefix and suffix a double underscore
+          Preprocessed expressions are exactly normal ones, but appear surrounded by a double underscore symbol.
+          i.e. _${VARIABLE_EXPRESSION}_
+          preprocessing is an execution of the expressions done before the normal ones,
+          that allows for modification of the expression that will eventually be executed.
+
+          Note: the preprocessing String __ can be escaped in attributes using \_\_
+
+Setting Attribute Values
+1. Thymeleaf support for HTML5-friendly attribute and element names
+   1.1 The data-{PREFIX}-{ATTR_NAME} syntax is the standard way to write custom attributes in HTML5,
+       without requiring developers to use any namespaced names like th:*
+   1.2 There is also a syntax to specify custom tags: {PREFIX}-{ATTR_NAME},
+       which follows the W3C Custom Elements specification
+
+Iteration
+1. Iterable values
+  1.1 Any object implementing **java.util.Iterable**
+  1.2 Any object implementing **java.util.Enumeration**
+  1.3 Any object implementing **java.util.Iterator**
+  1.4 Any object implementing **java.util.Map. iter variables will be of class java.util.Map.Entry
+  1.5 Any array
+
+2. for each iter variable, Thymeleaf offer the following additional attributes
+  2.1 index, starting from 0
+  2.2 count, starting from 1
+  2.3 size
+  2.4 current, the iter variable itself
+  2.5 even/odd, first/last
+  Note:
+    1. when defining the iter varialbe, we can declare two of them,
+       one is used to extract domain value,
+       the other is used to control the iteration's display
+       they are of different names, but underneath they are the same variable
+    2. If you don't explicitly set a status variable, Thymeleaf will always create one for you
+       by **suffixing Stat** to the name of the **iteration variable**
+
+Condition Evaluation
+1. th:if, evaluation logic
+  1.1 if value is not null, the expression is true when:
+    1.1.1 if value is boolean and is true
+    1.1.2 if value is number and is non-zero
+    1.1.3 if value is a character and is non-zero
+    1.1.4 if value is a String and is not "false", "off" or "no"
+    1.1.5 if value is not a (boolean|number|character|string)
+  1.2 if value is null, null is evaluated to false
+
+2. th:unless has the opposite evaluation logic to th:if
+
+3. to negate the evaluation, in the expression, use "not"
+
+4. Thymeleaf also have attribute th:switch amd th:case presentation control logic.
+   the default value is th:case="*"
+
+Template Layout
+1. th:fragment is used to define HTML fragments used for insertion| replacement
+   th:insert|replace|include are used to "use"f fragments
+   Note: with the help of selector(AttoParser's syntax), we do not always need to use th:fragment to define fragments
+   th:insert, insert the specified fragment as the body of its host tag
+   th:replace, replaces its host tag
+   th:include, only inserts the contents of this fragment
+2. th:remove,
+    is mostly used in prototyping
+    it can take the following values: {all, tag, body, all-but-first, none}
+    Note: for prototyping, it means when creating the template, we need some mock data to present the structure of the template
+          This data should always remain in the template, and removed dynamically instead of removed after the design phase
+
+Local Variables
+1. define local variable with th:with
+
+Inlining
+inlining mainly means that escape the syntax of certain language
+1. Expressions inlining,
+   between [[]] or [()] are considered inlined in Thymeleaf
+  1.1 [[]], corresponds to th:text, has HTML escaping
+  1.2 [()], corresponds to th:utext, does not have HTML escaping
+  1.3 inlining is enabled by default for tag's body,
+      but not the tag itself
+      Disabling inlining by specifying th:inline="none"
+
+2. Text inlining
+  text inlining is enabled by th:inline="text"
+
+3. JavaScript inlining
+  javascript inlining is enabled by th:inline="javascript"
+
+4. CSS inlining
+  CSS inlining is enabled by th:inline="css"
+
+Static and dynamic pages
+1. static page means view the page by solely using the browser
+2. dynamic means the page has been processed first by the browser
+   and then send to the browser for presentation

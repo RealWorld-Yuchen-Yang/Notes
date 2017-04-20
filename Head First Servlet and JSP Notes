@@ -625,3 +625,203 @@ Chapter11. deploying your app
   7.7 <mime-mapping>
 
 12 Web app security, keep it secret, keep it safe
+  1. Servlet security boils down to 4 main concepts:
+    authentication,
+    authorization, have certain right to do something, HTTP Unauthorized status code: 401
+    confidentiality,
+    data integrity
+
+  2. How container do authentication and authorization
+    Note: HTTP is stateless, so 2 request are required
+    2.1 request1:
+      2.1.1 Having received the request, the container finds the URL in the "security table"
+      2.1.2 If the Container finds the URL in the security table,
+            it checks to see whether the requested resource is constrained.
+            If it is, the Container return 401
+
+    2.2 request2:
+      2.2.1 When the Container receives a request with a username and password,
+            it checks the URL in the security table
+      2.2.2 If it finds the URL in the security table
+            (and sees that it's constrained),
+            it checks the username and password information to make sure that they match
+      2.2.3 If the username and password are OK,
+            the container checks to see if the user has been assigned
+            the correct 'role' to access this resource (i.e. authorization)
+            If so, the resource is returned to the client
+
+    3. Keep security out of the code!
+       For most webapps, most of the time, the webapp's security constraints should be handled declaritively
+       in the deployment descriptor
+
+    4. LDAP: Lightweight  Directory Access Protocol
+
+    5. Head First Servlets and JSP's page 688(book page 665) describes the security config in web.xml in detail
+       The purpose of the <web-resource-collection> sub-element in <securituy-constraint> is to tell the container
+       which resources and HTTP method combinations should be constrained in such a way
+       that they can be accessed only by the roles in the corresponding <auth-constraint> tag
+
+    6. When two different non-empty <auth-constraint> elements apply to the same constrained resource,
+       access is granted to the union of all roles from both of the <auth-constraint> elements
+
+    7. In the security configuration section, even though in the situation "NOBODY" can access some resource.
+       It means that nobody from the client side that can access the resource.
+       However, other part of the web app can still access them.
+
+    8. The deployment descriptor has a mechanism for mapping hard-coded role names in a servlet
+       to the "official" <security-role> declarations in your Container.
+
+      In DD
+        <web-app>
+          <servlet-role-ref>
+            <role-name>NAME_IN_SERVLET
+            <role-link>NAME_IN_TOMCAT
+
+          <security-role>
+            <role-link>NAME_IN_TOMCAT
+
+    9. Declaring authentication in  DD
+      <web-app>
+        <login-config>
+          <auth-method>BASIC|DIGEST|CLIENT-CERT|FORM
+
+    10. Data Integrity:  data that arrives is the same as the data that was sent.
+
+    11. Confidentiality: nobody can see the data along the way
+
+    12. Implementing data confidentiality and integrity sparingly and declaratively
+      <web-app>
+        <security-constraint>
+          <user-data-constraint>
+            <transport-guarantee>
+              CONFIDENTIAL|NONE|INTEGRAL
+          <!-- SHOULD USE THE ABOVE TOGETHER WIHT THE FOLLOWING -->
+          <web-resource-collection>
+          <auth-constraint>
+
+    13. The mechanism of **CONFIDENTIALITY** transport(Head First Servlets and JSP P710(687))
+      The browser makes 3 requests in total in the whole process
+      13.1 client request(**1st**) a constrained resource with a transport guarantee.
+           the container sees that this constrained resource has a transport guarantee.
+           the container sees that the request did not come in securely
+      13.2 The container sends a **301**(redirect) response to the client,
+           that tells the browser to redirect the request using a secure transport
+      13.3 The browser makes the same resource request again(2nd time), but this time, over a secure connenction
+           In other words, the resource stays the same, but the protocol is now HTTPS
+      13.4 The container sees that the resource is constrained. And that this user has not authenticated.
+           So now the container starts the **authentication** process by sending a **401**(unauthorized) to the browser
+      13.5 The browser makes the same request again(**3rd time**).
+           but this time, the request has the user's login data in the HEADER
+           and the request comes over using a secure connection.
+           So this time the client's login data is transmitted securely.
+
+    14. If you want to use your own custom form page, say it is named loginPage.html
+        which is deployed directly at the root of the web app,
+        and you want "loginError.html" to be displayed if the client cannot be authenticated.
+        The following should be configured in web.xml
+          <web-app>
+            <login-config>
+              <auth-method>FORM
+              <form-login-config>
+                <form-login-page>/loginPage.html
+                <form-error-page>/loginError.html
+
+Chapter13: The power of filters: wrappers and filters
+1. Best practice with filters:
+  1.1 Used as request filter:
+    1.1.1 perform security checks
+    1.1.2 reformat request headers or bodies
+    1.1.3 audit or log requests
+  1.2 Used as response filter:
+    1.2.1 compress the response stream
+    1.2.2 append or alter the response stream
+    1.2.3 create a different response altogether
+
+2. filters are self contained and can be chained.
+   we configure filters in DD
+
+3. Filter has to implement javax.servlet.Filter interface
+
+4. Filter's life cycle
+  4.1 init()
+  4.2 doFilter()
+  4.3 destroy()
+  Note: the doFilter() method in Filter does the real filtering business logic
+        the doFilter() method in FilterChain does filter chaining control,
+        i.e. figuring out whose doFilter() method will be called
+             if it is the end of the filter chain, which is the service() method of a servlet
+
+5. We can view chained filers as stacks,
+   since first filter getting the client's request,
+   the last that it passes the response back to the client
+
+6. When writing the "response filter",
+   to avoid the response is sent back to the client instead of waiting for the filter,
+   we can instead of manipulating the "response object" customize the output stream
+   That is After the servlet does his service() method,
+    The filter passes a custom "MyResponse" which implements HttpServletResponse
+  6.1 The "MyResponse" object passes-through most of the calls it receives to the real response object
+  6.2 The "MyResponse" object also has a custom output stream that "manipulates the response data"
+      from the servlet's output, and then sends the compressed data to the original output stream
+      which goes back to the client
+
+7. ServletRequestWrapper, HttpServletRequestWrapper, ServletResponseWrapper, HttpServletResponseWrapper
+  The Decorator/Wrapper decorates/wraps one kind of an object with an "enhanced" implementation.
+  It delegates method invocations to the thing it wraps, rather than being a complete replacement
+  Whenever you want to create a custom request/response object, just subclass one of the convenience wrapper class
+
+8. The implementation of request & response filter is not in different methods,
+   but in the same doFilter() method of a filter.
+   doFilter(request, response)
+   {
+      //1. filtering request
+
+      //2. filterChain.doFitler(request, response), which is the recursive call to the next filter's doFilter()
+           and the request/response actually passed into the method can be customized wrappers
+
+      //3. filtering response
+   }
+
+Chapter14. Enterprise Design Patterns
+1. Intercepting Filter
+2. Model-View-Controller
+3. Front Controller
+4. Service Locator
+5. Business Delegate
+6. Transfer Object
+7. Design Principles
+  7.1 Loose Coupling
+    The less two classes know about each other, the more loosely coupled they are to each other
+  7.2 Remote Proxy
+    A **remote proxy** is an object **local to the "client object"**,
+    but the proxy itself is pretending to be a remote object
+    The proxy is remote in that it is remote from the object it is emulating
+    The client object communicates with the proxy,
+    and proxy handles all the networking complexities of communicating with the actual "service object"
+  7.3 Increase Declarative Control
+    by using the web.xml Deployment Descriptor,
+    change the project by just changing the xml, instead of coding
+  7.4 Performance concern
+  7.5 Modularity,
+    so as to let different pieces of your application run on different servers at the same time
+  7.6 Flexibility, Maintainability, Extensibility
+  7.7 Code to interfaces
+  7.8 Separation of Concerns and Cohesion
+  7.9 Hide
+
+8. JNDI: Java Naming and Directory Interface
+         it gives a network centralized location to find things
+         If you have got objects that you want other programs on your network to find and access,
+         you register your object with JNDI.
+
+9. RMI: Remote Method Invocation
+        you want an object in one JVM to cause a method invocation on a remote object,
+        but you want to pretend that you are invoking a method on a local object.
+        Using RMI, you will create a proxy and you will register your object with some sort of registry
+        Any client who wants to call your method will do a lookup on the registry and get a copy of the remote proxy.
+        Then the client will make calls on the remote proxy, pretending it's the real thing.
+        The remote proxy(stub), handles all the communications detail.
+        The proxy on the server side(skeleton) does similar chores on the server side(where the remote object actually lives)
+        **client-->stub-->|NETWORK|-->skeleton-->server's remote object**
+
+10 Struts is a front controller's framework
