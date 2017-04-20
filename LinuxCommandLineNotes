@@ -75,4 +75,125 @@ Manipulating Files and Directories
         deleting the symbolic link only deletes the link, not the original item.
         if the target is deleted before the link, the link is said to be broken.
 
-Working With Commands
+Processes
+  1. Zombie process: This is a child process that has terminated, but has not been cleaned up by its parent
+
+  2. Shell prompt is not returned, because the shell is waiting for the program to finish
+
+  3. If we want to get the shell prompt back without terminating the program,
+     we should place the program in the background,
+     while "terminal" is regarded as the foreground.
+
+  4. jobs, list jobs launched from the terminal
+
+  5. fg %#JOB, WILL bring the job back to the foreground
+
+  6. ctrl+z (TSTP,terminal stop, 20), will stop(pause) a job.
+     signal STOP(19), is the corresponding stop signal to the kernel
+
+  7. move the stopped job to background and let it run: bg %#JOB
+     move the stopped job to the foreground and let it run: fg %#JOB
+     Note: I can not move a foreground job to the background without stopping it
+
+  8. The benefit of launching a program from CLI instead of from GUI is
+     in this way, we can view the program's error messages
+
+  9. There are two levels of signals
+    9.1 signal to the Kernel, this is done mandatory
+    9.2 signal to the program/Terminal, the program will decide how to deal with the signal
+
+  10. kill's default signal is TERM(Terminate, 15)
+
+  11. continue(18), restore a process after stopping it.
+
+  12. kill -l, will list all signals
+
+  13. I must have super user's priviledge to kill other people's process
+
+  14. pstree, display a tree of all processes
+
+Environment
+  1. Environment contents:
+    1.1 environment variable
+    1.2 shell variables
+    1.3 alias
+    1.4 shell functions
+
+  2. To view the environment
+    2.1 set, view both shell and environment variables
+    2.2 printenv, view only the environment varialbes
+
+  3. To use the environment variable, use the VARIABLE_NAME directly,
+     To use the value of the environment variable, use $VARIABLE_NAME
+     i.e view environment variable value: echo $VARIABLE_NAME
+
+  4. shell script comments: #LINE
+
+  5. environment path is stored in PATH variable, and separated by ":"
+
+  6. export PATH, tells the shell to make contents of PATH to child processes of this shell
+
+  7. Using nano editor, "control commands" are issued by ctrl+KEY
+    7.1 ctrl+x, exit
+    7.2 ctrl+o, save
+
+Introduction to VI(VIM)
+  1. :q, gently quit VIM
+     :q!, force quit VIM
+
+  2. If you are lost in VIM, press ESC twice to focus
+
+  3. The leading "~" character indicates no text exists on the line
+
+  4. When starting up VIM, we firstly enters the command mode
+
+  5. In command mode, enter "i", to enter insert mode. (Note: there is no leading ":" here)
+
+  6. Press ESC in insert mode, will let the user go back to command mode
+
+  7. In command mode
+    7.1 enter ":w", will save the file
+    7.2 enter ":wq", will save the file and quit VIM
+
+  8. Usually, command#, will execute the command # times
+
+  9. In command mode, press "u" will undo the last change
+
+  10. In command mode,
+    10.1 press "a", append at the next character
+    10.2 press "A(shift+a)", append at the end of current line
+
+  11. In command mode,
+    11.1 o, enter a new line before the current line
+    11.2 O, enter a new line after the current line
+
+  12. In command mode, press "x" delete the current character
+
+  13. Cursor moving anchors, they can either be used alone, or combined with editing commands
+    13.1 ^, beginning of the current line
+    13.2 $, end of the current line
+    13.3 G, last line of the file
+
+  14. d, cut commands
+    14.1 dd, cut the current line
+    14.2 d^, delete from the cursor to the first non-whitespace character in the line
+    14.3 d$, delete from the cursor to the end of the current line
+
+  15. y, copy(yank) commands
+
+  16. p, paste
+
+  17. j, join(it should be issued at the end of a line, and it will join the next line with the current line)
+
+  18. /PATTERN, used to search in the entire file
+
+  19. In command mode, switch from one file to another: press "n" or "N"
+      Note, if the file is not saved, vi will prevent the user from switching
+
+  20. In command mode, if we are modifying multiple files
+    20.1 :buffers, list all the edited files
+    20.2 :buffer #, switch to the #th buffer
+    20.3 :e, open an additional file to the current edit session
+    20.4 :r FILE, read in the whole FILE into the cursor position
+
+Package Management
