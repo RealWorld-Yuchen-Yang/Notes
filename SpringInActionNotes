@@ -37,3 +37,33 @@ Chapter1 Spring Into Action
        Likewise, if any bean was declared with a destroy method, then the specified method will be called.
 
 7. We must wire our application objects into the Spring Container.
+
+8. Spring Framework simplifies Java Development by
+  8.1 dependency injection
+  8.2 aspect-oriented programming
+  8.3 boilerplate reduction
+
+9. OSGi: Open Service Gateway initiative
+
+10. Six Spring Modules
+  10.1 Data access and integration(With integration points to persistent layer framework, like Hibernate, Mybatis)
+    Transaction, JDBC, ORM, JMS(Java Message Service), OXM(Object-t-XML Mapping)
+  10.2 Web and remoting(Spring MVC Framework is a counterpart of Apache Struts)
+    Web, Servlet, Portlet, Struts
+  10.3 AOP(Aspect Oriented Programming)
+    AOP, Aspects
+  10.4 Instrumentation
+    Instrument, Instrument Tomcat
+  10.5 Core Spring Container
+    Beans, Core, Context, Expression, Context support
+  10.6 Testing
+    Test
+
+11. LDAP: Light Weight Directory Access Protocol
+
+12. Rather than acquiring dependencies on their own,
+    dependent objects are given the objects that they depend on.
+    Because dependent objects often only know about their injected objects through interfaces,
+    coupling is kept low.
+
+Chapter2. Wiring Beans
