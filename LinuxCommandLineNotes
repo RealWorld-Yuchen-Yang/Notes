@@ -304,4 +304,72 @@ Permissions
        20.3 :e, open an additional file to the current edit session
        20.4 :r FILE, read in the whole FILE into the cursor position
 
-   Package Management
+Package Management
+1. Packages can be installed in two ways
+  1.1 Install from a repository by using high level tools like apt-get, yum, which will conduct dependency resolution
+  1.2 Install from a package file by using low level tools like dpkg, rpm, which can be installed directly without dependency resolution
+
+Storage Media
+1. list all the mounted file systems:
+    mount
+
+2. mount a device;
+   The first step in managing a storage device is attaching the device to the file system tree.
+   This process is called mounting
+   2.1 to actually mount/umount a device, we need the super user priviledge
+   2.2 create a new mount point for the disk,
+       which is usually a directory on the file system tree
+   2.3 mount the device as a type of file system on the mounting point
+       mount -t FILE_SYSTEM_TYPE DEVICE_NAME MOUNT_POINT
+       i.e. mount -t iso9660(means CD-ROM) /dev/hdc /mnt/cdrom
+
+3. umount a device
+   To umount a device, we firstly need to make sure we are not using,
+   which is by change the working directory out of the device's file system, then
+   umount DEVICE_NAME,
+   i.e. umount /dev/hdc
+   Note: umounting a device entails writing all the remaining data to the device,
+         so that it can be safely removed.
+4. Linux Storage Device Names
+  4.1 /dev/hd*#, represents IDE(PATA) disk on older systems, where
+      *, master/slave device channel
+      #, partition number on the device
+      i.e. /dev/hda1 refers to the first partition on the first hard drive on hte system
+                     /dev/hda refers to the entire drive
+  4.2 /dev/sd*#, represents  SCSI disks on recent Linux systems
+                kernel treats all disk like devices(including PATA/SATA hard disk, flash drives and USBs) as SCSI disks
+  4.3 /dev/cdrom, /dev/dvd, /dev/floppy are symbolic links, which point to the actual device files
+
+5. use "tail -f /var/log/messages" to determine which device has been plugged in. (or other system operations)
+
+6. device name is determined during plug time.
+   it will remain the same as long as it remains physically attached to the computer and the computer is not rebooted
+
+Networking
+1. ping, use ICMP(Internet Control Message Protocol)
+2. tranceroute, output the route from the user's machine to the destination
+3. netstat, used to examine various network settings and statics
+4. FTP is not secure, they are not encrypted and anyone sniffing the network can see them.
+   because of this, almost all FTP done over the Internet is done by anonymous FTP servers.
+   Anonymous Server:
+    login name: anonymous
+    password: a meaningless password
+5. wget, downloading content from both web and FTP sites
+6. PuTTY is a Windows SSH client program
+7. scp and sftp are similar, and are both used to transmit files over ssh port
+  scp REMOTE_USER@REMOTE_HOST:REMOTE_DIRECTORY/REMOTE_FILE LOCAL_DIRECTORY:
+  This results in copying the REMOTE_FILE TO the LOCAL_DIRECTORY
+
+Searching for files
+1. locate, find files by name
+
+2. find, search for files in a directory hierarchy based solely on the file's name
+  2.1 find can take 1~* directories as arguments
+
+3. xargs, build and execute command lines from standard input
+  the xargs command accepts input from standard input and converts it into an argument list for a specified command.
+  
+
+4. touch, change file times
+
+5. stat, display file or file system status
