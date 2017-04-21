@@ -1,0 +1,39 @@
+Chapter1 Spring Into Action
+1. Wiring: The act of creating associations between application components is referred to as wiring
+
+2. ApplicationContext loads bean definitions and wires them together
+
+3. cross-cutting concerns: system services tend to cut across multiple components in a system
+  concern examples are  logging, security issues, etc.
+
+4. Boilerplate code: the code that you often have to write over and over again
+                     to accomplish common and otherwise simple tasks.
+                     i.e. JDBC, JMS, JNDI and consumption of REST services often involve a lot of commonly repeaeted code
+                          which has nothing to do with business logic,
+                          but just setting up the service
+
+5. Two categorizes of Spring Containers: ApplicaitonContext and BeanFactory
+   5.1 ApplicationContext is higher level and more preferable than BeanFactory
+   5.2 Three most common flavours of ApplicationContexts
+    5.2.1 ClassPathXmlApplicationContext, loads a context definition from an XML file located in the classpath
+    5.2.2 FileSystemXmlApplicationContext, loads context definitions from an XML file in the file system
+    5.2.3 XmlWebApplicationContext, loads context definitions from an XML file contained within a web application
+
+6. A bean's life cycle inside Spring Container
+  6.1 Spring instantiates the bean
+  6.2 Spring injects values and bean references into the bean's properties.
+  6.3 If the bean implements BeanNameAware, Spring passes the bean's ID to the setBeanName() method
+  6.4 If the bean implements BeanFactoryAware, Springs calls the setBeanFactory() method, passing in the bean factory itself.
+  6.5 If the bean implements ApplicationContextAware, Spring will call the setApplicationContext() method, passing in a reference to the enclosing application context.
+  6.6 If any of the beans implements the BeanPostProcessor interface, Spring calls their postProcessBeforeInitialization() method.
+  6.7 If any beans implement the InitializingBean interface, Spring calls their afterPropertiesSet() method.
+      Similarly, if the bean was declared with an init-method, then the specified initialization will be called.
+  6.8 If there are any beans that implement BeanPostProcessor, Spring will call their postProcessAfterInitialization() method
+  ****************************************************************************************************************
+  6.9 At this point, the bean is ready to be used by the application
+      and will remain in the application context until the application is destroyed.
+  ****************************************************************************************************************
+  6.10 If any beans implement the DisposableBean interface, then Spring will call their destroy() methods.
+       Likewise, if any bean was declared with a destroy method, then the specified method will be called.
+
+7. We must wire our application objects into the Spring Container.
