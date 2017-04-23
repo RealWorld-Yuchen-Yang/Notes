@@ -67,3 +67,217 @@ Chapter1 Spring Into Action
     coupling is kept low.
 
 Chapter2. Wiring Beans
+1. When declaring beans in XML, the root element of Spring configuration file is
+   <beans> element from spring's bean schema
+   i.e.
+        <?xml version="1.0" encoding="UTF-8"?>
+        <beans xmlns="http://www.springframework.org/schema/beans"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.springframework.org/schema/beans
+               http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+          <!-- Bean declarations go here -->
+        </beans>
+
+2. Injecting value through bean constructor
+
+3. Inject object reference through bean constructor
+
+4. Wire object produced by a static factory method.
+
+5. Bean scoping
+  5.1 By default, all Spring beans are singletons, that is a single instance per Spring container
+    Note: Spring's notion of singleton is not true singleton(only a single instance of a class per classloader)
+          nothing is stopping you from instantiating that same class in a more conventional way,
+          or even defining several <bean> declarations that instantiate the same class
+
+  5.2 To force Spring to produce a new bean instance each time one is needed,
+      you should declare the bean's scope attribute to prototype.
+  5.3 request, scopes a bean definition to an HTTP request. Only valid when used with a web-cable Spring context(i.e. Spring MVC)
+  5.4 session, scopes a bean definition to HTTP session. Only valid when used with a web-capable Spring context(i.e. Spring MVC)
+  5.5 global-session, scopes a bean definition to global HTTP session. Only valid when used in a portlet context
+
+6. Injecting simple values by using <property name="PROPERTY_NAME" value="VALUE">
+  ,similar to <constructor-arg value="VALUE">,
+  except that instead of injecting values through a constructor argument,
+  <property> injects by calling a property's setter method
+
+7. Injecting referencing bean values by using <property name="PROPERTY_NAME" ref="VALUE">
+  ,similar to <constructor-arg ref="MANAGED_BEAN_REFERENCE">,
+
+8. Injecting inner beans.
+  Inner beans are beans that are defined within the scope of another bean.
+  An inner bean is defined by declaring a <bean> element directly as a child of the <property> element to which it'll be injected.
+  or inside the <constructor-arg>
+  Note: Inner beans are only useful for injection once and can't be referenced to by other beans
+
+9. SpEL
+  9.1 Literal Values
+    Literal values can be wired into bean's property by using
+    #{ }, a clue to Spring that the content that they contains a SpEL expression,
+    it can be mixed with non-SpEL values
+    i.e. <property name="count" value="#{5}"/>
+    Note: Literal String values can be expressed in SpEL with either ' ' or " "
+
+  9.2 Referencing beans, properties and methods
+    SpEL can allow one bean to reference another bean by its **ID**
+    i.e. <property name="instrument" value="#{saxophoneID}"
+    after getting the reference of the bean, we can also use that reference to extract properties and invoke methods
+    Note:
+      The way to avoid the dreaded NullPointerException in SpEL is to use the null-safe accessor **'?.'**
+      i.e. <property name="song" value="#{songSelector.selectSoong()?.toUpperCase()}"
+
+  9.3 Working with types
+    The key to working with class-scoped methods and constants in SpEL is to use the
+    T() operator. It will return a Class-typed Object
+    i.e. <property name="nultiplier" value="#T(java.lang.Math).PI"/>
+
+  9.4 Performing operations on SpEL values
+    9.4.1 Arithmetic: +, -, *. /, %, ^
+    9.4.2 Relational: <, >, ==, <=, >=,
+                      lt, gt, eq, le, ge
+                      Note: the <, > symbols pose a problem when using these expressions in Spring's XML configuration,
+                            so in the XML, it is better use the textural relational operators
+    9.4.3 Logical: and, or, not, !
+    9.4.4 Conditional: ?:(ternary), ?:(Elvis)
+                      Note: a common use of the ternary operator is to check for a null value and to wire a default value in the event of a null
+                            This can be done by using ?: for clarity
+    9.4.5 Regular expression: matches
+      i.e.
+        <property name="validEmail" value="#{admin.email matches '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.com'}"/>
+
+    9.4.6 Shifting through collections in SpEL
+      9.4.6.1 Accessing collection members by using the [INDEX or 'KEY'] operator
+      9.4.6.2 In addition to reading properties from a <util:propertise> declared collection,
+              Spring makes two special selections of properties available to SpEL:
+                * systemEnvironment, contains all of the environment variables on the machine running the application
+                * systemProperties, contains all of the properties that were set in Java as the application started.
+                                    (typically using the -D argument)
+                                    i.e. -Dapplication.home=/etc/myapp
+                                         then you could wire that value into the homePath
+                                         <property name="homePath" value="#{systemProperties['application.home']}"/>
+      9.4.6.3 **.?[CONDITION_EXPRESSION]** operator, Selecting collection members satisfies the CONDITION_EXPRESSION
+        i.e. <property name="bigCities" value="#{cities.?[population gt 100000]}"/>
+
+      9.4.6.4 **.^[CONDITION_EXPRESSION]**, select first element from the collection satisfying the CONDITION_EXPRESSION
+              **.$[CONDITION_EXPRESSION]**, select last element from the collection satisfying the CONDITION_EXPRESSION
+
+      9.4.6.5 **.![DESIRED_VALUE_EXPRESSION]**, projection operator, used to collect a particular property from each collection elements
+        i.e. <property name="cityNames" value="#{cities.![name + ', ' + state]}"/>
+
+    9.5 Using SpEL should be with caution,
+        for SpEL expressions are ultimately just Strings that are tricky to test
+        and have no IDE support for syntax checking
+
+    9.6 SpEL can be used in both XML and Annotations
+
+Chapter3 Minimizing XML configuration in Spring
+1. Four kinds of autowiring, attempts to match all properties of the autowired bean with beants
+            that
+   When declaring a bean, it is like registering it in a database to be searched from.
+   If a bean classA declared as "autowired" need Spring container to supply certain instances objects,
+   based on different autowiring mechanism,
+   the bean classA use that mechanism to search for the desired bean instance in the "Spring Container database"
+   "auto" means that the underlying searching logic is handle and hidden by Spring framework
+
+  1.1 byName, have the same **name** or **ID**
+  1.2 byType, types are assignable to the properties
+  1.3 constructor, types are assignable to the constructor
+  1.4 autodetect, will try constructor wiring first,
+                  if fails, byType will be tried.
+
+2. Autowring byName:
+  2.1 In Spring, everything is given a name.
+  2.2 When declaring a bean A to be autowire="byName",
+      we are telling spring to consider all properties of bean A
+      and look for beans that are declared with the same names as the properties of bean A
+
+3. Autowiring byType:
+  If Spring finds more than one bean whose type is assignable to the autowired property,
+  it is not going to guess which bean to autowire,
+  and will instead throw an exception
+  To overcome ambiguities with autowiring byType, Spring offers two options to declare beans
+  * **primary="true|false"**, identify a primary autowire candidate for autowiring
+  * **autowire-candidate="true|false"**, eliminate beans from autowiring candidacy
+
+4. Autowiring by constructor:
+  declare bean with property **autowire="constructor"**
+  if the bean is configured using constructor injection, you may choose to put away the <constructor-arg> elements
+  autowiring by "constructor" also tries to search the beans whose **type** satisfies the current declared bean's constructor
+  further more, if a class has multiple constructors,
+  any of which can be satisfied by autowiring, Spring won't attempt to guess which constructor to use
+
+5. use **<beans default-autowire="byType|byName|constructor|autodetect"/>** to set default autowiring type
+  5.1 default-autowire would be applied to all beans in a given Spring configuration file.
+      however, we can have multiple configuration files that define a single application context
+      each with their own default autowiring setting.
+  5.2 we can also override the default autowiring strategy on a bean-by-bean basis
+
+6. We can mix autowiring with explicit wiring <property ref="EXPLICIT_REFERENCE"/>
+  6.1 we could use <null/> to force an autowired property to be null
+  6.2 when using constructor autowiring,
+      you must let Spring wire all of the constructor arguments,
+      you can not mix <constructor-arg> elements with constructor autowiring
+
+7. Wiring with annotations
+  7.1 annotation allows for more fine-grained autowiring
+      by allowing you select annotating certain properties for autowiring.
+  7.2 to turn on annotation wiring,
+      <beans>
+        <context:annotation-config/>
+      </beans>
+  7.3 Spring supports 3 different annotations for autowiring
+    7.3.1 Spring's own @Autowired annotation
+      @Autowired can be used to annotate properties/methods, the logic behind it is autowire byType
+      7.3.1.1 @Autowired(required=false), optional wiring
+        Note: When multiple constructors are annotated with @Autowired, Spring will choose the constructor
+              with the most arguments that can be satisfied.
+      7.3.1.2 qualifying ambiguous dependencies
+              To help @Autowired figure out which bean you want,
+              you can accompany it with Spring's @Qualifier("BEAN_NAME|BEAN_ID|QUALIFIER_VALUE") annotation
+              where, the QUALIFIER_VALUE is declared on the class need to be searched among
+      7.3.1.3 Defining your custom qualifier annotation
+        Declaration:
+        @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.TYPE})
+        @Retention(RetentionPolicy.RUNTIME)
+        @Qualifier
+        public @interface CUSTOMIZED_QUALIFIER_NAME
+        {
+
+        }
+        Then we can use the **@CUSTOMIZED_QUALIFIER_NAME** annotation to annotate the beans, which are used to be annotated by @Qualifier
+        @Autowired
+        @@CUSTOMIZED_QUALIFIER_NAME
+    7.3.2 JSR-330's @Inject annotation
+      @Inject uses @Name("ID") to reduce ambiguity
+    7.3.3 JSR-250's @Resource annotation
+    7.3.4 @Value lets user wire primitive values such as int, boolean and String using annotation
+          @Value can take SpEL as its value
+
+8. <context:component-scan> does everything <context:annotation-config> does,
+   plus it configures Spring to automatically discover beans and declare them for you.
+   it works by scanning a package and all of its subpackages
+   by default, the ID of the autodetected bean will be generated by camel-casing the class name
+   we can also specify the ID by @Component("ID")
+
+9.  <context:component-scan> looks for classes that are annotated with one of a handful of special stereotype annotations:
+  @Component, a general-purpose stereotype annotation indicating that the class is a Spring component.
+  @Controller, indicate that the class is a Spring MVC controller
+  @Repository, indicates that the class defines a data repository
+  @Service, Indicates that the class defines a service
+  @Any custom annotation that is itself annotated with @Component
+
+10. Component scanning can be customized using any of 5 kinds of filters.
+  10.1 annotation, scan classes looking for those annotated with a given annotation at the type level.
+                   The annotation to scan for is specified in the expression attribute.
+  10.2 assignable, scan classes looking for those that are assignable to the type specified in the expression attribute
+  10.3 aspectj, scan classes looking for those that match the AspectJ type expression specified in the expression attribute
+  10.4 custom, use a custom implementation of org.springframework.core.type.TypeFilter as specified in the expression attribute
+  10.5 regex, scan classes looking for those whose class names matches the regular expression specified in the expression attribute
+
+11. @Configuration annotated class, Java-based configuration equivalent to <beans>
+
+12. @Bean annotated method, Java-based configuration equivalent to <bean>
+                            the return value of the annotated method will be the declared bean
+
+Chapter4 Aspect-oriented Spring
+1. 
