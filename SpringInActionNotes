@@ -1,3 +1,4 @@
+Part1 Core Spring
 Chapter1 Spring Into Action
 1. Wiring: The act of creating associations between application components is referred to as wiring
 
@@ -280,4 +281,113 @@ Chapter3 Minimizing XML configuration in Spring
                             the return value of the annotated method will be the declared bean
 
 Chapter4 Aspect-oriented Spring
+1. Functions that span multiple points of an application are called cross-cutting concerns
+
+2. DI(Dependency Injection) helps decouple application objects from each other.
+   AOP(Aspect-Oriented Programming) helps decouple cross-cutting concerns from the objects that they affect.
+
+3. Cross-cutting concerns can be modularized into special classes called aspects.
+
+4. AOP terminology
+  An aspect's functionality(advice) is woven into a program's execution at one or more join points
+  pointcut defines which join points get advised.
+  4.1 advice, the job of an aspect, defines both what and when of an aspect
+    4.1.1 before, advice functionality takes place before the advised method is invoked
+    4.1.2 after, advice functionality takes place after the advised method completes, regardless of the outcome
+    4.1.3 after-returning, advice functionality takes place after the advised method successfully completes.
+    4.1.4 after-throwing, advised functionality takes place after the advised method throws an exception
+    4.1.5 around, wraps the advised method, provide some functionality before and after the advised method is invoked.
+  4.2 pointcut
+    Pointcuts help narrow down the join points adviced by the aspect
+    it defines where
+  4.3 join point
+    A join point is a point in the execution of the application where an aspect can be plugged in.
+    join point can be:
+      * method being called
+      * exception being thrown.
+      * field being modified
+    Note: Spring only supports method join points (no field/constructor join point)
+  4.4 aspects
+    an aspect is the merger of advice and pointcuts
+    Spring aspects are implemented as proxies that wrap the target object
+  4.5 introductions
+    an introduction allows you to add new methods and attributes to existing classes
+  4.6 weaving
+    weaving is a process of applying aspects to a target object to create a new proxied object.
+    aspects are woven into the target object at the specified join points.
+    * compile time
+    * classload time
+    * runtime,
+
+5. Spring's support for AOP comes in 4 flavors
+  5.1 Classic Spring proxy-based AOP
+  5.2 @AspectJ annotation-driven aspects
+  5.3 Pure-POJO aspects
+  5.4 Injected AspectJ aspects
+
+6. selecting join points with pointcuts
+  6.1 Spring leveraged AspectJ's pointcut expression language
+    6.1.0 execution, matches join points that are method executions
+      Note: the execution designator is the only one that actually performs matches.
+            the other designators are used to limit those matches
+
+    6.1.1 args(), limits join point matches to the execution of methods whose arguments are instances of the given types
+    6.1.2 @args(), limits join point matches to the execution of methods whose arguments are annotated with the given annotation types
+    6.1.3 this(), limits join point matches to those where the bean reference of the AOP proxy is of a given type
+    6.1.4 target(), limits join point matches to those where the target object is of a given type
+    6.1.5 @target(), limits matching to join points where the class of the executing object has an annotation of the given type
+    6.1.6 within(), limits matching to join points within certain types
+    6.1.7 @within(), limits matching to join points within types that have the given annotation
+    6.1.8 @annotation(), limits join point matches to those where the subject of the join point has the given annotation
+  6.2 Spring's bean() designator
+    lets you identify beans by their ID within a pointcut expression
+
+7. Writing pointcuts
+  syntax:
+    i.e. execution(* com.springinaction.springidol.Instrument.play(..)) && within(com.springinaction.springidol.*)
+      Note:
+        execution, trigger on method execution
+        *, matches any return type
+        com.springinaction.springidol.Instrument, the type that the method belongs to
+        play(), the method
+        .., taking any argument
+        &&, combination operator
+        within, when the method is called from within any class in the com.springinaction.springidol packages
+
+8. Declaring aspects in XML, tag definitions
+  8.1 <aop:advisor>, defines an AOP advisor
+  8.2 <aop:after>, defines an AOP after advice, regardless of whether the advised method returns successfully.
+  8.3 <aop:after-returning>, defines an AOP after-returning advice.
+  8.4 <aop:after-throwing>, defines an AOP after-throwing advice.
+  8.5 <aop:around>, defines an AOP around advice
+  8.6 <aop:aspect>, defines an aspect
+  8.7 <aop:aspectj-autoproxy>, enables annotation-driven aspects using @AspectJ
+  8.8 <aop:before>, defines an AOP before advice
+  8.9 <aop:config>, defines top-level AOP element. Most <aop:*> elements must be contained within <aop:config>
+  8.10 <aop:declare-parents>, introduces additional interfaces to advised objects that are transparently implemented
+  8.11 <aop:pointcut>, defines a pointcut
+  Note: one <aop:aspect> can have multiple advices, like: <aop:before>, <aop:after>, <aop:after-returning>, <aop:after-throwing>, etc.
+        and one advice can should have a "pointcut" and a "method" attribute
+
+9. around advice, is passed in a ProceedingJoinPoint joinPoint parameter,
+                  which is used to represent the execution method,
+                  before invoking joinPoint.proceed(), is the same as before advice
+                  after invoking joinPoint.proceed(), is the same as the after advices
+
+10. advices can also be passed in customized parameters
+  10.1 declare the argument name in the pointcut by using args() expression
+  10.2 pass the declared parameter into the advice
+
+11. Annotating aspects
+  11.1 A class should be annotated with @Aspect so as to be considered as a Spring aspect
+  11.2 we need to annotate a symbolic empty method as the pointcut by using @Pointcut
+       The actual body of the annotated method is irrelevant.
+       It is just a marker
+       the name of the pointcut(which will be referenced later in advices) is derived from the name of the pointcut method.
+  11.3 <aop:aspect>(XML tag declaration) has one distinct advantage over @AspectJ(the feature of annotating aspects by using AspectJ annotation)
+       in that you do not need the source code of the class that's to provide the aspect's functionality.
+
+
+Part2 Spring application essentials
+Chapter5 Hitting the database
 1. 
