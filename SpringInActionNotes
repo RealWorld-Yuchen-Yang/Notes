@@ -390,4 +390,88 @@ Chapter4 Aspect-oriented Spring
 
 Part2 Spring application essentials
 Chapter5 Hitting the database
-1. 
+1. Service objects don't handle their own data access.
+   Instead, they delegate data access to DAOs.
+   DAO's interface keeps it loosely coupled to the service object
+
+2. Spring's data access exceptions. They are all rooted from DataAccessException
+   To take advantage of Spring's data access exceptions, we must use one of Spring's data access template
+  2.1 CannotAcquireLockException
+  2.2 CannotSerializeTransactionException
+  2.3 CleanupFailureDataAccessException
+  2.4 ConcurrencyFailureException
+  2.5 DataAccessException
+  2.6 DataAccessResourceFailureException
+  2.7 DataIntegrityViolationException
+  2.8 DataRetrievalFailureException
+  2.9 DeadlockLoserDataAccessException
+  2.10 EmptyResultDataAccessException
+  2.11 IncorrectResultSizeDataAccessException
+  2.12 IncorrectUpdateSemanticsDataAccessException
+  2.13 InvalidDataAccessApiUsageException
+  2.14 InvalidDataAccessResourceUsageException
+  2.15 OptimisticLockingFailureException
+  2.16 PermissionDeniedDataAccessException
+  2.17 PermissionLockingFailureException
+  2.18 TypeMismatchDataAccessException
+  2.19 UncategorizedDataAccessException
+
+3. A template method delegates the implementation-specific portions of the process to an interface.
+   Different implementations of this interface define specific implementations of this portion of the process.
+
+4. Spring separates the fixed and variable parts of the data access process into two distinct classes: templates and callbacks
+         DAO template                        DAO callback
+    4.1 prepare resources
+    4.2 start transaction
+                                         4.3 execute in transaction
+                                         4.4 return data
+    4.5 commit/rollback transaction
+    4.6 close resources and handle errors
+
+5. Using a data access template simply involves
+   configuring the template as a bean in Spring context,
+   and then wiring it into your application DAO
+   The proxy chain:
+    ApplicationDAO->DAOSupport->DataAccessTemplate->PersistenceFramework->Database
+
+6. When possible, we should retrieve the pooled data source from an application server via JNDI
+
+7. Spring's JDBC framework will shoulder the burden of resource management and exception handling
+   Spring comes with three template classes to choose from
+    7.1 JdbcTemplate
+    7.2 NamedParameterJdbcTemplate
+    7.3 SimpleJdbcTemplate, it is named as well, and we should always choose
+
+8. Spring's data access exceptions are all runtime(unchecked) exceptions
+
+9. Named parameters let user give each parameter in the SQL an explicit name
+   and to refer to the parameter by that name when binding values to the statement
+   i.e.
+      9.1 in the query string
+        private static final String SQL_INSERT_SPITTER =
+        "insert into spitter (username, password, fullname) " +
+        "values (:username, :password, :fullname)";
+      9.2 in the template's update code
+        public void addSpitter(Spitter spitter)
+        {
+          Map<String, Object> params = new HashMap<String, Object>();
+          params.put("username", spitter.getUserName());//"username" refers to the declared named parameter in the SQL
+          params.put("password", spitter.getPassword());
+          params.put("fullname", spitter.getFullName());
+
+          jdbcTemplate.update(SQL_INSERT_SPITTER, params);
+          spitter.setId(queryForIdentity());
+        }
+
+      Note: the ":parameters" in the values refers to the parameters declared in insert clause
+
+10. Spring has 3 DAOSupport classes for corresponding JdbcTemplates
+  10.1 JdbcDaoSupport
+  10.2 NamedParameterJdbcDaoSupport
+  10.3 SimpleJdbcDaoSupport
+  Note: the support class and its corresponding template class conform the Proxy pattern
+        which is support class not only inherit the corresponding dao class,
+        but also, it holds an instance of the dao class that it inherits from.
+        The support class implements the dao's functionality by decorating it.
+
+11.
