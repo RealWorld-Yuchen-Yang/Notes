@@ -474,4 +474,36 @@ Chapter5 Hitting the database
         but also, it holds an instance of the dao class that it inherits from.
         The support class implements the dao's functionality by decorating it.
 
-11.
+11. Declaring a Hibernate session factory
+  the main interface for working with Hibernate is org.hibernate.Session.
+  The session interface provides basic data access functionality such as the ability to save, update, delete and load objects
+
+12. The standard way to get a reference to a Hibernate Session object is through an implementation of Hibernate's SessionFactory
+
+13. Building Spring-free Hibernate
+  With Hibernate manages Contextual session, there is no need of Spring's Template class
+  You can wire a Hibernate session directly into DAO class
+
+14. use @Autowired to annotate SessionFactory parameter, so as to get the SessionFactory injected by Spring
+
+15. if <context:component-scan> is configured, Class annotated with @Repository will be treated as HibernateDao
+
+16. <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+    is a bean post processor,
+    which adds an advisor to any bean that annotated with @Repository
+    so that any platform-specific exception are caught and then rethrown as one of Springs unchecked data access exception.
+
+17. Spring and the Java Persistence API
+  17.1 Entity bean, a type of EJB that describes business objects that are persisted in a relational database
+  17.2 The only real difference between application-managed and container-managed entity manager factories,
+       as far as Spring is concerned,
+       is how each is configured within the Spring application context.
+    17.2.1
+      Application-managed entity manager factories derive most of their configuration information from a configuration file
+      persistence.xml.
+      This file must appear in the META-INF directory with in the classpath
+    17.3
+      Container-managed JPA configure data source information in Spring's ApplicationContext
+
+Chapter6 Managing Transactions
+1.
