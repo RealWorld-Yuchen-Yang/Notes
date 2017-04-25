@@ -506,4 +506,96 @@ Chapter5 Hitting the database
       Container-managed JPA configure data source information in Spring's ApplicationContext
 
 Chapter6 Managing Transactions
-1.
+1. In software, all-or-nothing operations are called transactions.
+   It is done by grouping a few steps into a single action.
+   * if everything goes right, transaction committed
+   * if something goes wrong, transaction rolled back
+
+2. When writing to a database, we must ensure that the integrity of the data is maintained
+   by performing the updates within a transaction.
+
+3. Explaining transactions in only four words: ACID
+  3.1 A, Atomic
+         view all steps as a whole
+
+  3.2 C, Consistent
+         consistent with the business model
+
+  3.3 I, Isolated
+         Transactions should allow multiple users to work with the same data,
+         without each user's work getting tangled up with the others.
+         Translations should be isolated from each other,
+         preventing concurrent reads and writes to the same data from occurring.
+         Note: isolation typically involves locking rows and/or tables in a database
+
+  3.4 D, Durable
+         persistent
+
+4. If your application uses only a single persistent resource,
+   Spring can use the transactional support offered by the persistent mechanism
+
+5. Transaction Managers delegate the responsibilities  for transaction management to a platform specific transaction.
+  5.1 org.springframework.jdbc.datasource.DataSourceTransactionManager, working with Spring's JDBC abstraction support. Also useful when using iBATIS for persistence.
+  5.2 org.springframework.orm.hibernate3.HibernateTransactionManager, using Hibernate3 for persistence.
+  5.3 org.springframework.orm.jpa.JpaTransactionManager, Using Java Persistence API (JPA) for persistence
+  5.4 org.springframework.transaction.jta.JtaTransactionManager, when you need distributed transactions or when no other transaction manager fits the need.
+
+6. All of Spring's vendor-specific implementation of JpaDialect
+   (EclipseLinkJpaDialect, HibernateJpaDialect, OpenJpaDialect, TopLinkJpaDialect)
+   provide support for mixing JPA with JDBC.
+   DefaultJpaDialect does not.
+
+7. In Spring,
+   You are limited to declaring transaction boundaries at the method level.
+   If you need more fine-grained control over transactional boundaries,
+   programmatic transactions are the only way to go.
+
+8. TransactionsTemplates should be injected into the Application's Service class
+
+9. Attributes that defines transactions.
+  9.1 Propagation behavior, defines the boundaries of the transactions with respect to the client and to the method being called.
+    Propagation rules, SpringInAction: P182:
+      PROPAGATION_MANDATORY
+      PROPAGATION_SUPPORTS
+      PROPAGATION_NEVER
+      PROPAGATION_NOT_SUPPORTED
+      (the following will start a new transaction)
+      PROPAGATION_REQUIRED
+      PROPAGATION_ REQUIRES_NEW
+      PROPAGATION_NESTED
+
+
+  9.2 Isolation levels
+    Concurrency can lead to the following problems
+      * Dirty reads, occurs when one transaction reads data that has been written but not yet committed by another transaction.
+                     If the changes are later rolled back, the data obtained by the first transaction will be invalid.
+      * Nonrepeatable reads, occurs when a transaction performs the same query two or more times
+                             and each time the data is different.
+                             This is usually due to another concurrent transaction updating the data between the queries.
+      * Phantom reads, similar to nonrepeatable reads,
+                       occurs when a transaction reads several rows, and then a concurrent transaction inserts rows.
+                       Upon subsequent queries, the first transaction finds additional rows that weren't there before.
+    Isolation level
+      ISOLATION_READ_UNCOMMITTED
+      ISOLATION_READ_COMMITTED
+      ISOLATION_REPEATABLE_READ
+      ISOLATION_SERIALIZABLE
+
+  9.3 Read-only
+    read-only optimization are applied by the underlying data store when a transaction **begins**
+    it only make sense to declare a transaction as read-only on methods with propagation behavior that may start a new transaction.
+      * PROPAGATION_REQUIRED
+      * PROPAGATION_REQUIRED_NEW
+      * PROPAGATION_NESTED
+
+  9.4 Transaction timeout
+    timeout clock begins ticking when a transaction starts,
+    it only make sense to declare a transaction timeout on methods with propagation behavior that may start a new transaction.
+      * PROPAGATION_REQUIRED
+      * PROPAGATION_REQUIRED_NEW
+      * PROPAGATION_NESTED
+
+  9.5 Rollback
+    By default transactions are rolled back only on runtime exceptions(unchecked exceptions)
+
+page 185
