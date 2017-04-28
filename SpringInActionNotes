@@ -598,4 +598,192 @@ Chapter6 Managing Transactions
   9.5 Rollback
     By default transactions are rolled back only on runtime exceptions(unchecked exceptions)
 
-page 185
+10. The <tx:annotation-driven> configuration element tells Spring to examine all beans in the application context
+    and to look for beans that are annotated with @Transactional,
+    either at the **class level** or at the **method level**
+
+Building web applications with Spring MVC
+1. Following a request through Spring MVC
+  A request's job description is a courier, who carries information from one place to another
+
+  Request -1)-> Dispatcher servlet -2)-> Handler mapping
+                (Front Controller)
+                |  |    ^   |
+                |  |    |    --3)  -> Controller --4)--> delegate business to
+                |  |    |                             Model and logical view name
+                |  |    |                                              |
+                |  |     ----------------5)----------------------------
+                |  |
+                |   ----------------------6)--------------------->ViewResolver
+                --------------------------7)---------------------->View (JSP)
+
+2. Setting up Spring MVC
+  2.1 **DispatcherServlet** is the heart of Spring MVC.
+    2.1.1 It is Spring MVC's front controller
+    2.1.2 It should be configured in web.xml
+    2.1.3 If not specified, the DispatcherServlet named DISPATCHER,
+          will use /APP_NAME/WEB-INF/DISPATCHER-servlet.xml
+          to load Spring's ApplicationContext
+          and all spring web tier configuration
+    2.1.4 the preferred DispatcherServlet mapping is as follows
+      <servlet-mapping>
+        <servlet-name>DISPATCHER</servlet-name>
+        <url-pattern>/</url-pattern>
+      </servlet-mapping>
+    2.1.5 in the corresponding DISPATCHER-servlet.xml
+      <beans xmlns="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:mvc="http://www.springframework.org/schema/mvc"
+             xsi:schemaLocation="http://www.springframework.org/schema/mvc
+                                 http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+                                 http://www.springframework.org/schema/beans
+                                 http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+             <mvc:resources mapping="/resources/**" location="/resources/" /><!-- Ant style wild card /** means any subfolder -->
+      </beans>
+
+3. Writing a basic controller (Request Handler)
+  3.1 Developing resource-oriented controllers:
+    Rather than write one controller for each use case,
+    write a single controller for each kind of resource that the application serves
+    Note: resources can be:
+      3.1.1 Utils: like HomePageController, ForwardingController
+      3.1.2 Domains: domain objects' controller
+
+  3.2 Architecture of the web application:
+    WebBrowser--------------------------->ServerSideWebTire
+          ^                           (Contains controllers)
+          |                                    |   |
+          | ----------Static Resources<--------    |
+          |              (ViewTire)            |   |
+           ------JSP--- <--Template Engine<----     ---->ServiceTire----->Domain
+                                                   |    ^             |
+                                                   |    |             |
+                                                   |     -------------
+                                                   |
+                                                    ------->PersistenceTire
+                                                                (DAOs)
+                                                                  |
+                                                                   ----->Database
+
+  3.3 Configuring Annotation Driven Controller(Handlers)
+    Using one of the handler mappings is usually a matter of configuring it as a bean in Spring.
+    DefaultAnnotationHandlerMapping maps request to controller methods that are annotated with @RequestMapping
+    In the xml configuring ApplicaitonContext, mark it as <mvc:annotation-driven>
+
+  3.4 **Model** object is the data passed between the controller and the view
+      RequestHandling method can include almost anything as an argument.
+      In the controller, it is just a blank parameter,
+      we need to add useful attributes into it, and pass it done to the view
+
+  3.5 The last thing a controller usually does is
+      return a string as the name of the logical view,
+      which will later on be used by ViewTire
+
+  3.6 For Unit Testing the WebTire, the granularity is usually at the controller level
+    3.6.1 MockService
+    3.6.2 Create the controller
+    3.6.3 Call handler method
+    3.6.4 Assert results:
+            1) View Logical name is resolved correctly
+            2) Domain Model return data as expected
+
+  3.7 Resolving views:
+    3.7.1 a view resolver's job is to map a logical view name to some implementation of
+           **org.springframework.web.servlet.View**
+        i.e.
+          <bean id="templateResolver"
+                class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">
+            <property name="prefix" value="/WEB-INF/views/"/>
+            <property name="suffix" value=".html"/>
+            <property name="templateMode" value="HTML5"/>
+          </bean>
+
+    3.7.2 A lot of Spring MVC embraces a convention-over-configuration approach.
+
+4. Splitting Spring Configuration across multiple XML files:
+   One for service layer, One for persistence layer and another for data source configuration
+   We do this by configuring the ContextLoaderListener in
+
+      Deployment Descriptor **web.xml**
+
+    i.e.
+        <!-- The definition of the Root Spring Container shared by all Servlets and Filters -->
+        <context-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/applicationContext*.xml</param-value>
+        </context-param>
+
+        <listener>
+            <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+        </listener>
+
+        As the naming of the configuration path /WEB-INF/applicationContext*.xml,
+        Configuration files are called
+          applicationContext-jpa.xml
+          applicationContext-security.xml
+          applicationContext.xml
+          , etc.
+        And the corresponding bean definitions for the other tires can be defined in their configuration xml respectively
+
+5. Handling Controller Input
+  5.1 Annotating the controller class
+    At the class level, annotation @RequestMapping defines the root URL path that this controller will handle.
+    At the methods level, annotation @RequestMapping defines the sub path, regarding to the class level root path
+
+  5.2 URL query parameter can be passed in the controller as parameters.
+      If the parameter name is the same as url parameter names, no annotation is needed
+      If the parameter name is different from url parameter names, we should use @RequestParam("URL_PARAMETER_NAME") HANDLER_PARAMETER_NAME to annotate the parameter
+
+  5.3 model object(org.springframework.ui.Model) used in the the controller handles its attributes as javaBean properties
+      which means the conventional name of the properties conform the getter/setter of that property
+      so we only need to add property value into the model, no attribute names need to be supplied
+
+6. Processing forms (Spring in Action chapter 7.4)
+  6.1 Working with forms in a web application involves two operations
+    6.1.1 displaying the form (GET method handler)
+    6.1.2 processing the form submission (POST method handler)
+    we can use two handler methods to handle each of the operations
+
+  6.2 @RequestMapping's params attribute can limit a handler method to only handling requests with certain parameters
+
+  6.3 after letting the user inputs form information,
+      we should sent the form back to the URL requesting the form creation.
+      however, different from the first time of requesting the form to be edited is with HTTP GET method,
+      after editing the form, we let the user use HTTP POST method to the same URL
+
+  6.4 In the controller
+    6.4.1 redirect, this concept means that we would like other handler to handle the request additionally.
+              and "the other handler" is indicated by the new redirection URL name
+
+    6.4.2 dispatch, this concept means to forward the request to a view for further display
+
+  6.5 In Controllers, the request handler's parameter annotated with @Valid
+      means that the parameter should pass validation before being passed into the handler body
+
+  6.6 By redirecting form post request to another page,
+      we can avoid duplicate submission of the form if the user clicks the "Refresh Button" in the browser
+
+  6.7 In controller's request mapping annotation.
+      "{VARIABLE_NAME}", this syntax is used to declare path variable
+                         and this path variable is further passed into the handler as the @PathVariable VARIABLE_NAME in the signature of the handler
+                         the actual value passed in is whatever value is in that location
+                        i.e.
+                          handler declaration:
+                            @RequestMapping(value="/{username}", method=RequestMethod.GET)
+                            public String showSpitterProfile(@PathVariable String username, Model model)
+                            {
+                              ...
+                            }
+                          when handling request with path "/username/habuma",
+                          "habuma" is firstly assigned to the RequestMapping declared path variable "username"
+                          and passed into the handler showSpitterProfile's parameter "username", which is annotated with @PathVariable and have the same name as the @RequestMapping declared variable
+                          Note: in this case, the handler handles a request redirection,
+                                the redirected URL is constructed by /spitter+spitter.getUserName()
+
+  6.8 validating inputs:
+    6.8.1 annotations can be placed on class(mostly domain entities) properties to specify validation rules.
+    6.8.2 the message property set in the validation annotations are to be displayed
+          in the form, when validation fails
+          and the corresponding error message can be extracted in the JSP by BindingRequest's getFieldError() method
+          or by using <sf:errors> in Spring's form binding JSP tag library
+            6.8.2.1 path property, specifies the form field for which errors should be displayed
