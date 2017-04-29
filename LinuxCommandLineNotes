@@ -368,8 +368,452 @@ Searching for files
 
 3. xargs, build and execute command lines from standard input
   the xargs command accepts input from standard input and converts it into an argument list for a specified command.
-  
+
 
 4. touch, change file times
 
 5. stat, display file or file system status
+
+Archiving and Backup
+1. Compression programs
+   Note: do not be copmressive complusive, compress the already compressed files additionally will only result in larger files
+  1.1 gzip FILE, compress the FILE, and replace the original one
+      gunzip FILE.gz, is the corresponding decompression operation
+      gunzip -c TEXT_FILE.gz, view the contents of a compressed text file
+
+  1.2 bzip2 FILE, block sorting file compressor, different from gzip by using different compression algorighm
+                  output is FILE.bz2
+
+2. archiving programs
+    Archiving is the process of gathering up many files and bundling them together into a single large file.
+    Archiving is often used with compression tasks
+    files with extension .tar, indicates a plain tar archive
+    files with extension .tgz, indicates a gzipped archive
+  2.1 tar OPTIONS FILE/PATH_NAMES, tape archiving utility
+    tar options:
+      2.1.1 c, create an archive from a list of files and/or directories
+      2.1.2 x, extract an archive
+      2.1.3 r, append specified pathnames to the end of an archive
+      2.1.4 t, list the contents of an archive
+      2.1.5 f, specify the name of the tar archive
+      2.1.6 v, verbose
+      Note:
+      1. tar's options do not have a leading dash (-)
+      2. files and directories extracted from archives take the ownership of the user performing the restoration
+      3. the default of pathnames is relative, rather than absolute, by simply removing any leading slash from the pathname
+      4. using 'tar' with 'find' is a good way of creating incremental backups
+         i.e. find DIRECTORY -name 'FILE_NAME' | tar cf - --files-from=- | gzip > OUTPUT_NAME.tgz
+          * if the filename '-' is specified, it is taken to mean standard input or output as needed.
+          * --files-from| -T, cause tar to read its list of pathnames from a file rather than the command line
+
+  2.2 zip, package(archive) and compress files
+           -r, recursive
+      unzip, the corresponding decompression operation
+           -l, cause unzip to merely list the contents of the archive without extracting the file.
+
+3. rsync OPTIONS SOURCE DESTINATION, remote file and directory synchronization
+  A common strategy for maintaining a backup copy of a system involves keeping one or more directories synchronized with another directory
+  rsync  detect the differences between two directories and perform the minimum amount of copying required to bring them in sync.
+  SOURCE and DESTINATIONJ are one of the following
+  3.1 local file or directory
+  3.2 remote file or directory(USER@HOST:REMOTE_DIRECTORY)
+  3.3 a remote rsync server specified with a URI of rsync://[USER@]REMOTE_HOST[:PORT]REMOTE_DIRECTORY
+  i.e. rsync -av SOURCE_DIRESCTORY DESTINATION_DIRECOTRY,
+       this cause a mirror of the SOURCE_DIRECTORY to be made into DESTINATION_DIRECTORY
+        -a, archiving
+        -v, verbose
+  i.e. sudo rsync -av --delete --rsh=ssh /LOCAL_DIRECTORIES REMOTE_HOST:REMOTE_DIRECTORY, use rsync to copy files over network
+        --delete, remove files from destination if they do not exist on the source
+        --rsh, remote shell specification
+
+Regular Expression
+1. grep(Global Regular Expression Print)
+  grep [OPTIONS] regex [FILE], grep options:
+  1.1 -i, ignore case
+  1.2 -v, invert match, does not contain the regex pattern
+  1.3 -c, count, print the number of matches
+  1.4 -l, print the name of each file that contains a match of the lines themselves
+  1.5 -L, print the name of each file that do not contain matches
+  1.6 -n, prefix each matching line with the number of line within the files
+  1.7 -h, for multi-file searches, suppress the output of filenames
+
+2. Metacharacters and Literals
+  Regular expression metacharacters consist of the following:
+    ^, $, ., [ ], { }, -, ?, *, +, ( ), |, \
+  Note: when passing regular expressions containing metacharacters on the command line,
+        it is vital that they be enclosed in quotes to prevent the shell from attempting to expand them
+  2.1 '.', used to match any one character
+
+  2.2 '^', '$', anchors in regular expression, '^' represents the beginning of the line, '$' represents the end of the line
+      Note: '^$' is used to match blank lines
+
+  2.3 [ ], match one of the characters inside the [ ] bracket
+      Note: metacharacters lose their special meaning when placed within bracket expressions.
+            however, there are two cases:
+              2.3.1 '^', be the first character in brackets, indicates negation, it is counted as one character and none of the characters in the bracket should be matched.
+              2.3.2 '-', in brackets, indicates a character range,
+                         also, by making '-' the first letter, we treat it as a literal '-'
+
+  2.4 character classes
+    2.4.1 [:alnum:], alphanumeric characters, [A-Za-z0-9]
+    2.4.2 [:word:], [:alnum:] & '_'
+    2.4.3 [:alpha:], [A-Za-z]
+    2.4.4 [:digit:], [0-9]
+    2.4.5 [:xdigit:], hexadecimal characters, [0-9A-Fa-f]
+    2.4.6 [:blank:], space and tab
+    2.4.7 [:space:], the whitespace characters including: space, tab, carriage return, newline, vertical tab, form feed. [ \t\r\n\v\f]
+    2.4.8 [:cntrl:], ASCII control codes, include characters 0~31, 127
+    2.4.9 [:graph:], ASCII code 33~126
+    2.4.10 [:lower:], the lowercase letters
+    2.4.11 [:upper:], the uppercase letters
+    2.4.12 [:punct:], the punctuations, [-!"#$%&'()*,./:;<=>?@[\\\]_`{|}~"]
+    2.4.13 [:print:], all the printable characters, [:graph:] & space
+
+  2.5 in the extended grep feature, -E, '|' means logical or
+
+  2.6 Quantifiers,
+    Extended regular expressions support several ways to specify the number of times element is matched
+    2.6.1 '?', 0/1 times
+    2.6.2 '*', 0/more times
+    2.6.3 '+', 1/more times
+    2.6.4 {N}, exactly N times
+          {N, M}, [N, M] times
+          {N,}, no less than N times
+          {,M}, no more than M times
+
+Text Processing
+1. cat, concatenate files and print on the standard output
+  options:
+    -A, display non-printing characters in the text
+    -n, number lines
+    -s, suppresses the output of multiple blank lines
+
+2. sort, sort lines of text files
+3. uniq, report or omit repeated lines
+4. cut, remove sections from each line of files
+5. paste, merge lines of files
+6. join, join lines of two files on a common field
+7. comm, compare two sorted files line by line
+8. diff, compare files line by line
+9. patch, apply a diff file to an original
+  9.1 prepare diff: diff -Naur old_file new_file > diff_file
+    -N, new file, treat absent files as empty
+    -a, treat all files as text
+    -u, Output NUM (default 3) lines of unified context.
+    -r, recursive
+  9.2 patch <diff_file
+    Note: we do not need to specify the target file to patch,
+          as the diff file (in unified format) already contains the filenames in the header.
+
+10. tr, translate or delete characters
+11. sed, stream editor for filtering and transforming text
+12. aspell, interactive spell checker
+
+Formatting Output
+1. use:
+  groff -mandoc > FILE, to generate a .ps file
+2. additionally we can use
+  ps2pdf PS_FILE PDF_FILE, to generate a pdf file out of the .ps file
+
+Writing Shell Scripts
+1. Three steps of writing a shell script
+  1.1 write a shell script, name the script with .sh extension
+      so as to give other programs like Atom the indication of the file type
+  1.2 make the script executable, chmod +x SCRIPT
+      Alternatively, there are two numbered permission types
+      1.2.1 755, everyone can execute and read, only the owner can edit
+      1.2.2 700, only the owner can execute.
+  1.3 put the script somewhere the shell can find it
+      PATH variable separate the each executable paths by using ":" as a separator
+      In the ~/.bash_profile, or ~/.bash_rc
+      export PATH=SHELL_SCRIPT_HOME:"$PATH"
+      after the modification, we should issue . .bash_profile, where "." is the synonym of "source"
+      Note: $VARIABLE can be included in " ", shell will do the expansion
+
+2. Script File Format
+  2.1 first line #!/bin/bash,
+    this is the shebang, it is used to tell the system the name of the interpreter that should be used to execute the script that follows.
+
+3. Good locations for scripts
+  3.1 ~/bin, scripts intend for personal use.
+  3.2 /usr/local/bin, scripts shared by all users on the system
+  3.3 /usr/local/sbin, scripts for system administrators
+  3.4 /usr/bin, scripts/compiled programs of locally supplied software
+
+4. Tricks
+  4.1 when interacting with shell directly, short options are preferred for the sake of less typing
+      when writing shell scripts, long options are preferred for the sake of readability
+  4.2 '\', used at the end of a script line, is used as line-continuation marker,
+           which can increase readability
+
+Starting a Project
+1. variables and constants
+  1.1 declare: VARIABLE=VALUE
+      USE: $VARIABLE
+  1.2 we also have access to shell variables, which we do not need to declare in the script
+  1.3 declare read-only variables
+    declare -r VARIABLE=VALUE
+
+2. shell does not care about the type of variables,
+   it treats them all as Strings
+
+3. results of a command can be assigned to a variable
+  VARIABLE=$(COMMAND)
+  i.e. d=$(ls -l foo.txt)
+
+4. multiple variable assignments may be done on a single line
+  i.e. a=5 b="a string"
+
+5. during expansion, VARIABLE_NAMEs may be surrounded by optional curly braces "{ }".
+  This is useful in cases where a name becomes ambiguous due to surrounding context
+  i.e. mv $filename ${filename}1
+  by adding the surrounding braces,
+  the shell no longer interprets the tailing 1 as part of the variable name,
+  but only the ${filename} part of ${filename}1 will be expanded
+
+6. Here document:
+   it is used for I/O redirection,
+   which embed a body of text into the shell script,
+   and feed the embedded text into the standard input of a command
+
+   Syntax:
+    COMMAND <<- END_OF_LINE_TOKEN
+    EMBEDDED_TEXT_BLOCK
+    END_OF_LINE_TOKEN
+
+   Note:
+    6.1 END_OF_LINE_TOKEN can be any token,
+        but by convention, it is usually _EOF_
+    6.2 The '-' after << is used to let shell script ignore the leading tab characters in the embedded text, so as to improve readability
+    6.3 inside the embedded text, the " or ' are escaped
+
+Top-Down Design
+1. Shell Functions
+  1.1 We could write separate scripts and place them in a directory listed in the PATH
+      Or, we could embed the functions within scripts
+  1.2 Shell function's syntactic forms
+    function NAME{
+      COMMANDS
+      return
+    }
+
+    or
+
+    NAME(){
+      COMMANDS
+      return
+    }
+  1.3 Since shell scripts are executed in a top-down manner
+      in order for function calls to be recognized as shell functions
+      and not interpreted as the names of external programs,
+      shell function definitions must appear in the script before they are called.
+
+2. Local Variables
+    the syntax for local variables is the same as global variables
+    However, global variables are defined outside any function
+    local variables are defined inside functions
+
+Flow Control: Branching with if
+1. "if then else" statement syntax
+  if [COMMANDs1]; then
+    COMMANDs2
+  elif [COMMANDs3]; then
+    COMMANDs4
+  else
+    COMMANDs5
+  fi
+
+  Note: [COMMANDs] is the text statement syntax
+
+2. exit status of a command
+  Once a command is issued, as a side effect
+  it will update the $?, which represents the exit status of the previous command
+  exit status ranges from 0 to 255
+  0, successful
+  1~255, different error codes, meaning can be find in man page
+
+3. test statement
+  syntax:
+    test EXPRESSION
+      or
+    [EXPRESSION], which is more popular
+
+4. File expressions
+    file1 -ef file2, file1 and file2 have the same inode numbers(the two filenames refer to the same file by hard linking)
+    file1 -nt file2, file1 is newer than file2
+    file1 -ot file2, file2 is order than file2
+    -b file, file exists and is a block-special (device) file
+    -c file, file exists and is a character-special (device) file
+    -d file, file exists and is a directory
+    -e file, file exists
+    -f file, file exists and is a regular file
+    -g file, file exists and is set-group-ID
+    -G file, file exists and is owned by the effective group ID
+    -k file, file exists and has its "sticky bit" set.
+    -L file, file exists and is a symbolic link
+    -O file, file exists and is owned by the effective user ID
+    -p file, file exists and is a named pipe
+    -s file, file exists and has a length greater than zero
+    -S file, file exists and is a network socket
+    -t fd, fd is a file descriptor directed to/from the terminal.
+           This can be used to determine whether standard input/output/error is setuid
+    -u file, file exists and is setuid
+    -r file, file exists and is readable (has readable permission for the effective user)
+    -w file, file exists and is writable (has write permission for the effective user)
+    -x file, file exists and is executable (has execute/search permission for the effective user)
+
+5. have variable wrapped in quotes ensures that the operator is always followed by a string,
+   even if the string is empty
+
+6. exit, appearing on the last line of the script,
+         is optional and used for formality
+
+7. Similar to exit command,
+    shell function can return an exit status by including an integer argument to the return command.
+    i.e. return 0/1
+
+8. String Expression, used to evaluate strings
+  STRING, STRING is not null
+  -n STRING, the length of STRING is greater than zero.
+  -z STRING, the length of STRING is zero
+  STRING1 == STRING2, STRING1 and STRING2 are equal
+                      Note: STRING1 = STRING2 is applicable as well, but definitely not preferred
+  STRING1 != STRING2, STRING1 and STRING2 are not equal
+  Note: following expressions must be quoted
+  STRING1 > STRING2, STRING1 sorts after STRING2
+  STRING1 < STRING2, STRING1 sorts before STRING2
+
+9. Integer Expressions
+  integer1 -eq integer2, integer1 is equal to integer2
+  integer1 -ne integer2, integer1 is not equal to integer2
+  integer1 -le integer2, integer1 is less than or equal to integer2
+  integer1 -lt integer2, integer1 is less than integer2
+  integer1 -ge integer2, integer1 is greater than or equal to integer2
+  integer1 -gt integer2, integer1 is greater than integer2
+
+10. A more Modern Version of test expression (applicable only to bash)
+  10.1 [[ ]], similar test expression(POSIX syntax),
+              however, it also adds
+              10.1.1 string =~ REGEX, regular expression mapping
+              10.1.2 == operator, supports pattern matching the same way pathname expression does
+                                  i.e. [[ $FILE == foo.* ]]
+  10.2 (( )), designed for integers, used for arithmetic truth test
+              return:
+                true if the value inside (( )) non-zero !!!
+                false, if the value inside (( )) is zero
+
+11. logical operands
+    -a, &&, logical AND
+    -o, ||, logical OR
+    !, logical NOT
+
+Reading Keyboard Input
+1. read [-options] [variable...]
+  1.1 When reading the variables, they are implicitly declared
+  1.2 If read receives fewer than the expected number, the extra variables are empty.
+      If excessive amount of input is read, they will all end up in the final variable
+      If no variables are listed after the read command, shell variable REPLY will be assigned as the input
+  1.3 Useful options:
+    -a, assign the input to array.
+    -e, use ReadLine to handle input. This permits input editing in the same manner as command line.
+    -p, display a prompt for input using the string prompt
+    -r, raw mode, do not interpret backslash characters as esapts
+    -s, silent mode, do not echo characters to the display as they are typed.
+        This is useful when inputting passwords and confidential information.
+    -t seconds, timeout, terminate input after seconds
+    -u fd, use input from file descriptor fd, rather than standard input.
+
+2. IFS, Internal Field Separator
+
+3. The shell allows one or more variable assignments to take place immediately before a command.
+   The effect of the assignment is temporary (only the duration of the command).
+   i.e.
+   IFS=":" read user pw uid gid name home shell <<< "$file_info"
+
+4. <<< operator, indicates the "here string".
+                 similar to here document which allow you to embed texts,
+                 only shorter.
+
+5. You can not Pipe read !!!
+   read can not read stdIn, but can read stdOut
+
+6. In Unix-like systems, pipelines are implemented by subshells,
+    subshell copies environments but they can not alter the environment of their parent
+
+Flow Control: Looping with while/until
+1. While Loop syntax:
+    while [[ condition ]]; do
+      #statements
+    done
+    Note: while exits loop when condition is non-zero (logical true)
+
+2. Until Loop syntax:
+    until [[ condition ]]; do
+      #statements
+    done
+  Note: until loop is similar to while loop, except that
+        until exits loop when the condition is zero (logical false)
+
+3. continue, break controls the loop
+
+4. To redirect a file to the loop,
+   we place the redirection operator after the done statement of the while loop
+
+Troubleshooting
+1. we can use echo command to print informations guiding debugging
+
+2. for the debugging messages,
+   we can send them to stdErr to separate them from normal output
+   we also do not indent the lines containing the messages,
+   so it is easier to find when it's time to remove them
+
+3. to enable shell script built-in tracing:
+  in the first Shebang line, add '-x' option
+
+4. Enable tracing for a portion of script
+   wrap the desired portion with:
+   set -x
+   set +x
+
+5. For heavy duty debugging, use the "Bash Debugger"
+
+Flow control branching with case
+1. case statement syntax:
+
+    case word in
+      pattern )
+        ;;
+    esac
+
+  Note:
+  1.1 patterns are terminated with ')'
+  1.2 default pattern is *
+  1.3 to break out one particular case, we should use ';;&',
+      which is the same as 'break' in loops
+
+Positional Parameters
+1. Accessing the command line:
+  1.1 the default initialized command line parameters are $0~$9,
+      they are global to the script/shell functions,
+      and $0 is the full pathname of the "command"
+
+  1.2 You can access more than nine parameters by using parameter expansion
+      i.e. ${10}
+
+  1.3 $#, will yield the number of (parameters-1), which represent the numb of arguments
+
+2. shift, once it is called, it shifts the command line argument one step left, decrease the number of parameters by 1
+   Note: $0 never change
+
+3. Positional Parameter group expansion
+  $*, Expands into the list of positional parameters, starting with 1
+      When surrounded by double quotes,
+      it expands into a double quoted string containing all of the positional parameters,
+      each separated by the first character of the IFS(Interior Field Separator)
+  $@, Expands into the list of positional parameters, starting with 1
+      When surrounded by double quotes,
+      it expands each positional parameter into a separate word surrounded by double quotes.
+  Note: when not surrounded with " ", these two expansion are the same
+        when surrounded with " ", $@ considers the original positional parameter, which makes it more useful
+
+  
