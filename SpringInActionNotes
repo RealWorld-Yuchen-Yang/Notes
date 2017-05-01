@@ -787,3 +787,184 @@ Building web applications with Spring MVC
           and the corresponding error message can be extracted in the JSP by BindingRequest's getFieldError() method
           or by using <sf:errors> in Spring's form binding JSP tag library
             6.8.2.1 path property, specifies the form field for which errors should be displayed
+
+Working with Spring Web Flow
+1. Spring Web Flow is an extension to Spring MVC that enables development of flow-based web application.
+   It does this by separating the definition of an application's flow from the classes and views that implement the flow's behavior.
+   All requests to a flow first go through Spring MVC's DispatcherServlet
+
+2. The flow executor drives the execution of a flow.
+
+3. The FlowHandlerMapping is wired with a reference to the flow registry so it knows when a request's URL maps to a flow.
+
+4. Handler Adapter is the bridge between DispatcherServlet and Spring Web Flow.
+   It handles flow requests and manipulates the flow based on those requests
+
+5. Components of a flow:
+  5.1 States, a state in a flow is where some logic is performed.
+    5.1.1 "Action" state, are where the logic of a flow takes place
+    5.1.2 "Decision" state, branch the flow into two directions,
+                            routing the flow based on the outcome of evaluation flow data
+    5.1.3 "End" state, the last stop for a flow.
+                       once a  flow has reached its end state, the flow terminated
+                       It is important to realize that a flow may have more than one end state.
+
+    5.1.4 "Subflow" state, starts a new flow within the context of flow that is already underway.
+                           just like submethods called by the main method in Java
+    5.1.5 "View" state, pauses the flow and invites the user to participate in the flow.
+                        by default, <view-state>'s id has 2 purposes.
+                          1) Identifies the state within the flow
+                          2) defines the logical name of the view.
+
+  5.2 Transition
+    transitions can be seen as roads that connect those points(States)
+    A transaction is defined by the <transaction> element,
+    a child of the various state elements
+    More commonly transitions are defined to take place upon some event being fired.
+      In a view state, the event is usually some action taken by the user.
+      In an action state, the event is the result of evaluating an expression.
+      In a subflow state, the event is determined by the ID of the subflow's end state.
+
+    Global transition, common transitions in multiple states. i.e. "cancel" transition
+
+  5.3 Flow data, informations to be carried
+                 they are determined by the <var> tag
+      Scoping of flow data:
+        5.3.1 Conversation, created when a top-level flow starts and destroyed when the top-level flow ends
+                            shared by a top-level flow and all of its subflows
+        5.3.2 Flow, created when a flow starts and destroyed when the flow ends.
+                    Only visible within the flow it was created by.
+
+        5.3.2 Request, Created when a request is made into a flow and destroyed when the flow returns.
+        5.3.4 Flash, created when a flow starts and destroyed when the flow ends.
+                     It's also cleared out after a view state renders.
+        5.3.5 View, created when a view state is entered and destroyed when the state exits.
+                    Visible only within the view state.
+
+        Note: when declaring a variable using the <var> element,
+              the variable is always flow-scoped within the flow defining the variable
+              When using <set>, <evaluate>, the scope is specified as a prefix for the name or result attribute.
+              i.e. <set name="flowScope.theAnswer" value="42">
+
+6. the _eventId_portion of an input button in a  viewState is a clue to Spring Web Flow,
+   that what follows is an event that should be fired
+
+7. after a subflow is finished, the url is directed back to the place originating the subflow, which just method calls.
+
+8. Not all web applications are freely navigable.
+   Sometimes, a user must be guided along
+   asked appropriate questions, and led to specific pages based on their responses.
+
+Securing Spring
+1. For the most part, an application should play no part in securing itself.
+
+2. It is better to keep security concerns separate from application concerns
+
+3. Spring Security is a security framework implemented with Spring AOP and servlet filters.
+
+4. Spring Security tackles security from two angles.
+   4.1 To secure web requests and restrict access at the URL level
+
+5. Java web application starts with an HttpServletRequest
+   And if the request is the access point to a web application,
+   then that's where security for a web application should begin
+
+6. We will only need to configure one filter in the application's web.xml.
+   It is not possible to inject beans into servlet filters registered in web.xml
+
+7. It is important to know that the <intercept-url> rules are applied top to bottom.
+
+8. Spring security's basic concepts are
+  8.1 grant different kind of users different levels of authorities
+  8.2 each part of the Spring Application should offer to the client only if they have matched level of authority
+
+9. Securing View-level elements
+  9.1 <security:accesscontrollist>, allows the body to be rendered if the currently authenticated user has one of the stipulated permissions in the specified domain object
+  9.2 <security:authentication>, accesses properties of the current user's authentication object
+  9.3 <security:authorize>, allows the body of the tag to be rendered if a specified security constraint has been met
+
+10. you can access several of the user's authentication details using the <security:authentication> tag
+  10.1 authorities, a collection of GrantedAuthority objects that represent the privileges granted to the user
+  10.2 credentials, the credential that were used to verify the principal (commonly, this is the user's password)
+  10.3 details, additional information about the authentication (IP address, certificate serial number, session ID, and so on.)
+  10.4 principal, the user's principal
+
+11. Spring Security's LDAP (LightWeight Directory Access Protocol)
+    assumes that the LDAP server is listening on port 33389
+
+12. Using Spring's remember-me functionality for user authentication
+  The token that's stored in the cookie is made up of:
+    username,
+    password,
+    expiration date,
+    private key
+  all encoded in an MD5 has before being written to the cookie
+  Also the login request will need to include a _spring_security_remember_me parameter
+
+13. Securing methods with @Secured,
+    Only users with the authorities specified in @Secured's argument list can access the annotated method
+    If the secured method is invoked in the course of a web request,
+    the exception will be automatically handled by Spring Security's filter.
+    Otherwise, you will need to write the code to handle the exceptions
+
+14. Spring Security has a few implicit objects defined in SpEL
+
+Working with remote services
+1. Remoting is a conversation between a client application and a service
+
+2. Conversation between two applications starts with a RPC (Remote Procedure Call)
+   RPC is when execution flow is handed off from one application to another application.
+
+3. Spring supports remoting for several different RPC models.
+   including RMI(Remote Method Invocation), Caucho's Hessian and Burlap, Spring's own HTTP invoker, JAX-RPC and JAX-WS
+   difference can be found in Spring in Action's p282
+
+4. Spring manages the remote service by
+   using a proxy factory bean that enables you to wire remote services
+   into properties of your other beans as if they were local objects
+
+5. If the call to the remote service results in a java.rmi.RemoteException,
+   the proxy handles that exception and rethrows it as an unchecked RemoteAccessException
+
+6. On the server side, you are able to expose the functionality of any Spring-managed bean as a remote using
+   any of the RPC implementations.
+   we can expose bean methods as remote services.
+
+7. Working with remote services in Spring is purely a matter of configuration.
+   No java code is needed.
+   However, beans passed to or returned from remote calls may need to implement java.io.Serializable.
+
+8. RmiServiceExporter works by wrapping the bean (POJO) in an adapter class,
+   and binding the service adapter to the RMI registry
+
+9. By default, RmiServiceExporter attempts to bind to an RMI registry on port 1099 of the local machine
+
+10. working with Remote demands writing
+  10.1 on the server side, export the bean method as an endpoint to be invoked by clients
+  10.2 on the client side, we need to define proxy objects to access the server side end points
+                          even though the client isn't aware that the given service is a remote service.
+                          you may want to take designing the service's interface
+
+11. RMI has difficulty working across firewalls,
+    That is because RMI uses arbitrary ports for communication,
+    which firewalls typically do not allow
+
+12. HessianServiceExporter is a Spring MVC controller
+
+13. HessianProxyFactoryBean and BurlapProxyFactoryBean produce proxy objects that talk to a remote service over HTTP
+    (Hessian in binary, Burlap in XML)
+
+14. Hessian and Burlap work well across firewalls,
+    but use a proprietary object serialization mechanism
+
+15. Spring HttpInvoker can be passed over firewalls
+    and does not use proprietary serialization mechanism
+    but it depends both client and server are Spring-based applications
+
+16. A class(of course on the server side) that's annotated with @WebService is considered a web service endpoint
+    and its methods, annotated with @WebMethod, are the operations
+
+17. By extending SpringBeanAutoWiringSupport,
+    you can annotate an endpoint's properties with @Autowired and its dependencies will be met
+
+REST Support    
