@@ -816,4 +816,113 @@ Positional Parameters
   Note: when not surrounded with " ", these two expansion are the same
         when surrounded with " ", $@ considers the original positional parameter, which makes it more useful
 
-  
+Flow control: Looping with for
+1. Syntax:
+  1.1
+    for (( i = INIT; i < MAX; i++ )); do
+      #statements
+    done
+
+  1.2
+    for i in COLLECTION; do
+      #statements
+    done
+
+String and Numbers
+1. Parameter Expansion
+  1.1 Basic Parameters
+    Syntax:
+      $a
+      ${a}
+    Note: the { } has no effect on expansions.
+          but it is required if the variable is adjacent to other text
+          i.e. echo "${a}_file"
+
+  1.2 Expansions to manage empty variables
+    1.2.1 Syntax:
+            ${parameter:-word}
+          if the parameter is unset or is empty, the expansion will result in the default value "word"
+    1.2.2 Syntax:
+            ${parameter:=word}
+          if the parameter is unset or is empty, the expansion will result in the default value "word"
+          In addition, the value "word" is assigned to the parameter
+    1.2.3 Syntax:
+            ${parameter:?word}
+          if the parameter is unset or is empty, the expansion will cause the script to exit with an error.
+          and the content of "word" are sent to standard error.
+          (which can be used for debugging)
+    1.2.4 Syntax:
+            ${parameter:+word}
+          if the parameter is unset or is empty, the expansion results in nothing.
+          If the parameter is not empty,
+          the value of the "word" is substituted for paramter,
+          however, the value of the parameter is not changed
+
+  1.3 Expansions that return variable names
+      ${!PREFIX*}, this expansion returns the names of existing variables with names beginning with prefix.
+      ${!PREFIX@}
+
+  1.4 String operations:
+    ${#PARAMETER}, returns length of parameter.
+
+    $(PARAMETER:OFFSET[:LENGTH]), returns the substring of PARAMETER, from OFFSET to optional LENGTH length
+
+    $(PARAMETER: -OFFSET[:LENGTH]), negative offset -OFFSET, starts from the end of the string
+
+    ${PARAMETER#[#]PATTERN}, removes a leading portion of the string contained in PARAMETER defined by PATTERN
+      Note, #, removes the shortest match
+            ##, removes the longest match
+
+    ${PARAMETER%[%]PATTERN}, this expansion is similar to the above one,
+                             except this one remove text from the end of the string contained in PARAMETER rather than from the beginning
+
+    search and replace upon the contents of a string conforming the PATTERN with STRING
+    ${PARAMETER/PATTERN/STRING}, replace only the first matching one
+    ${PARAMETER//PATTERN/STRING}, replace all occurrences
+    ${PARAMETER/#PATTERN/STRING}, requires match occurs at the beginning of the string
+    ${PARAMETER/%PATTERN/STRING}, requires match occurs at the end of the string
+    Note: when no STRING is specified, the string in the PARAMETER that conforming PATTERN is just deleted
+
+  1.5 Case conversion
+    ${PARAMETER,,}, expand the value of PARAMETER into all lowercase
+    ${PARAMETER,}, expand the value of PARAMETER changing only the first character to lowercase
+    ${PARAMETER^^}, expand the value of PARAMETER into all uppercase
+    ${PARAMETER^}, expand the value of PARAMETER changing only the first character to uppercase
+
+2. Arithmetic Evaluation and Expansion
+  $(( expression )), Arithmetic expression syntax
+  2.1 Number bases
+    2.1.1 number, default
+    2.1.2 0number, octal
+    2.1.3 0xnumber, hexadecimal
+    2.1.4 base#number, number is in base
+
+  2.2 Unary Operators
+    2.2.1 '+', positive
+    2.2.2 '-', negative
+
+  2.3 Simple Operators
+    2.3.1 '+', addition
+    2.3.2 '-', subtraction
+    2.3.3 '*', multiplication
+    2.3.4 '/', integer division
+    2.3.5 '**', exponentiation, different from other languages (^)
+    2.3.6 '%', modulo(remainder), it is useful in loops to do loop execution on certain intervals
+
+  2.4 Assignment, '=' and all its alternatives
+
+  2.5 Bit Operations
+    2.5.1 '~', bitwise negation
+    2.5.2 '<<', left bitwise shift
+    2.5.3 '>>', right bitwise shift
+    2.5.4 '&', bitwise and
+    2.5.5 '|', bitwise or
+    2.5.6 '^', bitwise XOR
+
+  2.6 Logic
+    Note: expression evaluated to zero (0) is considered false
+          expression evaluated to non-zero is considered true
+
+Arrays
+
+Exotica
