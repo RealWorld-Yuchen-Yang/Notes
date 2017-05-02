@@ -967,4 +967,104 @@ Working with remote services
 17. By extending SpringBeanAutoWiringSupport,
     you can annotate an endpoint's properties with @Autowired and its dependencies will be met
 
-REST Support    
+REST Support
+1. REST: Representational State Transfer
+  RPC is service-oriented and focused on actions and verbs,
+  REST is resource-oriented and focused on the things and nouns that describe an application
+  1.1 Representational, REST resource can be represented in virtually any form.
+                        including XML, JSON (Javascript Object Notation), or even HTML
+                        whatever form best suits the consumer of those resources
+  1.2 State, state of a resource, when working with REST,
+             we are more concerned with the state of the resource
+             than with the actions we can take against resources
+  1.3 Transfer, the transportation of data in some representational form,
+                from one application to another
+
+2. @PathVariable, enables controllers to handle requests for parameterized URLs
+      i.e.
+          @RequestMapping(value="/{id}", method=RequestMethod.GET)
+          public String getSpittle(@PathVariable("id") long id, Model model)
+          {
+            ...
+          }
+          2.1 the first id, value="/{id}", is a declaration of the path variable id
+          2.2 the second id, @PathVariable("id"), is extracting the value of the declared path variable id
+          2.3 the third id, long id, is the parameter of the method getSpittle(long id, Model model),
+                                     the path parameter's value is passed into the method parameter
+          Note: if the declared path variable and the method parameter's name are the same,
+                we do not need to path the variable name into @PathVariable annotation
+
+3. @ResponseBody, view-based rendering can be bypassed altogether, using the @ResponseBody annotation and various HttpMethodConverter implementations
+
+4. @RequestBody, along with HttpMethodConverter implementations, can convert inbound HTTP data into Java Objects passed into a controller's handler method
+
+5. In the REST concept:
+    URL represents a resource,
+    And also URL uniquely identifies a resource (URI)
+    It does not matter what is to be done to the resource
+    The action is taken care of by the HTTP methods
+
+6. Query parameters have no use in REST paradigm,
+   for query parameters are used to guide server how to create resources,
+   not used to identify a resource
+
+7. Performing the REST verbs (CRUD, Create, Read, Update, Delete)
+   HTTP methods is characterized by two traits: safety and idempotency.
+   * safety, does not change the state of a resource
+   * idempotency, repeated requests does not have further side effects after the first request
+   NOTE: Safe methods are all idempotent
+
+   7.1 GET, retrieves resource data from the server, safe, idempotent
+   7.2 POST, post(update/create) data to the server, not safe, not idempotent
+   7.3 PUT, put data to the server, not safe, idempotent
+   7.4 DELETE, delete resource on the server, not safe, idempotent
+
+8. methods annotated with @RequestMapping can also be annotated with @ResponseStatus
+   @ResponseStatus(HttpStatus.NO_CONTENT), indicates to the client the HTTP status after the handler method
+
+9. POST method is different from the rest methods (GET, PUT, DELETE)
+   when use POST method to **create resources**,
+   since the resource does not exist on the server yet,
+   POST has to operate against a URL that isn't  the same as the resource it is creating.
+   (GET, PUT, DELETE operates on the exact url of the manipulated resource)
+   What is more, in the POST request handler,
+   we should also set the Location header to the certain resource's URL
+
+   we can annotate such post handler with @ResponseStatus.CREATED
+
+10. Representing resources
+    10.1 ContentNegotiatingViewResolver
+      10.1.1 first looks at the URL's file extension.
+      10.1.2 if the file extension does not produce any media type to work with
+             then the Accept Header in the request will be considered
+      10.1.3 if the request header does not have an accept header,
+             then it will fall back to the media type set in the defaultContentType property
+
+    10.2 When server deals with human client,
+         the controller often operates by manipulating the domain model and return a logical view
+         When server deals with another application as a client, (which is by producing REST resource)
+         the controller's job is more straight forward,
+         the object returned from the controller is automatically converted into a representation appropriate for the client
+
+    10.3 a client may send an object in form of JSON, XML or some other content type.
+         It can be inconvenient for our controller's handler method to receive those objects in their raw form.
+         and convert them ourselves.
+         We can use @ResquestBody to annotate the parameter in the controller's handler,
+         so as to convert the read in resource as an known object.
+         This is similar to @ResponseBody when annotating the response object response from server to the client
+
+11. Writing REST clients
+  11.1 In RestTemplate class, the only difference between getForObject() and getForEntity() is that
+    * getForObject() simply returns an object of the type requested.
+    * getForEntity() returns that object along with extra information about the response
+                     and the extra response METADATA are
+                     * HTTP status code,
+                     * response headers, etc.
+
+  11.2 there are also put, delete, post, exchange counterparts
+       Note: exchange is used for set request header
+
+12. RPC and RESEful interaction are both synchronous.
+    Messaging is asynchronous.
+
+Messaging in Spring
