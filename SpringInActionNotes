@@ -1032,4 +1032,39 @@ REST Support
 
    we can annotate such post handler with @ResponseStatus.CREATED
 
-10. Representing resources   
+10. Representing resources
+    10.1 ContentNegotiatingViewResolver
+      10.1.1 first looks at the URL's file extension.
+      10.1.2 if the file extension does not produce any media type to work with
+             then the Accept Header in the request will be considered
+      10.1.3 if the request header does not have an accept header,
+             then it will fall back to the media type set in the defaultContentType property
+
+    10.2 When server deals with human client,
+         the controller often operates by manipulating the domain model and return a logical view
+         When server deals with another application as a client, (which is by producing REST resource)
+         the controller's job is more straight forward,
+         the object returned from the controller is automatically converted into a representation appropriate for the client
+
+    10.3 a client may send an object in form of JSON, XML or some other content type.
+         It can be inconvenient for our controller's handler method to receive those objects in their raw form.
+         and convert them ourselves.
+         We can use @ResquestBody to annotate the parameter in the controller's handler,
+         so as to convert the read in resource as an known object.
+         This is similar to @ResponseBody when annotating the response object response from server to the client
+
+11. Writing REST clients
+  11.1 In RestTemplate class, the only difference between getForObject() and getForEntity() is that
+    * getForObject() simply returns an object of the type requested.
+    * getForEntity() returns that object along with extra information about the response
+                     and the extra response METADATA are
+                     * HTTP status code,
+                     * response headers, etc.
+
+  11.2 there are also put, delete, post, exchange counterparts
+       Note: exchange is used for set request header
+
+12. RPC and RESEful interaction are both synchronous.
+    Messaging is asynchronous.
+
+Messaging in Spring
