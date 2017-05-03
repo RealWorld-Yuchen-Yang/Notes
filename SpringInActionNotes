@@ -1065,6 +1065,67 @@ REST Support
        Note: exchange is used for set request header
 
 12. RPC and RESEful interaction are both synchronous.
-    Messaging is asynchronous.
+    JMS is asynchronous messaging.
 
 Messaging in Spring
+1. Asynchronous messaging is a way of indirectly sending messages from one application to another without waiting for a response
+   JMS (Java Messaging Service) is a standard API for asynchronous messaging
+
+2. There are two main actors in JMS:
+  * message brokers
+  * destinations
+
+3. In JMS, there are two types of destinations, each of these is associated with a specific messaging model:
+   * queues, point-to-point messaging model
+   * topics, publish-subscribe messaging model
+
+4. point-to-point messaging
+  it is guaranteed that each message in the message queue is delivered to only receiver
+  however, it does not mean that only one receiver is pulling messages from the queue
+  if multiple receivers are listening to a queue,
+  there's no way of knowing which one will actually process a specific message.
+  This uncertainty is a good thing,
+  because it enables an application to scale up message processing by simply adding another listener to the queue
+
+5. publish-subscribe messaging
+  all subscribers to a topic will receive a copy of the message
+
+6. In JMS, the client (message originator) drops the message off with the message broker
+   It does not know who will process the message
+
+7. Benefits of JMS
+  7.1 no waiting,
+    client does not need to wait around for it to be processed or even delivered
+  7.2 message orientation and decoupling,
+    messages sent with JMS are data-centric.
+    not like synchronous message who is fixed with service specific method interface
+    JMS's client does not need to know any service specifics
+  7.3 location independence,
+    JMS is not tied to network addresses, while its counterpart synchronous messaging does
+
+8. MDB (Message Driven Bean), EJBs that process messages asynchronously.
+
+Managing Spring Beans with JMX
+1. JMX (Java Management Extensions), it is used to change configuration on the fly.
+
+2. The key component of an application that is instrumented for management with JMX
+   is the MBean (managed bean)
+
+3. The JMX specification defines four types of MBeans
+  3.1 Standard MBean,
+      Standard MBean's management interface is determined by reflection on a fixed Java interface
+      that is implemented by the bean class
+  3.2 Dynamic MBean,
+      Dynamic MBeans are MBeans whose management interface is determined at runtime by invoking methods of the
+      DynamicMBean interface.
+      Because the management interface isn't defined by a static interface,
+      it can vary at runtime.
+  3.3 Open MBean,
+      Open MBeans are a special kind of dynamic MBean whose attributes and operations are limited to
+      primitive types, class wrappers for primitive types, and any type that can be decomposed into primitives or primitive wrappers
+  3.4 Model MBeans,
+      Model MBeans are a special kind of dynamic MBean that bridges a management interface to the managed resource.
+      Model MBeans aren't written as much as they are declared.
+      They are typically produced by a factory that uses some metainformation to assemble the management interface
+
+4. Spring's JMX module enables you to export Spring beans as Model MBeans
