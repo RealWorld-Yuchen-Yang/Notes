@@ -924,5 +924,50 @@ String and Numbers
           expression evaluated to non-zero is considered true
 
 Arrays
+1. Arrays in Shell are limited to one dimensional
+
+2. declaring an array
+    declare -a ARRAY_NAME
+
+3. assigning values to an array
+  3.1 single values
+    ARRAY_NAME[INDEX]=VAL
+  3.2 multiple values
+    ARRAY_NAME=(VAL1 VAL2 VAL3 ...)
+  3.3 to specific elements
+    ARRAY_NAME=([INDEXA]=VAL1 [INDEXB]=VAL2 [INDEXC]=VAL3 ...)
+
+4. Array Operations
+  4.1 Outputting the entire contents of an array
+    *, i.e. ARRAY_NAME[*], "ARRAY_NAME[*]"
+    @, i.e. ARRAY_NAME[@], "ARRAY_NAME[@]"
+    Note: @ is used more often.
+          when not quoted, they are the same
+          when quoted, the @ operation preserves spaces
+  4.2 determining array length
+    ${#ARRAY_NAME[@|INDEX]}, same as parameter expansion
+                        ${#ARRAY_NAME[@]}, determines the length of the array
+                        ${#ARRAY_NAME[INDEX]}, determines the length of element of INDEX in ARRAY_NAME
+  4.3 finding subscripts (indices) used by an array
+    As bash allows arrays to contain "gaps" in the assignment of subscripts
+    this operation can determine which elements are actually exist.
+    ${!ARRAY_NAME[*]}
+    ${!ARRAY_NAME[@]}
+    Note: @ is also more used, for it preserves spaces
+  4.4 adding elements to the end of an array
+    +=,
+    syntax: ARRAY_NAME+=(ADDITIONAL_VALS)
+  4.5 sorting an array
+    no specific operation, should use "sort" command
+  4.6 delete array/array element
+    unset ARRAY_NAME, deleting an array
+    unset 'ARRAY_NAME[INDEX]', deleting array element
+    Note: any reference to an ARRAY_NAME without INDEX refers to element 0 of the array
+  4.7 Associative array (string-keyed array)
+    unlike integer-indexed arrays,
+    we should first declare the associative array with:
+      declare -A ASSOCIATIVE_ARRAY_NAME
+    then assign string-indexed key-value pairs
+      i.e. ASSOCIATIVE_ARRAY_NAME["STRING_INDEX"]=VAL
 
 Exotica
