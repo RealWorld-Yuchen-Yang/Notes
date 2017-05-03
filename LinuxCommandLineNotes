@@ -971,3 +971,43 @@ Arrays
       i.e. ASSOCIATIVE_ARRAY_NAME["STRING_INDEX"]=VAL
 
 Exotica
+1. Group commands and subshells
+  Group command, { COMMAND1; COMMAND2; [COMMAND3;...] }
+  Subshell, (COMMAND1; COMMAND2; [COMMAND3;...])
+  Note:
+    1.1 they are both used to group commands together.
+    1.2 group command is more often used than subshell for it execute commands in the original shell
+        so it keeps its environment
+    1.3 for group command, there should be ' ' between { } and commands
+    1.4 the last command should be ended with ';' or '\n'
+    1.5 group commands are most commonly used in pipelines,
+        it can bind the input/output of the command executions into one single stream
+
+2. process substitution
+  process substitution are always executed first,
+  it is used to deal with situations that a process is executed in a subshell,
+  so we can not use the subshell's input/output due to the subshell's environment is destroyed after returning to the parent
+  2.1 <(COMMANDS), for processes that produce standard output
+  2.2 >(COMMANDS), for processes that intake standard input
+
+3. Traps
+   can be used as "signal handlers", often used in temporary files' cleaning upon certain occurrence of some signals
+   syntax:
+    trap STRING_ARGUMENT SIGNAL1 [SIGNAL2, ...]
+    Note: STRING_ARGUMENT is the string-formed commands which will be parsed and executed once the listed signals occurs
+          it is command practice to define a shell function for the STRING_ARGUMENT
+
+4. wait PID,
+    used in multitasking,
+    let the current script wait until the PID specified process end
+    Note: shell parameter
+            #!
+          always contains the process ID of the last job put into the background
+
+5. Named pipes
+   syntax: mkfifo PIPE_NAME
+   The pipe is created as a file with type property 'p', (which can be seen by ls -l)
+   Named pipes are used to link the "input" and "output" of two process together
+   After creating the pipe, we can
+   * write into the pipe: COMMANDS > PIPE_NAME
+   * read from the pipe: COMMANDS < PIPE_NAME
