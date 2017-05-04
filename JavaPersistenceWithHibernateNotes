@@ -1,0 +1,109 @@
+Understanding object/relational persistence
+1. Relational database product (Relational database management system with SQL-based application programming interfaces):
+    DBMS (DataBase Management System)
+
+2. Two paradigms:
+    Object Modeling, object-oriented programming
+    Relational Modeling, SQL
+    These two paradigms have the following mismatches
+    2.1 granularity, in terms of contained objects
+    2.2 subtypes, how to map subtype, when there is only one foreign key
+    2.3 identity, how to determine two entities are equal
+
+3. UDT, User Defined data Types
+
+4. Identity of a database row is expressed as
+   a comparison of primary key values
+
+5. surrogate key, is a primary key column with no meaning to the application user
+                  it  is not presented to the application user,
+                  but only used to identify data inside the application
+
+6. lazy loading, retrieving data on demand only.
+                 in java, fetching the data of associated instances only when the association is first accessed
+                 in persistence context, it is inefficient, because it requires executing one statement for each node or collection of the object network that is accessed.
+
+Introducing Hibernate (Hibernate is a middleware (persistence) framework)
+1. Hibernate is not only an **ORM service**, but also a collection of data management tools extending well beyond ORM.
+  1.1 Hibernate ORM, consists of
+      * a core
+      * base service for persistence with SQL database
+      * a native proprietary API
+  1.2 Hibernate EntityManager,
+      Hibernate's implementation of the standard Java Persistence APIs,
+      it is an optional module you can stack on top of Hibernate ORM
+      Hibernate's native features are a superset of the JPA persistence features in every respect
+  1.3 Hibernate Validator,
+      provides declarative validation for your domain model
+  1.4 Hibernate Envers,
+      like version control systems
+      Envers is dedicated to audit logging and keeping multiple versions of data in SQL database
+      This helps you add history and audit trails to your application
+  1.5 Hibernate Search,
+      Hibernate Search keeps an index of your domain model data up to date in an Apache Lucence database
+  1.6 Hibernate OGM
+      OGM, object/grid mapper
+      It provides JPA support for NoSQL solutions
+
+2. Persistence Unit,
+   Your starting point in JPA is the persistence unit.
+   It is a pairing of domain model class mappings with a database connection.
+
+3. standard configuration file for persistence unit is located the classpath,
+   in META-INF/persistence.xml
+
+4. Standard or vendor-specific options can be set as properties on a persistence unit.
+   * standard properties, name should be prefixed with javax.persistence
+   * Hibernate's settings, name should be prefixed with hibernate
+
+5. To log SQL,
+   in persistence.xml, set the following properties to true
+   * hibernate.format_sql
+   * hibernate.use_sql_comments
+
+6. Basic mapping configuration of classes to be persisted (annotation-based)
+  6.1 @Entity, class annotation
+               every persistent entity class must have at least the @Entity annotation.
+               Hibernate maps this class to a table in the database with the same name as class name, but all uppercase characters
+               e.g. Java class "Message" is mapped to database table "MESSAGE"
+  6.2 @Id, attribute annotation
+           every persistent entity class must have an identifier attribute annotated with @Id
+           Hibernate maps this attribute to a column named ID
+           Note, id property defined in the persistence class can be any type,
+                 but usually it is defined as "long"
+  6.3 @GeneratedValue, attribute annotation
+                       it is a attribute value generation strategy
+                       usually, it is used to annotate Ids
+  6.4 Persistence class should conform the JavaBean convention
+      6.4.1 has no parameter constructor
+      6.4.2 naming of property follows getter/setter naming,
+            what is more, the mapped column name in the database is the same as properties,
+            but with all uppercase characters
+
+7. you can use the persistent class in any execution context,
+   no special container is needed
+
+8. the alternative way of defining mapping other than annotation
+   is by using xml,
+   and in the following locations
+   * orm.xml, JPA object relation mapping file
+   * hbm.xml, Hibernate native object relation mapping file
+
+9. Storing and loading messages
+  9.1 First you need an **EntityManagerFactory** to talk to your database.
+      This API represents your persistence unit
+  9.2 transaction starts and ends with explicit declarations
+    * UserTransaction's **begin()** method declares the starting point of the transaction
+    * UserTransaction's **commit()** method declares the end point of the transaction
+  9.3 Inside the transaction boundary,
+      we use the entityManager (which is created by the EntityManagerFactory) to persist object instances
+      and to do database queries
+  9.4 finally after the transaction is committed,
+      we close the entityManager
+
+10. JPQL, Java Persistence Query Language
+
+11. The Hibernate counterpart of the EntityManagerFactory is the SessionFactory
+    and the EntityManagerFactory's configuration option's counterpart this the Session
+
+Domain models and metadata
