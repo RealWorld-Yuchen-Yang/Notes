@@ -24,7 +24,8 @@ Understanding object/relational persistence
                  in persistence context, it is inefficient, because it requires executing one statement for each node or collection of the object network that is accessed.
 
 Introducing Hibernate (Hibernate is a middleware (persistence) framework)
-1. Hibernate is not only an **ORM service**, but also a collection of data management tools extending well beyond ORM.
+1. Hibernate is a JPA standard's implementation who not only an **ORM service**,
+   but also a collection of data management tools extending well beyond ORM.
   1.1 Hibernate ORM, consists of
       * a core
       * base service for persistence with SQL database
@@ -62,7 +63,7 @@ Introducing Hibernate (Hibernate is a middleware (persistence) framework)
    * hibernate.use_sql_comments
 
 6. Basic mapping configuration of classes to be persisted (annotation-based)
-  6.1 @Entity, class annotation
+  6.1 @Entity, class annotation to the domain model
                every persistent entity class must have at least the @Entity annotation.
                Hibernate maps this class to a table in the database with the same name as class name, but all uppercase characters
                e.g. Java class "Message" is mapped to database table "MESSAGE"
@@ -107,3 +108,31 @@ Introducing Hibernate (Hibernate is a middleware (persistence) framework)
     and the EntityManagerFactory's configuration option's counterpart this the Session
 
 Domain models and metadata
+1. Cross-cutting concerns
+  It is often implemented by framework code.
+  Including logging, authorization, transaction demarcation, security, concurrency, remoteness
+
+2. For the starting point of modeling, we can start either from the domain model, or from the database table
+   there is only slight differences between the two starting points,
+   and eventually, they will be mapped to each other
+
+3. The main concern of defining the database schema is to keep the integrity of the data
+
+4. Working with fine-grained and rich domain models is a major Hibernate objective.
+   In general, using fine-grained objects means more classes (Domain Entity) than tables
+
+5. When storing a collection of objects, sometimes we would like the stored object to have some sequence,
+   However it does not mean that we need to maintain such sequence in the database.
+   Data integrity is not affected the sequence
+   To make the sequence behavior flexible,
+   we can always restore it when doing data retrieving
+
+6. Hibernate recognizes constraints on persistent domain model classes
+   and triggers validation before database insert or update operations.
+
+7. A class mapping in a Hibernate XML document is a "complete" mapping,
+   which means that any other mapping metadata for that class,
+   whether in annotations or JPA XML files,
+   will trigger a "duplicate mapping" error on startup.
+
+8. The persistent classes only depend on JPA at compile time. 
