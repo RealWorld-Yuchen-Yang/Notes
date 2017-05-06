@@ -1,0 +1,94 @@
+Class Diagram
+
+Class Diagram (Advanced Concepts, optional to draw)
+1. Static Operations and Attributes, are underlined on a class diagram
+
+2. Aggregation and Composition, also compared with normal association
+  2.1 a --> b, normal association, means a "has a" property b
+  2.2 a --* b, composition, represented by solid diamond on the graph,
+                            means child a is "concrete part of" parent b,
+                            if b is deleted, a should be deleted as well
+                            Note:
+                              general rule for composition is that,
+                              although a class may be a component of many other classes,
+                              any instance must be a component of only one owner
+  2.3 a --o b, aggregation, represented by empty diamond on the graph,
+                            means child a is "soft part of" parent b,
+                            if b is deleted, we do not have to delete child a
+                            Note: aggregation is seldom used due to its ambiguity
+
+3. Derived Properties, starts by the leading '/'
+
+4. Interfaces and Abstract Classes
+  4.1 Syntax:
+        most common way to indicate an abstract class or operation is to italicize the name
+        Italics are tricky to do on a whiteboard, so you can use the label: {abstract} instead
+  4.2 mark an interface with the keyword <<interface>>
+  4.3 Classes have two kinds of relationships with interfaces: providing and requiring
+    4.3.1 class a provides an interface b, means the class implements the interface
+      Syntax
+          a ..|> b, abstract class a implements interface b
+          a --|> b, concrete class a implements interface b
+
+    4.3.2 class a requires an interface b, means the class needs an instance of that interface in order to work
+                                           (which implies the class has a dependency to that interface)
+      Syntax
+          a ..> b, class a requires an instance that implements interface b
+
+5. {readOnly}, means a property can **not be updated**, but can be deleted
+   {frozen}, means a property can **not changed** during the lifetime of an object
+
+6. Reference objects and value objects
+   All objects have identity, which in code is represented by "reference/pointer"
+   However, in practice,
+   identity is important for reference objects
+   but is not important for value objects
+   Note: value objects should be immutable, which means that every we should manipulate a new instance of that value type,
+         instead of manipulate the same object
+         we should use <<value>> or <<struct>> on value objects
+
+7. Qualified associations
+  Qualified associations are used to represent:
+    arrays, maps, hashes and dictionaries
+  Note: the qualifier is the key/index of the collection objects
+
+8. Classification and Generalization
+  The "is a" relationship can be interpreted as either Classification or Generalization
+  Classification, is static, which can be defined on the association line's parent side in the UML
+  Generalization, is transitive
+
+9. Association class
+  9.1 represents the association relationship between two classes
+  9.2 it allows you to add attributes, operations and other features to the association
+  9.3 The association class adds an extra constraint,
+      in that there can be only one instance of the association class between any two participating objects
+  9.4 Implement association classes as if it were a full class
+      but to provide methods that get information to the classes linked by the association class
+
+10. Template (Parameterized) Class, which represents the "Generalized classes"
+    A use of a parameterized class, such as Set<Employee>, is called a derivation
+    Syntax:  <parameter-name::parameter-value>
+    Note: using a derivation is not the same as subtyping,
+          however, you are not allowed to add features to the bound element,
+          which is completely specified by its template.
+
+11. Enumeration
+  are used to show a fixed set of values that don't have any properties other than their symbolic value.
+  In UML, such class should be marked with <<enumeration>> keyword
+
+12. Active Classes
+  An active class has instances, each of which executes and controls its own thread of controls
+
+13. visibility
+  +, public
+  -, private
+  ~, package
+  #, protected
+  most of the time, we do not need to draw visibility markers in diagrams,,
+  only use them only if we need to highlight the differences in visibility of certain features
+
+14. Messages,
+    These add arrows to the sides of associations
+    You may also need to add a dependency arrow to show messages between classes that are not associated
+
+Sequence Diagrams
