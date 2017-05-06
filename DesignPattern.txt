@@ -83,7 +83,7 @@ Structural Patterns****************************
 Behavioral Patterns****************************
 1. Chain of Responsibility Pattern
 
-2. Command Pattern
+2. Command Pattern (currently watching)
 
 3. Interpreter Pattern
 
