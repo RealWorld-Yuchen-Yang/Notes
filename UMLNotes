@@ -1,6 +1,122 @@
-Class Diagram
+****Class Diagram****
+1. A class diagram describes the **types of objects** in the system
+   and various kinds of **static relationships** that exist among them.
 
-Class Diagram (Advanced Concepts, optional to draw)
+2. Properties (including calculated properties):
+   one concept, but appear in two quite distinct notations
+
+   2.1 attributes
+    In Graph: the attributes notation describes a property as a line of text in the class box,
+    syntax:
+             visibility name: type multiplicity = default {property-string}
+        e.g.     -  username: String    [1]     = "Untitled" {readOnly}
+        Note: the "{property-string}" describes additional property for the attribute
+
+   2.2 associations
+    In Graph: -->, solid line with (optional) arrows,
+                   directed from the source class to the target class
+                   The name of the property goes at the target end,
+                   together with its multiplicity
+
+3. Multiplicity:
+    a multiplicity of property is an indication of how many objects may fill in the property
+    it composed of **lowerBound** and **upperBound**
+    if lowerBound==upperBound, they can be notated with just one notation
+    stereotype description translations
+    3.1 optional, implies a lowerBound of 0
+    3.2 mandatory, implies a lowerBound of 1, and possibly more
+    3.3 single-valued, implies an upperBound of 1
+    3.4 multivalued, implies an upperBound of more than 1, usually *
+
+4. In most cases, you to not assign to a multivalued (collection) property.
+   Instead you update with add & remove methods.
+   It's okay for clients to modify the member objects,
+   but the clients shouldn't directly change the collection itself
+
+5. Bidirectional associations, (default, solid line with two arrows)
+  Arrows are drown only when you want to increase readability
+  The bidirectional nature of the association is made obvious by the navigability arrows at both ends of the associations
+
+6. Many-to-many relationship is very tricky to program,
+   for we should keep both sides synchronized.
+   To solve the problem, we should use
+   * many-to-one
+   *  one-to-many
+   relationship (which can be accomplished by introducing association classes)
+
+7. Operations:
+    Actions that a class knows to carry out (other than getters and setters)
+    Syntax:
+      visibility name(parameter-list): return-type {property-string}
+      Note:
+          1. direction name: type = default-value
+              (in or out)
+          2. it is useful to distinguish between operations that
+             change the state (observable from the outside) of the system
+             and those do not
+
+8.  distinctions between operation and method
+  - operation: invoked on the object, a procedure declaration
+  - method: body of the procedure
+            in polymorphism, there can be operation mapped to several methods
+
+9. Generalization: inheritance
+    9.1 subtype, a class is a subtype if it is substitutable for its supertype,
+                 whether or not it uses inheritance
+    9.2 subclassing, used as a synonym for regular inheritance
+
+10. Notes and comments, there are two forms
+      10.1 block
+      10.2 --inline
+
+11. Dependency,
+      A dependency exists between two elements
+      if changes to definition of one element (the supplier)
+      may cause changes to the other (the client).
+
+      with classes, dependencies exists for various reasons
+      11.1 one class sends a message to another
+      11.2 one class has another as parts of its data
+      11.3 one class mentions another as a parameter of an operation
+
+      Syntax: A --> B, means A is dependent on B
+        A's change will not affect B,
+        but B's change may affect A
+
+      Note:
+        1. changes' effect does not propagate to non-directly connected objects
+        2. Many UML relationships imply a dependency
+          2.1 a navigable association represents dependency
+          2.2 in inheritance, subclass depends on superclass
+
+      11.4 Dependency keywords,
+           (principle is: source is affected by the target's change)
+
+           * <<call>>, the source calls an operation in the target
+           * <<create>>, the source creates instances of the target
+           * <<derive>>, the source is derived of the target
+           * <<instantiate>>, the source is a instance of the target
+           * <<permit>>, the target allows the source to access the target's private features
+           * <<realize>>, the source is an implementation of a specification or interface defined by target
+           * <<refine>>, the source refines the target, in terms of semantics
+           * <<substitute>>, source can substitute the target
+           * <<trace>>, used to track such things as requirements to classes or how changes in one link to changes in another source
+           * <<use>>, source need to use target for its implementation
+
+12. we should reduce dependencies and minimize dependency cycles.
+
+13. differences between dependencies and association
+    13.1 dependencies, used to represent "transient" relationship
+                       e.g. argument passing
+    13.2 associations, used to represent "static" relationship
+
+14. Constraint rules
+      syntax: {constraint-rule} or {rulename: rule-constraints}
+      can be defined by either natural language or OCL (Object Constraint Language, which is based on predicate calculus)
+
+15. principles of drawing UML: draw the most concerned part, not all of them
+
+****Class Diagram (Advanced Concepts, optional to draw)****
 1. Static Operations and Attributes, are underlined on a class diagram
 
 2. Aggregation and Composition, also compared with normal association
@@ -90,5 +206,3 @@ Class Diagram (Advanced Concepts, optional to draw)
 14. Messages,
     These add arrows to the sides of associations
     You may also need to add a dependency arrow to show messages between classes that are not associated
-
-Sequence Diagrams
