@@ -135,4 +135,7 @@ Domain models and metadata
    whether in annotations or JPA XML files,
    will trigger a "duplicate mapping" error on startup.
 
-8. The persistent classes only depend on JPA at compile time. 
+8. The persistent classes only depend on JPA at compile time.
+******************************************************************
+No book notes from chapter 4, the following are Java Brains Notes
+******************************************************************
