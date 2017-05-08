@@ -136,9 +136,11 @@ Domain models and metadata
    will trigger a "duplicate mapping" error on startup.
 
 8. The persistent classes only depend on JPA at compile time.
+
 ******************************************************************
 No book notes from chapter 4, the following are Java Brains Notes
 ******************************************************************
+
 1. In order to let Hibernate persist an object, we should
   1.1 mark the class as @Entity
   1.2 Offer an id, usually a surrogate key
@@ -202,6 +204,12 @@ No book notes from chapter 4, the following are Java Brains Notes
         @CollectionId, used to mark @ElementCollection,
                        It is a Hibernate specific annotation,
                        and is used to generate the primary key for the generated collection table.
+  5.11 @OneToOne, used to mark entity associations
+       @OneToMany
+       @ManyToOne
+       @ManyToMany
+  5.12 @NotFound(action=NotFoundAction.IGNORE), used to mark the above association annotations
+                                                specifying the IGNORE action, if the association is not yet established
 
 6. get object (Actually is the Hibernate maintained object's corresponding proxy object)
   session.get(OBJECT.class, PRIMARY_KEY_VALUE)
@@ -216,12 +224,56 @@ No book notes from chapter 4, the following are Java Brains Notes
    the fetch will fail.
    An alternative fetching-strategy is eager-fetching, which fetches all the properties at the first time
 
-8. advanced association mapping #######java brains tutorial 13
-  8.1 one-to-one mapping
-  8.2 one-to-many mapping
-  8.3 many-to-many mapping
+8. advanced association mapping: entity inside entity
+   Note: the mapping is unidirectional PARENT_CLASS to CHILD|CHILDREN_PROPERTY
+         if we would like to construct bidirectional association, we should annotate on both sides
+         the association annotations can have "cascade" property,
+         which let the user specify what to do with the subsequent entity when the current entity has been updated.
+         so as to save the user's effort of manually update subsequent entity
 
-9. Inheritance mapping strategies
+  8.1 one-to-one mapping
+    In the parent class, annotate the contained entity property with
+    @OneToOne.
+
+  8.2 one-to-many mapping
+    In the parent class, annotate the contained entity collection property with
+    @OneToMany
+    After this Annotation, when doing persistence,
+    an additional "association table" is created, containing the parent and children primary keys' combination
+
+  8.3 many-to-one mapping
+    Similar to one-to-many mapping,
+    only the association's direction is inverse,
+    this time the parent is the one with multiple instances.
+    @ManyToOne
+
+  8.4 bidirectional-one-to-many-and-many-to-one mapping in a joined table
+    In one class, mark @OneToMany(mappedBy="OPPOSITE_TABLE_PROPERTY_NAME")
+                  after this annotation,
+                  we are expecting the other table will be specified as the joined table containing the association relationship
+    In the other class, at the same time, mark @ManyToOne on the other entity property
+                                               @JoinColumn("OPPOSITE_PROPERTY_NAME_IN_JOINED_TABLE")
+    After this mapping, the bidirectional association is created in one joined table
+                        so in total, instead of 3 tables, Hibernate will only generate 2 tables, one for each entity, association information only appears in one of them
+
+  8.5 many-to-many mapping
+      similar to one-to-many bidirectional mapping, we mark
+      @ManyToMany on both classes' entity collection properties.
+      In order to guide Hibernate to generate association on only one table,
+      we need to add "mappedBy" argument on one of the @ManyToMany annotations,
+      that is @ManyToMany(mappedBy="OPPOSITE_TABLE_PROPERTY_NAME")
+      after this annotation, 3 tables in total will be created, 2 for entities, 1 for the joined association
+
+
+
+9. Inheritance mapping strategies ########will start
   9.1 single table strategy
   9.2 table per class strategy
   9.3 joined strategy
+
+10. Hibernate Collections
+  10.1 Bag semantic (allow duplication): List/ArrayList, etc.
+  10.2 Bag semantic with ID (allow value duplication): List/ArrayList, etc.
+  10.3 List semantic (allow duplication): List/ArrayList, etc.
+  10.4 Set semantic (no duplication): set
+  10.5 Map semantic: Map
