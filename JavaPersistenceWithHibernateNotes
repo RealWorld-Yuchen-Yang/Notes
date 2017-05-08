@@ -139,3 +139,89 @@ Domain models and metadata
 ******************************************************************
 No book notes from chapter 4, the following are Java Brains Notes
 ******************************************************************
+1. In order to let Hibernate persist an object, we should
+  1.1 mark the class as @Entity
+  1.2 Offer an id, usually a surrogate key
+    Note: different type of keys
+      1. candidate keys, a class can have multiple candidate keys, each of them can be used as a distinguisher of the class object
+      2. primary key, one of the candidate keys chosen to be the to be used identifier of the class
+                      primary key can be a single key, or a composite key, can be natural key or a surrogate key
+                      2.1 natural key, one of the business properties in Java, chosen to be the primary key
+                      2.2 surrogate key, a synthetic primary key, solely used in database to identify the object, has no business meaning in Java Class
+
+2. Using the Hibernate API
+  2.1 Create a session factory, by using Hibernate's configuration file
+      Note: the sessionFactory object is often shared among classes and even among layers
+  2.2 Create a session from the session factory
+      Session session = sessionFactory.openSession()
+  2.3 Use the session to save model objects
+      session.save(OBJ_TO_BE_SAVED)
+      session.getTransaction().commit()
+  2.4 close the session
+      session.close()
+  Note: the database table is automatically created by Hibernate, there is no need to manually create the database table
+
+3. Hibernate default recreate the database schema every time the application starts
+   If we want to persist the data for longer time
+   we can configure hibernate.cfg.xml's
+  <property name="hbm2ddl.auto">update</property>
+
+4. Class level annotations:
+  4.1 @Entity, configure the whole entity class
+  4.2 @Table, only used to configure the database table corresponding to the entity
+  4.3 @Embeddable, mark the class as a value type, counter to entity type,
+                   once its instance appears as a property of some other object,
+                   the persistence strategy is always embed the current object
+
+5. property level annotations:
+  5.1 @Id, used to mark identifiers, usually a surrogate with Long type
+      @GeneratedValue, is used to mark @Id, specifying the strategy how Hibernate generate the surrogate key
+  5.2 @Column, can be used to configure the database table column
+  5.3 @Collection, marked on collection-typed properties. so that Hibernate will store the collection property accordingly
+  5.4 @Basic
+  5.5 @Transient, used to tell Hibernate whether to save the corresponding property or not
+  5.6 @Temporal, used to configure Date and Time related properties, like Date
+  5.6 @Lob, used to mark String/byte[] typed properties, to indicate their size can be larger than default String's Max size 255
+        Hibernate will figure it out by itself, whether the Lob is blob or clob
+  5.7 @Embedeed, to mark the current value property as a embedded type,
+                 after this marking, the current property will be considered a sub-object  and dissected
+                 each property of the Embedded object will appear with its master table
+  5.8 @AttributeOverride, used to reconfigure the current property object
+      e.g. @AttributeOverride(name="ORIGINAL_NAME"), column=@Column(name="NEW_NAME")
+      @AttributeOverrides, if multiple @AttriubteOverride need to be specified,
+                           @AttributeOverrides is used to group these @AttributeOverride annotations
+  5.9 @EmbeddedId, used to mark value-typed Id
+  5.10 @ElementCollection, is used to mark collection objects
+                           the collection property is stored in a separate table,
+                           default name is prefixed with containing class's classname
+                           @ElementCollection has "fetch" property, which can be used to specify fetching strategies: EAGER/LAZY
+       Note: collection object's declaration type should be the conforming interface,
+             instead of the actual implementation class
+             Also, the collection table stores the containing class's primary key as a foreign key to reference the parent
+        @JoinTable, used to mark @ElementCollection, to perform join with other table, especially the parent
+        @CollectionId, used to mark @ElementCollection,
+                       It is a Hibernate specific annotation,
+                       and is used to generate the primary key for the generated collection table.
+
+6. get object (Actually is the Hibernate maintained object's corresponding proxy object)
+  session.get(OBJECT.class, PRIMARY_KEY_VALUE)
+  Note: the default "primary key" is the Id
+
+7. when using sessionFactory to get objects,
+   the returned object is not the desired class,
+   but the default class's proxy (which inherits the desired class, of course)
+   the default object fetching strategy is lazy-fetching, only the first level properties are fetch at the first time
+   other deeper level properties are fetch when they are actually called/used.
+   if session is closed before the deeper level objects are to be called,
+   the fetch will fail.
+   An alternative fetching-strategy is eager-fetching, which fetches all the properties at the first time
+
+8. advanced association mapping #######java brains tutorial 13
+  8.1 one-to-one mapping
+  8.2 one-to-many mapping
+  8.3 many-to-many mapping
+
+9. Inheritance mapping strategies
+  9.1 single table strategy
+  9.2 table per class strategy
+  9.3 joined strategy
