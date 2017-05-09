@@ -174,6 +174,9 @@ No book notes from chapter 4, the following are Java Brains Notes
   4.3 @Embeddable, mark the class as a value type, counter to entity type,
                    once its instance appears as a property of some other object,
                    the persistence strategy is always embed the current object
+  4.4 @Inheritance, used to configure inheritance mapping
+      @DiscriminatorColumn, on ParentClass, used to configure DiscriminatorColumn of inheritance
+      @DiscriminatorValue, use to specify the DiscriminatorValue
 
 5. property level annotations:
   5.1 @Id, used to mark identifiers, usually a surrogate with Long type
@@ -266,10 +269,42 @@ No book notes from chapter 4, the following are Java Brains Notes
 
 
 
-9. Inheritance mapping strategies ########will start
-  9.1 single table strategy
+9. Inheritance mapping strategies
+    @Inheritance to configure inheritance behavior
+      e.g. @Inheritance(strategy=InheritanceType.SINGLE_TABLE...)
+
+    @DiscriminatorColumn
+      e.g. @DiscriminatorColumn(
+        name="NAME"
+        discriminatorType=DiscriminatorType.XXX
+      )
+
+    @DiscriminatorValue, use to specify the DiscriminatorValue
+
+  9.1 single table strategy:
+        this is the default strategy of Hibernate,
+        ("default", means only annotate the classes as @Entity, no additional annotation)
+        map everything into the base class's table,
+        additionally, add the string valued datatype (dtype) to each stored object instances
+        this strategy will end up with many "holes" in the database table
+
   9.2 table per class strategy
+      @Inheritance(strategy=Inheritance.TABLE_PER_CLASS), on the parent class
+      no need to annotate the children classes other than @Entity
+      behavior:
+        children class will store all properties in itself's table
+        (no matter whether they are declared directly in themselves or inherited)
+      Downside of this strategy is there will be many data duplications in the database
+      also, the child class table has no clue that who is its parent
+
   9.3 joined strategy
+      @Inheritance(strategy=InheritanceType.JOINED), on the parent class
+      behavior:
+        all properties defined in a class will appear in its own class,
+        except for duplications of "primary keys",
+        duplicated primary keys will be used as foreign keys, when doing join table sql query on the child class,
+        so as to get the whole information of the child class
+      This is the best choice.
 
 10. Hibernate Collections
   10.1 Bag semantic (allow duplication): List/ArrayList, etc.
@@ -277,3 +312,44 @@ No book notes from chapter 4, the following are Java Brains Notes
   10.3 List semantic (allow duplication): List/ArrayList, etc.
   10.4 Set semantic (no duplication): set
   10.5 Map semantic: Map
+
+11. Since there are many discrepancies between Java and relational data
+    when storing objects into relational database,
+    information like "association (due to the flat structure of relational table)" will be missed.
+                     "inheritance"
+    To compensate this, Hibernate will generate additional table to store the missing information
+
+12. CRUD Operations
+    session.save(OBJECT)
+    session.get(OBJECT.CLASS, PRIMARY_KEY)
+    session.update(OBJECT), (the "OBJECT" has to be "gotten" by the session previously)
+    session.delete(OBJECT), delete() operation will transfer the object's state from "Persistent" to "Transient"
+
+    Note: by default,
+          we can still visit object's first level data outside the session,
+          for the proxy object returned by the session contains first level data in them
+
+13. Transient, Persistent and Detached Objects
+  13.1 Transient object:
+        Once the object has just been instantiated, but not yet saved by Hibernate
+
+  13.2 Persistent object:
+        Once the object is persisted by using Hibernate's session.save()
+        Note:
+              during the session,
+              even if you do not specify the update operation,
+              the changes of the persisted object will be updated automatically
+
+  13.3 Detached object:
+        After session.close(),
+        objects "obtained from"/"saved into" session are detached.
+        only cached data (like object's first level properties) can be accessed
+
+14. @org.hibernate.annotation.Entity(selectBeforeUpdate=true),
+    once we use this Hibernate specific annotation to mark the class
+    when doing update,
+    Hibernate will first do a select,
+    only update if the instance of the class has been changed.
+    This increases performance when change to the object is scarce, otherwise it will decrease performance.
+
+15.
