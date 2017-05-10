@@ -1,0 +1,166 @@
+Concurrency
+1. Purpose of synchronization:
+  Synchronization is required for reliable communication between threads as well as for mutual exclusion
+  (Specified in the "memory model", which defines when and how changes made by one thread become visible to others)
+  1.1 communication:
+        proper use of synchronization guarantees that
+        no method will ever observe the object in an inconsistent state.
+  1.2 mutual exclusion:
+        no two threads can manipulate the same synchronized block/method
+
+2. Java language specification guarantees that reading or writing a variable is atomic
+   unless the variable is of type **long** or **double**
+
+3. If we would like to use one thread to control the operation behavior of another thread.
+   we have to at least make the control "signal, e.g. static field indicator" **synchronized** (or **volatile** for atomic operations)
+   Note: if synchronization is marked on "methods", both read and write operations should by synchronized
+
+4. **volatile** key word
+  it is used in synchronization,
+  guarantees any thread reading the marked field's most recently written value,
+  but it performs no mutual exclusion
+
+5. ++ operator, is not atomic
+
+6. java.util.concurrent.* is an official Concurrency API,
+   which should be used in concurrent programming.
+
+   java.util.concurrent.atomic.AtomicLong type is the thread safe counterpart of the normal long type
+
+7. the best way of solving data inconsistency in concurrent programming is "from the origin"
+   which is to "confine mutable data to a single thread"
+   And for information sharing,
+   synchronize only the act of sharing the object reference,
+   such objects are said to be "effectively immutable"
+
+8. To avoid liveness and safety failure,
+   never "cede control to" the "client" within a synchronized method or block.
+   In other words,
+   inside a synchronized region,
+   do not invoke a method that is designed to be overridden, or one provided by a client in the form of a function object.
+   because, otherwise, server will not have control over the synchronized block,
+   which will cause indeterministic result
+
+9. If we use classes in java.util.concurrent.*
+   no explicit synchronization need to be performed.
+   since synchronization is handled inside these classes
+
+10. To prevent threads from concurrently modifying a shared collection,
+    if we use normal collection instead of the java.util.concurrent.* classes
+    we can synchronize the collection itself,
+    and move the modification of the collection outside the synchronization block
+
+11. An alien method invoked outside a synchronized region is known as an open call.
+
+12. As a rule, you should do as little work as possible inside synchronized regions.
+
+13. You should make mutable class thread-safe if it is intended for concurrent use.
+    You can achieve significantly higher concurrency by synchronizing internally than you could by locking the entire object externally.
+    Otherwise, do not synchronize internally.
+
+14. Use java.util.concurrent framework's ExecutorService in favor of Thread
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    executor.execute(RUNNABLE/CALLABLE)
+    executor.shutdown(RUNNABLE/CALLABLE)
+    If you want more than one thread to process requests from the queue, simply call a different static factory
+    Executors.newCachedThreadPool(), for lightweight loaded server
+             .newFixedThreadPool(), for heavy duty loaded server
+
+15. Given the difficulty of using wait and notify correctly,
+    you should use the 3 higher-level concurrency utilities instead.
+    15.1 Executor Framework
+
+    15.2 Concurrent Collections
+          concurrency is managed internally inside the concurrent collections
+          It is impossible to exclude concurrent activities from a concurrent collection.
+          On the other hand, locking it will have no effect
+
+    15.3 Synchronizers
+          objects that enable threads to wait for one another, allowing them to coordinate activities
+          More commonly used,
+            * CountDownLatch, single used barriers
+            * Semaphore
+          Less commonly used,
+            * CyclicBarrier
+            * Exchanger
+
+16. concurrency level: represents the number of actions to be executed concurrently
+    action: a Runnable/Callable instances
+
+17.  thread starvation deadlock:
+        executor must allow for the creation of at least as many threads as the given concurrency level,
+        otherwise,  task performed by the executor will never complete
+
+18. For internal timing, always use System.nanoTime in preference to System.currentTimeMillis.
+
+19. wait() method is used to make a thread wait for some condition
+    Only maintaining legacy code will you encounter opportunity of using wait()
+    If deal with wait() method, it must be invoked inside a synchronized region that
+    locks the object on which it is invoked
+
+    //standard idiom for using the wait method
+    synchronized(obj)
+    {
+      while(<condition does not hold>)
+      {
+        obj.wait();//release the lock, and reacquires on wakeup
+      }
+      ...//perform action appropriate to condition
+    }
+
+20. In order to deal with the problem: (spurious wakeup)
+      The waiting thread could rarely wake up in the absence of a notify.
+    It is often said that you should always use notifyAll().
+
+21. For documentation, I can not rely on judging if a method is thread safe by looking for the "synchronized" modifier
+    The presence of the synchronized modifier in a method declaration is an implementation detail,
+    not part of its exported API
+    There are a 5 levels of thread safety:
+    21.1 immutable
+          Instances of this class appear constant.
+          **No external synchronization** is necessary.
+          e.g. String, Long, and BigInteger
+    21.2 unconditional thread-safe (always thread safe)
+          Instances of this class are mutable,
+          but the class **has sufficient internal synchronization**
+          that its instances can be used concurrently **without the need for any external** synchronization
+          e.g. Random, ConcurrentHashMap
+    21.3 conditionally thread-safe
+          Like unconditionally thread-safe,
+          except that **some methods require** external synchronization for safe concurrent use.
+          e.g. collections returned by Collections.synchronized wrappers,
+               whose iterators require external synchronization
+    21.4 not thread-safe
+          Instances of this class are mutable.
+          To use them concurrently,
+          client must **surround each method** invocation (or invocation sequence)
+          with external synchronization of the clients' choosing.
+          e.g. general-purpose collection implementations, such as ArrayList and HashMap
+    21.5 thread-hostile
+          This class is **not safe** for concurrent use **even if all** method invocations are surrounded by external synchronization.
+          Thread hostility usually **results from modifying static data without synchronization**
+          No one writes a thread-hostile class on purpose;
+          such classes result from the failure to consider concurrency.
+
+22. API writers must document which lock/locks should be acquired when executing a method
+    so as to guarantee thread-safety
+    usually locks should be the originator of the method.
+    if the originator is a view of some object, the source object should be locked, instead of the view
+    (Note: these kind of documentations should appear in method comments)
+
+23. Denial-of-service attack
+    Definition:
+      a client holds the public accessible lock for a prolonged period.
+    Solution:
+      use a private lock object instead of using synchronized methods (which implies a publicly accessible lock)
+      e.g.
+        //private lock object idiom, thwart denial-of-service attack
+        private final Object lock = new Object();
+
+        public void foo()
+        {
+          synchronized(lock)
+          {
+            ...
+          }
+        }
