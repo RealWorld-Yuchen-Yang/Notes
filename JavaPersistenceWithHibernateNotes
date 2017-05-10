@@ -384,3 +384,4 @@ No book notes from chapter 4, the following are Java Brains Notes
        Note: you can also use named SQL queries by declaring queries as
              @NamedNativeQuery(name="NAME", query="SQL_QUERY", resultClass=RESULT.class),
              as can be seen, if we use SQL query, we need to explicit indicate Hibernate which result class should it hand back
+             
