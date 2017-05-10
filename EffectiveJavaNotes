@@ -154,8 +154,12 @@ Concurrency
     Solution:
       use a private lock object instead of using synchronized methods (which implies a publicly accessible lock)
       e.g.
-        //private lock object idiom, thwart denial-of-service attack
-        private final Object lock = new Object();
+        /*
+          private lock object idiom, thwart denial-of-service attack
+          suitable for unconditional thread-safe classes,
+          especially used for inheritance
+        */
+        private final Object lock = new Object();//Note: the lock is declared as final
 
         public void foo()
         {
@@ -164,3 +168,69 @@ Concurrency
             ...
           }
         }
+
+24. Lazy initialization in concurrent environment, idiom of guarantee thread-safety without "synchronized"
+    24.1 Lazy initialization on instance fields in concurrent environment
+         /*
+            double-check idiom:
+              check the value of the field twice
+              1. check value without locking
+              2. if the field appears to be uninitialized,
+                 check value with locking
+            Note: the checked field should be declared as "volatile"
+         */
+         private volatile FieldType field;
+         FieldType getField()
+         {
+            FieldType result = field;
+            if(result == null) //first check, no locking
+            {
+              synchronized(this) //synchronize the method call originator
+              {
+                //inside this block, the field value is communicated with other threads
+                result = field;
+                if(result == null) //Second check, with locking, if condition is satisfied, it means no thread has initialized this field
+                {
+                  field = result = computeFieldValue();//perform the first initialization
+                }
+              }
+            }
+            return result;
+         }
+
+    *****************************************************************************************************
+    Occasionally, you may need to lazy initialize an instance field that tolerate repeated initialization,
+    if it is the case,
+    the double-check idiom can be simplified to a single-check idiom
+          //single-check idiom - can cause repeated initialization
+          private volatile FieldType field;
+
+          private FieldType getField()
+          {
+            FieldType  result = field;
+            if(result == null)//first check, and the only check
+            {
+              field = result = computeFieldValue();
+            }
+            return result;
+          }
+
+    24.2 Lazy initialization on static fields in concurrent environment
+         //Lazy initialization holder class idiom for static fields
+         PARENT_CLASS
+         {
+             private static class FieldHolder()
+             {
+                static final FieldType field = computeFieldValue();
+             }
+
+             static FieldType getField()
+             {
+                return FieldHolder.field;
+             }
+         }
+
+25. Note that lazy initialization's trade-off is to postpone the field's initialization.
+    which can not always increase performance,
+    this technique should be used when the access to the field is scarce,
+    otherwise, it not worth optimizing.
