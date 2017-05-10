@@ -136,6 +136,220 @@ Domain models and metadata
    will trigger a "duplicate mapping" error on startup.
 
 8. The persistent classes only depend on JPA at compile time.
+
 ******************************************************************
 No book notes from chapter 4, the following are Java Brains Notes
 ******************************************************************
+
+1. In order to let Hibernate persist an object, we should
+  1.1 mark the class as @Entity
+  1.2 Offer an id, usually a surrogate key
+    Note: different type of keys
+      1. candidate keys, a class can have multiple candidate keys, each of them can be used as a distinguisher of the class object
+      2. primary key, one of the candidate keys chosen to be the to be used identifier of the class
+                      primary key can be a single key, or a composite key, can be natural key or a surrogate key
+                      2.1 natural key, one of the business properties in Java, chosen to be the primary key
+                      2.2 surrogate key, a synthetic primary key, solely used in database to identify the object, has no business meaning in Java Class
+
+2. Using the Hibernate API
+  2.1 Create a session factory, by using Hibernate's configuration file
+      Note: the sessionFactory object is often shared among classes and even among layers
+  2.2 Create a session from the session factory
+      Session session = sessionFactory.openSession()
+  2.3 Use the session to save model objects
+      session.save(OBJ_TO_BE_SAVED)
+      session.getTransaction().commit()
+  2.4 close the session
+      session.close()
+  Note: the database table is automatically created by Hibernate, there is no need to manually create the database table
+
+3. Hibernate default recreate the database schema every time the application starts
+   If we want to persist the data for longer time
+   we can configure hibernate.cfg.xml's
+  <property name="hbm2ddl.auto">update</property>
+
+4. Class level annotations:
+  4.1 @Entity, configure the whole entity class
+  4.2 @Table, only used to configure the database table corresponding to the entity
+  4.3 @Embeddable, mark the class as a value type, counter to entity type,
+                   once its instance appears as a property of some other object,
+                   the persistence strategy is always embed the current object
+  4.4 @Inheritance, used to configure inheritance mapping
+      @DiscriminatorColumn, on ParentClass, used to configure DiscriminatorColumn of inheritance
+      @DiscriminatorValue, use to specify the DiscriminatorValue
+
+5. property level annotations:
+  5.1 @Id, used to mark identifiers, usually a surrogate with Long type
+      @GeneratedValue, is used to mark @Id, specifying the strategy how Hibernate generate the surrogate key
+  5.2 @Column, can be used to configure the database table column
+  5.3 @Collection, marked on collection-typed properties. so that Hibernate will store the collection property accordingly
+  5.4 @Basic
+  5.5 @Transient, used to tell Hibernate whether to save the corresponding property or not
+  5.6 @Temporal, used to configure Date and Time related properties, like Date
+  5.6 @Lob, used to mark String/byte[] typed properties, to indicate their size can be larger than default String's Max size 255
+        Hibernate will figure it out by itself, whether the Lob is blob or clob
+  5.7 @Embedeed, to mark the current value property as a embedded type,
+                 after this marking, the current property will be considered a sub-object  and dissected
+                 each property of the Embedded object will appear with its master table
+  5.8 @AttributeOverride, used to reconfigure the current property object
+      e.g. @AttributeOverride(name="ORIGINAL_NAME"), column=@Column(name="NEW_NAME")
+      @AttributeOverrides, if multiple @AttriubteOverride need to be specified,
+                           @AttributeOverrides is used to group these @AttributeOverride annotations
+  5.9 @EmbeddedId, used to mark value-typed Id
+  5.10 @ElementCollection, is used to mark collection objects
+                           the collection property is stored in a separate table,
+                           default name is prefixed with containing class's classname
+                           @ElementCollection has "fetch" property, which can be used to specify fetching strategies: EAGER/LAZY
+       Note: collection object's declaration type should be the conforming interface,
+             instead of the actual implementation class
+             Also, the collection table stores the containing class's primary key as a foreign key to reference the parent
+        @JoinTable, used to mark @ElementCollection, to perform join with other table, especially the parent
+        @CollectionId, used to mark @ElementCollection,
+                       It is a Hibernate specific annotation,
+                       and is used to generate the primary key for the generated collection table.
+  5.11 @OneToOne, used to mark entity associations
+       @OneToMany
+       @ManyToOne
+       @ManyToMany
+  5.12 @NotFound(action=NotFoundAction.IGNORE), used to mark the above association annotations
+                                                specifying the IGNORE action, if the association is not yet established
+
+6. get object (Actually is the Hibernate maintained object's corresponding proxy object)
+  session.get(OBJECT.class, PRIMARY_KEY_VALUE)
+  Note: the default "primary key" is the Id
+
+7. when using sessionFactory to get objects,
+   the returned object is not the desired class,
+   but the default class's proxy (which inherits the desired class, of course)
+   the default object fetching strategy is lazy-fetching, only the first level properties are fetch at the first time
+   other deeper level properties are fetch when they are actually called/used.
+   if session is closed before the deeper level objects are to be called,
+   the fetch will fail.
+   An alternative fetching-strategy is eager-fetching, which fetches all the properties at the first time
+
+8. advanced association mapping: entity inside entity
+   Note: the mapping is unidirectional PARENT_CLASS to CHILD|CHILDREN_PROPERTY
+         if we would like to construct bidirectional association, we should annotate on both sides
+         the association annotations can have "cascade" property,
+         which let the user specify what to do with the subsequent entity when the current entity has been updated.
+         so as to save the user's effort of manually update subsequent entity
+
+  8.1 one-to-one mapping
+    In the parent class, annotate the contained entity property with
+    @OneToOne.
+
+  8.2 one-to-many mapping
+    In the parent class, annotate the contained entity collection property with
+    @OneToMany
+    After this Annotation, when doing persistence,
+    an additional "association table" is created, containing the parent and children primary keys' combination
+
+  8.3 many-to-one mapping
+    Similar to one-to-many mapping,
+    only the association's direction is inverse,
+    this time the parent is the one with multiple instances.
+    @ManyToOne
+
+  8.4 bidirectional-one-to-many-and-many-to-one mapping in a joined table
+    In one class, mark @OneToMany(mappedBy="OPPOSITE_TABLE_PROPERTY_NAME")
+                  after this annotation,
+                  we are expecting the other table will be specified as the joined table containing the association relationship
+    In the other class, at the same time, mark @ManyToOne on the other entity property
+                                               @JoinColumn("OPPOSITE_PROPERTY_NAME_IN_JOINED_TABLE")
+    After this mapping, the bidirectional association is created in one joined table
+                        so in total, instead of 3 tables, Hibernate will only generate 2 tables, one for each entity, association information only appears in one of them
+
+  8.5 many-to-many mapping
+      similar to one-to-many bidirectional mapping, we mark
+      @ManyToMany on both classes' entity collection properties.
+      In order to guide Hibernate to generate association on only one table,
+      we need to add "mappedBy" argument on one of the @ManyToMany annotations,
+      that is @ManyToMany(mappedBy="OPPOSITE_TABLE_PROPERTY_NAME")
+      after this annotation, 3 tables in total will be created, 2 for entities, 1 for the joined association
+
+
+
+9. Inheritance mapping strategies
+    @Inheritance to configure inheritance behavior
+      e.g. @Inheritance(strategy=InheritanceType.SINGLE_TABLE...)
+
+    @DiscriminatorColumn
+      e.g. @DiscriminatorColumn(
+        name="NAME"
+        discriminatorType=DiscriminatorType.XXX
+      )
+
+    @DiscriminatorValue, use to specify the DiscriminatorValue
+
+  9.1 single table strategy:
+        this is the default strategy of Hibernate,
+        ("default", means only annotate the classes as @Entity, no additional annotation)
+        map everything into the base class's table,
+        additionally, add the string valued datatype (dtype) to each stored object instances
+        this strategy will end up with many "holes" in the database table
+
+  9.2 table per class strategy
+      @Inheritance(strategy=Inheritance.TABLE_PER_CLASS), on the parent class
+      no need to annotate the children classes other than @Entity
+      behavior:
+        children class will store all properties in itself's table
+        (no matter whether they are declared directly in themselves or inherited)
+      Downside of this strategy is there will be many data duplications in the database
+      also, the child class table has no clue that who is its parent
+
+  9.3 joined strategy
+      @Inheritance(strategy=InheritanceType.JOINED), on the parent class
+      behavior:
+        all properties defined in a class will appear in its own class,
+        except for duplications of "primary keys",
+        duplicated primary keys will be used as foreign keys, when doing join table sql query on the child class,
+        so as to get the whole information of the child class
+      This is the best choice.
+
+10. Hibernate Collections
+  10.1 Bag semantic (allow duplication): List/ArrayList, etc.
+  10.2 Bag semantic with ID (allow value duplication): List/ArrayList, etc.
+  10.3 List semantic (allow duplication): List/ArrayList, etc.
+  10.4 Set semantic (no duplication): set
+  10.5 Map semantic: Map
+
+11. Since there are many discrepancies between Java and relational data
+    when storing objects into relational database,
+    information like "association (due to the flat structure of relational table)" will be missed.
+                     "inheritance"
+    To compensate this, Hibernate will generate additional table to store the missing information
+
+12. CRUD Operations
+    session.save(OBJECT)
+    session.get(OBJECT.CLASS, PRIMARY_KEY)
+    session.update(OBJECT), (the "OBJECT" has to be "gotten" by the session previously)
+    session.delete(OBJECT), delete() operation will transfer the object's state from "Persistent" to "Transient"
+
+    Note: by default,
+          we can still visit object's first level data outside the session,
+          for the proxy object returned by the session contains first level data in them
+
+13. Transient, Persistent and Detached Objects
+  13.1 Transient object:
+        Once the object has just been instantiated, but not yet saved by Hibernate
+
+  13.2 Persistent object:
+        Once the object is persisted by using Hibernate's session.save()
+        Note:
+              during the session,
+              even if you do not specify the update operation,
+              the changes of the persisted object will be updated automatically
+
+  13.3 Detached object:
+        After session.close(),
+        objects "obtained from"/"saved into" session are detached.
+        only cached data (like object's first level properties) can be accessed
+
+14. @org.hibernate.annotation.Entity(selectBeforeUpdate=true),
+    once we use this Hibernate specific annotation to mark the class
+    when doing update,
+    Hibernate will first do a select,
+    only update if the instance of the class has been changed.
+    This increases performance when change to the object is scarce, otherwise it will decrease performance.
+
+15.
