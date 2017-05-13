@@ -209,6 +209,8 @@ the following are Java Brains Notes
       @DiscriminatorValue, use to specify the DiscriminatorValue
   4.5 @Cacheable, let Hibernate know the annotated entity should be cached in the second level cache as well
       @Cache(usage=CacheConcurrencyStrategy.XXX), to additionally configure the second level cache
+  4.6 @NamedQuery(name="NAME", query="HQL_QUERY"),
+      @NamedNativeQuery(name="NAME", query="SQL_QUERY", resultClass=RESULT.class),
 
 5. property level annotations:
   5.1 @Id, used to mark identifiers, usually a surrogate with Long type
@@ -406,3 +408,33 @@ the following are Java Brains Notes
            2. Before performing sql query request,
               Hibernate should firstly check to see whether the query cache contains the desired entity object.
               and sql queries are only preformed if the query cache does not contain it.
+17. HQL Query
+  17.1 Should be performed inside Hibernate's session,
+       very similar to SQL
+
+  17.2 HQL is "object-centric",
+       so query should be based on object and properties,
+       instead of on tables and columns
+
+  17.3 SQL query injection: inject "value" into sql queries, then you may get undesired results
+
+  17.4 ParameterBinding in query context: bind values to parameters in your SQL queries
+       Hibernate uses ParameterBinding to prevent SQL injection.
+       Syntax:
+          you can use '?' or ':PARAM_NAME' as place holders in the query string,
+          and use the query object's set(INDEX or PARAM_NAME, VALUE) to supply values to the indexedParameterPlaceHolders
+
+  17.5 @NamedQuery, named HQL queries
+                    allows programmer define queries at the @Entity Level,
+                    which groups queries in one place and makes maintaining queries easier
+        syntax:
+          declaration:
+            @NamedQuery(name="NAME", query="HQL_QUERY"),
+            Note: the naming convention can be ENTITY_NAME.action, which describes the query
+          use:
+            session.getNamedQuery(NAME)
+
+       Note: you can also use named SQL queries by declaring queries as
+             @NamedNativeQuery(name="NAME", query="SQL_QUERY", resultClass=RESULT.class),
+             as can be seen, if we use SQL query, we need to explicit indicate Hibernate which result class should it hand back
+             
