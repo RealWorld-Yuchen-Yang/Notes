@@ -153,18 +153,144 @@ Managing data
         removed from the database.
         you should discard any references you may hold to it in the application after you finish working with it.
   1.4 Detached:
-        stale data,
+        stale data, removed from persistentContext
         modification of it will not reflect in its database representation.
         merge() detached objects can merge the changed stale data back to its persistent counterpart in the database
 
 2. PersistentContext
   2.1 created at EntityManagerFactory#createEntityManager()
       closed at EntityManager#close()
-      persistentContext defines the scope of the persistent context, demarcating the unit of work
+      persistentContext defines the scope of the persistent context, demarcating the **unit of work**
   2.2 The persistent context acts first level cache,
       it remembers all entity instances you have handled in a particular unit of work
   2.3 changes made in a particular persistent context are already immediately visible to all other code executed inside that unit of work
       and its persistence context.
+
+3. Rollback:
+  If one of the INSERT or UPDATE statements (database operation) made when flushing fails,
+  Hibernate causes a rollback of changes made to persistent instances in this transaction at the database level.
+  But Hibernate doesn't roll back in-memory changes to persistent instances.
+  That can be that Hibernate will not roll back changes after a persistent(), if commit failure occurs
+  This is reasonable because a failure of a transaction is normally non-recoverable,
+  and you have to discard (roll back) the failed persistence context and EntityManager immediately.
+
+4. DML statements usually create locks in the database that are held until the transaction completes,
+   so Hibernate keeps the lock duration in the database as short as possible by
+   propagate state changes to the database as late as possible
+
+5. Refreshing data:
+  5.1 definition:
+    If entity record is modified in the database after it is retrieved.
+    by calling EntityManager#refresh(ENTITY) will update the application memory with the latest instance
+    if the entity is deleted, EntityNotFoundException is to be thrown
+  5.2 usage:
+    usually no manual refresh() is needed.
+    the best use case for refreshing is with an extended persistence context,
+    which might span several request/response cycles and/or system transactions.
+
+6. Replication
+  You may need replication when you reconcile data entered into different databases.
+
+7. Hibernate, as a JPA implementation, synchronize at the following times:
+  7.1 When a joined JTA system transaction is committed
+  7.2 Before a query is executed--query with javax.persistence.Query or the similar Hibernate API
+  7.3 When the application calls flush() explicitly
+
+8. You can at any time, while a transaction is in progress,
+   force dirty checking and synchronization with database by calling EntityManager#flush()
+
+9. in different persistenceContext, entities represented by the same database table may not be equal
+   this may not be the desired behavior, so
+   whenever you work with instances in detached state and you test them for equality (usually in hash-based collections),
+   you need to supply your own implementation of the equals() and hashCode() method for your mapped entity class.
+
+10. Implementing equality methods;
+  10.1 when overriding equals method, we must override hashCode() as well.
+       if two instances are equal, they must have the same hashCode(),
+       (Note: on the contrary, if two instances' hashCode() are the same, they may not be equal, think of hashCode clashing)
+  10.2 we should favor of business key equality over database identifier equality, the later may change if the entity to be persisted is in a collection
+    10.2.1 business key: a property/some combination of properties,
+                         that is unique for each instance with the same database identity
+    10.2.2 business key is what the user thinks of as uniquely identifying a particular record (also have an unique constraint on the database column),
+           whereas the surrogate key is what the application and database systems rely on.
+  10.3 best practice can be found on p277 of the book
+
+11. If you want to delete a detached instance,
+    you have to merge it first.
+    Then call remove() on the persistent instance returned by merge()
+
+Transactions and Concurrency
+1. Transaction definition:
+    Application functionality requires that several things be done in one go.
+    These steps collectively is called a transaction or unit of work
+
+2. ACID, the criteria of transaction: atomicity, consistency, isolation, durability
+
+3. Transactions are marked in the code between UserTransaction#begin() and UserTransaction#commit()
+
+4. for transaction's exception handling, I can use UserTransaction#rollback() in the catch block
+
+5. When you create an EntityManager, it looks for an ongoing JTA system transaction within the current thread of execution
+   If the EntityManager finds an ongoing transaction, it joins the transaction by listening to transaction events.
+   This means you should always call UserTransaction#begin() and EntityManagerFactory#createEntityManger() on the same thread
+   if you want them to be joined.
+
+6. If the EntityManger can't find a started transaction in the same thread when it's created,
+   it is in a special unsynchronized mode.
+
+7. Recommendation of when to throw transaction exceptions
+  use fine-grained exception types to display better-looking (fatal) error messages, not for validation
+
+8. How to handle exceptions
+    Exceptions thrown by Hibernate are fatal.
+    This means that you have to close the current persistence context.
+    You aren't allowed to continue working with the EntityManager that threw an exception
+
+    Render an error screen and/or log the error,
+    and then let the user restart the conversation with the system using a fresh transaction and persistent context.
+
+9. Transaction boundaries can either be coded or be marked by using annotations in J2EE environment
+
+10. Transaction Isolation Issues (severity in decreased order)
+  10.1 lost update:
+        occurs if two transactions both update a data item
+        and then the second transaction aborts,
+        causing both changes to be lost.
+        This occurs in systems that do not implement concurrency control,
+        where concurrent transactions are not isolated.
+
+  10.2 dirty read:
+        occurs if a transaction reads
+        changes made by another transaction that has not yet been committed.
+
+  10.3 unrepeatable:
+        occurs if a transaction read a data item twice
+        and read different state each time.
+        A special case of an unrepeatable read is the last commit wins problem.
+        which is the last commit overwrite all the previous ones.
+
+  10.4 phantom read:
+        occur when a transaction executes a query twice,
+        and the second result includes data that wasn't visible in the first result,
+        or less data because something was deleted.
+
+11. Four(4) ANSI isolation levels (in ascending order)
+  11.1 Read uncommitted isolation,
+          permits dirty read, but not lost update
+  11.2 Read committed isolation (JPA default),
+          permits unrepeatable read, but not dirty read
+  11.3 Repeatable read isolation,
+          read is repeatable, neither unrepeatable read nor dirty read are allowed
+  11.4 Serializable isolation,
+          emulates serial execution, that is as if transactions are executed one after another
+
+12. guide lines of choosing the isolation level
+  12.1 never choose "read uncommitted isolation"
+  12.2 most applications do not need "serializable isolation"
+       for phantom read are not usually problematic.
+
+  12.3
+
 
 
 ******************************************************************
@@ -211,6 +337,7 @@ the following are Java Brains Notes
       @Cache(usage=CacheConcurrencyStrategy.XXX), to additionally configure the second level cache
   4.6 @NamedQuery(name="NAME", query="HQL_QUERY"),
       @NamedNativeQuery(name="NAME", query="SQL_QUERY", resultClass=RESULT.class),
+  4.7 @Version, marked on surrogate property version, use to enable versioning
 
 5. property level annotations:
   5.1 @Id, used to mark identifiers, usually a surrogate with Long type
@@ -437,4 +564,3 @@ the following are Java Brains Notes
        Note: you can also use named SQL queries by declaring queries as
              @NamedNativeQuery(name="NAME", query="SQL_QUERY", resultClass=RESULT.class),
              as can be seen, if we use SQL query, we need to explicit indicate Hibernate which result class should it hand back
-             
