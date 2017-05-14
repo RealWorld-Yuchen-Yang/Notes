@@ -234,3 +234,17 @@ Concurrency
     which can not always increase performance,
     this technique should be used when the access to the field is scarce,
     otherwise, it not worth optimizing.
+
+26. If thread is not getting enough CPU time,
+    do not try to fix it by calling Thread.yield,
+    nor try to adjust the thread priorities.
+    a better course of action is to restructure the application to reduce the number of concurrently runnable thread.
+
+27. In order to return control to the caller (most likely a thread)
+    you should use Thread.sleep(1) instead of Thread.yield.
+    Do not use Thread.sleep(0), which can return immediately
+
+28. Thread priorities may be used sparingly to improve the quality of service of an already working program,
+    but they should never be used to "fix" a program that barely works.
+
+29. Avoid using thread group
