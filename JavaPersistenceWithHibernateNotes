@@ -318,7 +318,49 @@ Fetch plans, strategies and profiles
    so as to minimize the number of SQL statements and the complexity of each SQL statement
    especially want to avoid n+1 selects and Cartesian product issues
 
+Cascading state transitions
+1. Definition:
+    When an entity instance changes state,
+    associated entity instances may also be included in this state transition
+    (cascading is not enabled by default)
 
+2. An object persistence layer is said to implement persistence by reachability
+   if any instance becomes persistent
+   whenever the application creates a reference to the instance from another instance that is already persistent
+   That is, ideally,
+   an instance should become transient and be deleted form the database
+   if it is not reachable via references from the root persistent object
+
+3. Life cycle callback annotations (should be marked on methods, so as to represent callback)
+  3.1 @PostLoad,
+        triggered after an entity instance is loaded into the persistence context
+        also called after refreshing an already-persistent instance.
+  3.2 @PrePersist,
+        called immediately when persist(), merge()
+  3.3 @PostPersist,
+        called after the database operation for marking an entity instance persistent is executed and identifier value is assigned.
+      @PreUpdate, @PostUpdate
+        executed before and after the persistence context is synchronized (flushing) with the database.
+      @PreRemove, @PostRemove
+        triggered before/after remove() is called
+
+4. After defining the entity listener, it must be enabled (Annotated) on the target.
+    @EntityListeners(XXXListener.class ... )
+    public class TARGET{
+
+    }
+
+5. Hibernate will call entity life-cycle event listeners in the following order
+  5.1 Default listeners for the persistent unit, in the order as declared in XML, metadata
+  5.2 Listeners declared on an entity with @EntityListeners, in the given order.
+  5.3 Callback methods declared in entity superclasses are first,
+      starting with the most generic superclass.
+      Callback methods on the entity class are last.
+
+6. org.hibernate.Interceptor
+    This is a Hibernate specific and more fine-grained entity life-cycle event listener
+
+Writing queries
 
 
 ******************************************************************
