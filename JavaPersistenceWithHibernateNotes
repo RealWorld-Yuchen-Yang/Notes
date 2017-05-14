@@ -289,7 +289,35 @@ Transactions and Concurrency
   12.2 most applications do not need "serializable isolation"
        for phantom read are not usually problematic.
 
-  12.3
+Fetch plans, strategies and profiles
+1. Cartesian product problem
+    This issue appears when you eagerly load two collections with one SQL query and JOIN operation.
+    The result can contain many redundant items.
+    Solution:
+      Still use eager loading, but break a whole JOIN table prefetching into several single table prefetching
+
+2. n+1 select problem:
+    for items to be lazy loaded, additional SQL queries are needed.
+
+3. Fetch plans (what data should be loaded):
+  3.1 lazy persistent collections:
+        @org.hibernate.annotations.LazyCollection(org.hibernate.annotations.LazyCollectionOption.EXTRA)
+  3.2 lazy loading with interception
+  3.3 eager loading of associations and collections
+
+4. Fetch strategies (how the data should be loaded):
+  4.1 prefetching data in batches
+  4.2 prefetching collections with subselects
+  4.3 eager fetching with multiple selects
+  4.4 dynamic eager fetching
+
+5. a fetch profile combines a fetch plan with a fetch strategy.
+   encapsulated in reusable metadata or code
+
+6. Optimization goal is to select the right fetching strategy for your fetch plan.
+   so as to minimize the number of SQL statements and the complexity of each SQL statement
+   especially want to avoid n+1 selects and Cartesian product issues
+
 
 
 
