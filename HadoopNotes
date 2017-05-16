@@ -44,4 +44,21 @@ Meet Hadoop
 
 
 The Hadoop Distributed System
-1. 
+1. hdfs fsck / -files -blocks,
+    lists the blocks that make up each file in the filesystem.
+
+2. Namenodes and Datanodes
+    2.1 Namenodes, manage the filesystem namespace
+    2.2 Datanodes, workhorses of the filesystem
+
+3. failover controller, manages transition from the active namenode to the standby
+
+4. fencing
+      during failover management,
+      make sure that the previously active namenode is prevented from doing any damage and causing corruption
+
+5. CLI
+  5.1 Hadoop can be run in three modes
+    5.1.1 standalone, no daemon, everything runs in a single JVM, suitable for development
+    5.1.2 pseudodistributed, daemons run on the local machine, simulate small scale cluster
+    5.1.3 fully distributed, daemons run on a cluster of machines
