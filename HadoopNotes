@@ -68,6 +68,46 @@ The Hadoop Distributed System
       * **mapred-site.xml**
       * **yarn-site.xml**
 
+    <?xml version="1.0"?>
+    <!-- core-site.xml -->
+    <configuration>
+        <property>
+            <name>fs.defaultFS</name>
+            <value>hdfs://localhost/</value>
+        </property>
+    </configuration>
+
+    <?xml version="1.0"?>
+    <!-- hdfs-site.xml -->
+    <configuration>
+        <property>
+            <name>dfs.replication</name>
+            <value>1</value>
+        </property>
+    </configuration>
+
+    <?xml version="1.0"?>
+    <!-- mapred-site.xml -->
+    <configuration>
+        <property>
+            <name>mapreduce.framework.name</name>
+            <value>yarn</value>
+        </property>
+    </configuration>
+
+    <?xml version="1.0"?>
+    <!-- yarn-site.xml -->
+    <configuration>
+        <property>
+            <name>yarn.resourcemanager.hostname</name>
+            <value>localhost</value>
+        </property>
+        <property>
+            <name>yarn.nodemanager.aux-services</name>
+            <value>mapreduce_shuffle</value>
+        </property>
+    </configuration>
+
   * customizing config files
       * declare config file location environment variable **HADOOP_CONF_DIR**, then export, or declare and export in .bash_profile
       * declare the above four config files
@@ -109,4 +149,4 @@ The Hadoop Distributed System
     6.1.2 pseudodistributed, daemons run on the local machine, simulate small scale cluster
     6.1.3 fully distributed, daemons run on a cluster of machines
 
-7. 
+7.
