@@ -57,8 +57,56 @@ The Hadoop Distributed System
       during failover management,
       make sure that the previously active namenode is prevented from doing any damage and causing corruption
 
-5. CLI
-  5.1 Hadoop can be run in three modes
-    5.1.1 standalone, no daemon, everything runs in a single JVM, suitable for development
-    5.1.2 pseudodistributed, daemons run on the local machine, simulate small scale cluster
-    5.1.3 fully distributed, daemons run on a cluster of machines
+5. Installing and Configure Hadoop
+  # Installation (Mac)
+  * **brew install hadoop**, installs hadoop
+  * **hadoop version**, verifies installation
+  # Configuration
+  * brew installed configure file location: **/usr/local/Cellar/hadoop/X.X.X/libexec/etc/hadoop**
+      * **core-site.xml**, common properties
+      * **hdfs-site.xml**
+      * **mapred-site.xml**
+      * **yarn-site.xml**
+
+  * customizing config files
+      * declare config file location environment variable **HADOOP_CONF_DIR**, then export, or declare and export in .bash_profile
+      * declare the above four config files
+
+  # Format the HDFS before running Hadoop
+  **hfs namenode -format**
+
+  # sbin directory: /usr/local/Cellar/hadoop/2.7.2/sbin, bin directory is already exported once brew-installed
+  (Note: running the following scripts are before logging into to the HDFS, also include sbin in the environment path is convenient)
+
+  * start/stop services individually
+      * start-dfs.sh
+      * start-yarn.sh
+      * mr-jobhistory-daemon.sh, mr-jobhistory-daemon.sh [start|stop] historyserver
+      * stop-dfs.sh
+      * stop-yarn.sh
+
+  * start/stop services in groups by declaring alias in .bash_profile
+      * start hadoop services, **alias hstart="start-dfs.sh;start-yarn.sh;mr-jobhistory-daemon.sh start history server"**
+      * stop hadoop services, **alias hstop="stop-yarn.sh;stop-dfs.sh;mr-jobhistory-daemon.sh stop history server"**
+
+  # Check running java jobs by using command: **jps**
+
+  # Pseudo Distributed Mode
+  * default Web UI
+      * namenode: http://localhost:50070/
+      * resource manager: http://localhost:8088/
+      * history server: http://localhost:19888/
+
+  Note: either Web UI or log directory (in Hadoop installation directory **/usr/local/Cellar/hadoop/2.7.2/libexec/logs**) can be used to verify running status
+
+  # Useful External Links
+  * https://dtflaneur.wordpress.com/2015/10/02/installing-hadoop-on-mac-osx-el-capitan/
+  * See also HadoopNotes for config details, especially xml https://github.com/RealWorld-Yuchen-Yang/Notes/blob/master/HadoopNotes
+
+6. CLI
+  6.1 Hadoop can be run in three modes
+    6.1.1 standalone, no daemon, everything runs in a single JVM, suitable for development
+    6.1.2 pseudodistributed, daemons run on the local machine, simulate small scale cluster
+    6.1.3 fully distributed, daemons run on a cluster of machines
+
+7. 
