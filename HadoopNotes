@@ -149,4 +149,36 @@ The Hadoop Distributed System
     6.1.2 pseudodistributed, daemons run on the local machine, simulate small scale cluster
     6.1.3 fully distributed, daemons run on a cluster of machines
 
-7.
+7. hadoop fs -ls DIRECTORY, lists detailed information of the DIRECTORY
+    the second column of the list result is the **replication factor**
+    entry in this column is empty for directories
+    directories are treated as metadata and stored by the namenode, not datanode
+
+8. Files in HDFS can not have "execution" permission,
+   because you can not execute a file on HDFS
+   directories can have "execution" permission, which means it can access it children
+
+9. There is a concept of a superuser,
+   which is the identity of the **namenode process**
+   Permissions checks are not performed for the superuser
+
+10. HDFS can only write to the end of a file,
+    so appending to a file works,
+    but random modifications of a file do not.
+
+11. It is possible to mount HDFS on a local client's filesystem using Hadoop's NFSv3 gateway.
+    You can then use Unix utilities (such as ls and cat) to interact with the filesystem.
+
+12. Network topology and Hadoop
+  What does it mean for two nodes in a local network to be "close" to each other?
+  The idea is to use the bandwidth between two nodes as a measure of distance
+  Hadoop does not measure the bandwidth between two nodes,
+  instead, it takes a single approach,
+  it view the network as a tree and the distance between two nodes is the sum of their distance to their closet common ancestor
+  The idea is that bandwidth available for each of the following scenarios becomes progressively less:
+    12.1 processes on the same node
+    12.2 different nodes on the same rack
+    12.3 nodes on different racks, but in the same data center
+    12.4 nodes in different data ceneters
+
+13.
