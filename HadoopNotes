@@ -245,3 +245,19 @@ Developing a MapReduce Application
       and improve your mapper or reducer as appropriate to handle such input correctly.
   1.5 improve the program's efficiency
   1.6 task profiling
+
+2. When the processing get more complex,
+   the complexity is generally manifested by having more MapReduce jobs,
+   rather than having more complex map and reduce functions
+
+3. An instance of JobControl represents a graph of jobs to be run
+   You add the job configurations, then tell the JobControl instance the dependencies between jobs.
+   You run the JobControl in a thread,
+   and it runs the jobs in dependency order.
+
+4. Apache Oozie,
+   is a system for running workflows of dependent jobs, it is composed of
+   4.1 workflow engine, stores and runs workflow composed of different types of Hadoop jobs (MapReduce, Pig, Hive)
+   4.2 coordinator engine, runs workflow jobs based on predefined schedules and data availability
+
+How MapReduce Works
