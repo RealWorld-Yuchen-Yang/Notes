@@ -318,7 +318,8 @@ Fetch plans, strategies and profiles
    so as to minimize the number of SQL statements and the complexity of each SQL statement
    especially want to avoid n+1 selects and Cartesian product issues
 
-
+Filtering data
+1. 
 
 
 ******************************************************************
