@@ -181,4 +181,67 @@ The Hadoop Distributed System
     12.3 nodes on different racks, but in the same data center
     12.4 nodes in different data ceneters
 
-13.
+YARN (Yet Another Resource Negotiator)
+1. YARN provides APIs for requesting and working with cluster resources,
+   but these APIs are not typically used directly by user code.
+   Users write higher-level APIs (MapReduce, Spark, Tez, etc.) provided by distributed computing frameworks,
+   which themselves are built on YARN
+   Also Processing frameworks like Pig, Hive, Crunch, etc. are built on MapReduce, Spark, Tez, etc.
+
+2. Two YARN long-running daemons:
+  2.1 resource manager,
+        one per cluster
+        manage the use of resources across the cluster
+  2.2 node manager,
+        all nodes in the cluster
+        launch and monitor containers
+
+Hadoop I/O
+1. which compression format should I use? principles are listed as follows
+  1.1 use a container file format such as sequence files, Avro datafiles, ORCFiles,
+      Parquet files, all of which support both compression and splitting.
+      A fast compressor such as LZO, LZ4, or Snappy is generally a good choice.
+  1.2 Use a compression format that supports splitting, such as bzip2, or one can be indexed to support splitting, such as LZO
+  1.3 Split the file into chunks in the application, and compress each chunk separately using any supported compression format
+      In this case, you should choose the chunk size so that the compressed chunks are approximately the size of an HDFS block
+  1.4 Store the files uncompressed
+
+2. Writable Interface and Writable Wrappers
+    2.1 Writable interface defines two methods:
+          * write(DataOutput out) throws IOException
+          * readFields(DataInput in) throws IOException
+          Note: DataOutput&DataInput wraps ByteArrayInput/OutputStream
+    2.2 wrapper classes implements WritableComparable interface,
+        which is a subinterface of the Writable and java.lang.Comparable interfaces
+        **public interface WritableComparable<T> extends Writable, Comparable<T> {}**
+
+3. MapFile
+  A MapFile is a sorted SequenceFile with an index to permit lookups by key.
+  The index is itself a SequenceFile that contains a fraction of keys in the map.
+  (every 128th key, by default)
+  The idea is that the index can be loaded into memory to provide fast lookups from the main data file,
+  which is another SequenceFile containing all the map entries in sorted key order.
+
+4. Sequence files, map files, and Avro datafiles are all row-oriented file formats,
+   4.1 row-oriented file, the values for each row are stored contiguously in the file.
+                          row-oriented formats are appropriate when a large number of columns of a single row are needed for processing at the same time
+   4.2 column-oriented file, rows in a file are broken up into row splits,
+                             then each spit is stored in column-oriented fashion,
+                             where values for each row in the first column are stored first,
+                             followed by the values for each row in the second column,
+                             and so on.
+                             A column-oriented layout permits columns that are not accessed in a query to be skipped
+                             column-oriented formats work well when queries access only a small number of columns in the table.
+                             e.g. ORCFile (Optimized Record Columnar File), Parquet, Trevni
+
+Developing a MapReduce Application
+1. Writing a program in MapReduce follows a certain pattern.
+  1.0 set up and configure development environment
+  1.1 start by writing your map and reduce functions
+  1.2 write unit tests to make sure these functions all work
+  1.3 write a driver program to run the program (Like YARN),
+      run the program with small subset of data to check it is working
+  1.4 with this information, you can expand your unit tests to cover this case
+      and improve your mapper or reducer as appropriate to handle such input correctly.
+  1.5 improve the program's efficiency
+  1.6 task profiling
