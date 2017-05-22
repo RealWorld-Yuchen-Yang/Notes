@@ -246,18 +246,23 @@ Developing a MapReduce Application
   1.5 improve the program's efficiency
   1.6 task profiling
 
-2. When the processing get more complex,
-   the complexity is generally manifested by having more MapReduce jobs,
-   rather than having more complex map and reduce functions
+2. Shuffle and Sort
+    MapReduce makes the guarantee that the input to every reducer is sorted by key.
+    2.1 Shuffle: The process by which the system performs the sort,
+                 and transfers the map outputs to the reducers as inputs
 
-3. An instance of JobControl represents a graph of jobs to be run
-   You add the job configurations, then tell the JobControl instance the dependencies between jobs.
-   You run the JobControl in a thread,
-   and it runs the jobs in dependency order.
+3. MapReduce configuration tuning
+  3.1 The general principle is to give the shuffle as much memory as possible.
+      However, there is a trade-off,
+      in that you need to make sure that your map and reduce functions gets enough memory to operate.
+      This is why it is best to write your map and reduce functions to use as little memory as possible
+  3.2 On the map side,
+      the best performance can be obtained by avoiding multiple spills to disk
+      one is optimal
+  3.3 On the reduce side,
+      the best performance is obtained when the intermediate data can reside entirely in memory
 
-4. Apache Oozie,
-   is a system for running workflows of dependent jobs, it is composed of
-   4.1 workflow engine, stores and runs workflow composed of different types of Hadoop jobs (MapReduce, Pig, Hive)
-   4.2 coordinator engine, runs workflow jobs based on predefined schedules and data availability
-
-How MapReduce Works
+4. Speculative execution of tasks
+    Hadoop doesn't try to diagnose and fix slow-running tasks
+    instead, it tries to detect when a task is running slower than expected
+    and launches another equivalent task as a backup
