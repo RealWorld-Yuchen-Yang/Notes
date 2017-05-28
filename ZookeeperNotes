@@ -1,0 +1,16 @@
+Zookeeper Basics
+1. Recipes: implementation of primitives.
+
+2. znodes: small data nodes, they are organized hierarchically as a tree. just like a file system.
+  2.1 The absence of data often conveys important information about a znode.
+  2.2 /workers znode, parent znode to all znodes representing a worker available in the system
+  2.3 /tasks znode, is the parent of all tasks created and waiting for workers to execute them.
+  2.4 /assign znode is the parent of all znodes representing an assignment of a task to a worker.
+
+3. znode mode options:
+  3.1 persistent
+  3.2 ephemeral
+  3.3 persistent_sequential
+  3.4 ephemeral_sequential
+
+4. 
