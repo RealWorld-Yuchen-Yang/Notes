@@ -283,3 +283,31 @@ How MapReduce Works
     Hadoop doesn't try to diagnose and fix slow-running tasks
     instead, it tries to detect when a task is running slower than expected
     and launches another equivalent task as a backup
+
+MapReduce Features
+1. Counters
+  1.1 Counters are useful channel for gathering statistics about the job:
+        for quality control or for application-level statistics
+  1.2 Task counters:
+        are maintained by each task attempt,
+        and periodically sent to the application
+  1.3 Job counters:
+        are maintained by the application master
+
+2. Sorting
+  2.1 If we partition the input randomly,
+      and perform sorting on each split,
+      we can only get partial sorted results,
+      since there is no way of combining the partial results
+      This is sufficient for some problems, like the ones require indexing, but not global result
+  2.2 If we would like to have a sorted global result,
+      the key is to partition the input in order,
+      this required input to be split evenly so as to get optimal time performance
+      which is accomplished by Sampling the input with Sampler
+  2.3 Sorting by value:
+    2.3.1 Make the key a composite of the natural key and the natural value
+    2.3.2 The sort comparator should order by the composite key (i.e. the natural key and natural value)
+    2.3.3 The partitioner and grouping comparator for the composite key should consider only the natural key for partitioning and grouping
+
+3. Joins
+4. Side Data Distribution
