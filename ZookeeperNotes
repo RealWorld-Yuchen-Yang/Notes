@@ -23,4 +23,24 @@ Zookeeper Basics
    Once the task znode is created, the master observes the event
    The master next checks the new task, get a list of available workers, and assign assignments to workers
 
-7. 
+7. Herd Effect and the scalability of watches
+    When possible, we recommend avoiding such a use of ZooKeeper
+    in which a large number of clients watch for a change to a given znode.
+
+Dealing with failures
+1. it is not always possible to handle failures based on the component in which they occur
+
+2. Rather than trying to determine cause of failures,
+   Zookeeper exposes two classes of failures: recoverable and unrecoverable
+   2.1 recoverable, which are transient and should be considered relatively normal, e.g. network hiccups, server failures
+
+   2.2 unrecoverable, the easiest and most common way to deal with this kind of failure is to exit the application.
+                      e.g. session timeout, authentication failures, network outages for longer than the session timeout
+
+3. you should try to avoid watching for the creation event of a znode.
+
+4. careful monitoring of system load can help detect possibly problematic situations.
+   well-designed multithreaded applications can avoid inducing overloads,
+   clock synchronization programs can keep system clocks in sync
+
+5. 
