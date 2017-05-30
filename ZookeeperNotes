@@ -13,4 +13,14 @@ Zookeeper Basics
   3.3 persistent_sequential
   3.4 ephemeral_sequential
 
-4. 
+4. For the quorum of servers, we should always shoot for an odd number,
+   It this way can we tolerate more crashes of servers
+
+5. My Zookeeper's installation directory
+   /usr/local/Cellar/zookeeper/3.4.9/bin
+
+6. Client: add tasks to the system
+   Once the task znode is created, the master observes the event
+   The master next checks the new task, get a list of available workers, and assign assignments to workers
+
+7. 
