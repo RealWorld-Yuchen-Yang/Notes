@@ -27,20 +27,45 @@ Zookeeper Basics
     When possible, we recommend avoiding such a use of ZooKeeper
     in which a large number of clients watch for a change to a given znode.
 
-Dealing with failures
-1. it is not always possible to handle failures based on the component in which they occur
+8. it is not always possible to handle failures based on the component in which they occur
 
-2. Rather than trying to determine cause of failures,
+9. Rather than trying to determine cause of failures,
    Zookeeper exposes two classes of failures: recoverable and unrecoverable
-   2.1 recoverable, which are transient and should be considered relatively normal, e.g. network hiccups, server failures
+   9.1 recoverable, which are transient and should be considered relatively normal, e.g. network hiccups, server failures
 
-   2.2 unrecoverable, the easiest and most common way to deal with this kind of failure is to exit the application.
+   9.2 unrecoverable, the easiest and most common way to deal with this kind of failure is to exit the application.
                       e.g. session timeout, authentication failures, network outages for longer than the session timeout
 
-3. you should try to avoid watching for the creation event of a znode.
+10. you should try to avoid watching for the creation event of a znode.
 
-4. careful monitoring of system load can help detect possibly problematic situations.
+11. careful monitoring of system load can help detect possibly problematic situations.
    well-designed multithreaded applications can avoid inducing overloads,
    clock synchronization programs can keep system clocks in sync
 
-5. 
+12. Access right must be set every time a znode is created,
+    it does not inherit the access permissions from its parent
+
+13. SASL (Simple Authentication and Security Layer) and Kerberos
+  13.1 SASL
+       It is a framework that abstracts the underlying system of authentication so that applications that use SASL can use any of the various protocols supported by SASL.
+  13.2 Kerberos
+       with respect to Zookeeper,
+       SASL usually uses Kerbeross,
+       which is an authentication protocol.
+       SASL uses sasl for its scheme name and the id is the Kerberos ID of the client
+
+14. When a znode is deleted and re-created, its version number is reset (means identical to before deletion).
+    An application that tries to make version check after a znode is re-created might fall into this trap
+
+15. If clients of an application communicate only by reading and writing to ZooKeeper,
+    the application shouldn't worry about sync.
+    sync exists because communication outside ZooKeeper may lead to a problem often referred to as a "hidden channel"
+
+16. Order with the Synchronous API and Multiple Threads
+     Zookeeper will deliver the responses in order,
+     but it is possible that due to thread scheduling,
+     the result of an operation submitted will be processed first.
+
+17. In general, it is not a good idea to mix synchronous and asynchronous calls.
+
+18.
