@@ -13,4 +13,22 @@ Zookeeper Basics
   3.3 persistent_sequential
   3.4 ephemeral_sequential
 
-4. 
+4.
+
+
+
+
+10. Herd Effect and the scalability of watches
+    When possible, we recommend avoiding such a use of ZooKeeper
+    in which a large number of clients watch for a change to a given znode.
+
+Dealing with failures
+1. it is not always possible to handle failures based on the component in which they occur
+
+2. Rather than trying to determine cause of failures,
+   Zookeeper exposes two classes of failures: recoverable and unrecoverable
+   2.1 recoverable, which are transient and should be considered relatively normal, e.g. network hiccups, server failures
+
+   2.2 unrecoverable, the easiest and most common way to deal with this kind of failure is to exit the application.
+                      e.g. session timeout, authentication failures, network outages for longer than the session timeout
+   
