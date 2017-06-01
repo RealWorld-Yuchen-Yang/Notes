@@ -1,0 +1,69 @@
+Introduction
+1. Concerns of "utilization", "fairness", and "convenience" motivates the development of
+    process and threads.
+    Threads allow multiple streams of program control flow to coexist within a process
+
+2. Processes and Threads:
+  2.1 Processes,
+      are synonym to Applications or programs
+  2.2 Threads,
+      are sometimes called lightweight processes,
+      and most modern operating systems treat threads, not processes as the basic units of scheduling
+
+3. Thread is the basic unit of scheduling
+
+4. Safety, Liveness, Performance
+  4.1 Safety, means nothing bad ever happens
+  4.2 Liveness, means something good eventually happens
+  4.3 Performance, means something good enough happens
+
+Thread Safety
+1. object's state:
+    its data, stored in state variables such as instance or static fields.
+
+2. Shared,
+    a variable could be accessed by multiple threads.
+
+3. mutable,
+    the field's value could change during its lifetime
+
+4. making an object thread-safe requires using synchronization to coordinate access to its mutable state
+
+5. The primary mechanism for synchronization in Java is the **synchronized** keyword
+   which provides exclusive lock
+   but the term "synchronization" also includes the use of **volatile variables**, **explicit lock**, **atomic variables**
+
+6. If multiple threads access the same mutable state variable without appropriate synchronization,
+   your program is broken.
+   There are three ways to fix it
+  6.1 do not share the state variable across threads
+  6.2 make the state variable immutable
+  6.3 use synchronization whenever accessing the state variable
+
+7. In any case, the concept of a thread-safe class makes sense only if the class encapsulates its own state.
+   Thread safety may be a term that is applied to code,
+   but it is about state, and it can only be applied to the entire body of code that encapsulates its state,
+   which may be an object or an entire program
+
+8. Definition of Thread-Safety
+   A class is thread-safe if it behaves correctly when accessed from multiple threads,
+   regardless of the scheduling or interleaving of the execution of those threads by the runtime environment,
+   and with no additional synchronization or other coordination on the part of the calling code
+
+9. Stateless objects are always thread-safe
+   Stateless objects means:
+   9.1 it has no fields and references no fields from other classes.
+   9.2 the transient state for a particular computation exists solely in local variables that are stored on the thread's stack
+       and are accessible only to the executing thread.
+
+10. Atomicity
+
+11. Race Condition:
+    The possibility of incorrect results in the presence of unlucky timing
+    A race condition occurs when the correctness of a computation depends on the relative timing or interleaving of multiple threads by the runtime.
+    The most common type of race condition is check-then-act,
+    where a potentially state observation is used to make a decision on what to do next.
+
+12. data race:
+    arises when synchronization is not used to coordinate all access to a shared non-final field.
+    different operations may overwrite the previous operation's result
