@@ -84,6 +84,30 @@ Behavioral Patterns****************************
 1. Chain of Responsibility Pattern
 
 2. Command Pattern (currently watching)
+  2.1 what is command design pattern
+    2.1.1 The command pattern is a behavioral design pattern in which
+          an object is used to represent and encapsulate all the information needed to call a method at a later time
+    2.1.2 This information includes the method name, the object that owns the method and values for the method parameters.
+    2.1.3 It allows you to store lists of code that is executed at a later time or many times
+    2.1.4 Client says I want a specific Command to run when execute() is called on 1 of these encapsulated (hidden) objects
+    2.1.5 An Object called the Invoker transfers this Command to another Object(which is the Receiver) to execute the right code
+          the Invoker encapsulates the SpecificCommand or Collection of SpecificCommand,
+          is agnostic the real functionality of the SpecificCommand,
+          but just blindly call the execute() method.
+    2.1.6 SpecificCommand is implemented as a class which implements the base Command Interface (who often have execute(), undo() abstract methods)
+    2.1.7 each different SpecificCommand do a particular thing, it encapsulates a SpecificExecutor,
+          which is an implementation of Executor class,
+          SpecificCommand invokes methods on the SpecificExecutor by using execute(),
+          and the SpecificExecution does the real execution
+  2.2 Benefits of the Command Design Pattern
+    2.2.1 Allows you to set aside a list of commands for later use
+    2.2.2 A class is a great place to store procedures you want to be executed
+    2.2.3 You can store multiple commands in a class to use over and over
+    2.2.4 You can implement undo() procedure of a specific command (subclass of Command interface)
+          undo() should be defined in the Command interface,
+          and implemented in the subclass, which the opposite effect of that specific command
+  2.3 Negative
+    you create many small classes that store lists of commands
 
 3. Interpreter Pattern
 
