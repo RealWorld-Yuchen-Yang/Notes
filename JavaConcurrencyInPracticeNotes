@@ -57,13 +57,69 @@ Thread Safety
        and are accessible only to the executing thread.
 
 10. Atomicity
+    atomic operations are either by nature (one command in JVM)
+    or synthetic (in a synchronized block)
 
 11. Race Condition:
     The possibility of incorrect results in the presence of unlucky timing
     A race condition occurs when the correctness of a computation depends on the relative timing or interleaving of multiple threads by the runtime.
-    The most common type of race condition is check-then-act,
+    The most common type of race condition is check-then-act, read-modify-write
     where a potentially state observation is used to make a decision on what to do next.
 
 12. data race:
     arises when synchronization is not used to coordinate all access to a shared non-final field.
     different operations may overwrite the previous operation's result
+
+13. for shared components,
+    even the shared field is private to the object itself,
+    it still risk the thread-safety problem,
+    only "method level variables" can escape from such issue
+
+14. Sequences of operations that must be executed atomically in order to remain thread-safe
+    and atomic is defined as:
+      Operation A and B are atomic with respect to each other if,
+      from the perspective of a thread executing A,
+      when another thread executes B,
+      either all of B has executed or none of it has.
+      An atomic operation is one that is atomic with respect to all operations,
+      including itself,
+      that operate on the same state
+
+15. **java.util.concurrent.atomic** package contains atomic variable classes
+    which are used for effecting atomic state transitions on numbers and object references.
+
+16. Servlet is stateless by nature,
+    if we introduce states (fields) into a servlet,
+    only if the introduced field is thread safe,
+    will let the Servlet containing it remain thread-safe
+
+17. When multiple variables participate in an invariant,
+    they are not independent (the value of one constrains the allowed value(s) of the others),
+    Thus when updating one,
+    you must update the others in the same atomic operations
+    In this case,
+    even though each call to set is atomic,
+    there is still a window of vulnerability when one field has been modified and the other has not,
+    and during that time other threads could see that the invariant does not hold.
+    Solution: update related state variables in a single atomic operation by using "Locking"
+
+18. Java Synchronized Block, contains two parts
+  18.1 a reference to an object that will server as the lock
+  18.2 a block of code to be guarded by that lock
+
+19. a synchronized method
+  a shorthand for a synchronized block,
+  span an entire method body,
+  whose lock is the object on which the method is being invoked.
+  Note: static synchronized methods use the Class object for the lock
+
+20. while synchronized methods can make individual operations atomic,
+    additional locking is required - when multiple operations are combined into a compound action.
+
+21. to improve efficiency while remain thread-safe,
+    we should make the synchronized block as small as possible,
+    at the same time,
+    the atomicity should be guaranteed.
+
+Sharing Objects
+1. 
