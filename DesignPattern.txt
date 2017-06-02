@@ -54,8 +54,24 @@ Creational Patterns****************************
 
 Structural Patterns****************************
 1. Adapter Pattern
+  1.1 Adapter Pattern allows two incompatible interfaces to work together
+  1.2 Used when the client expects a (target) interface
+  1.3 The adapter class allows the use of the available interface and the Target interface
+  1.4 Any class can work together as long as the Adapter solves the issue that all classes must implement every method defined by the shared interface
+  1.5 The Adapter is implemented by using "Composition",
+      it bridges the "Target" and the "Adaptee" by
+      containing the "Adaptee" and
+      implementing the "Target"
 
 2. Bridge Pattern
+  2.1 Decouple an abstraction from its implementation so that the two can vary independently
+  2.2 It allows progressively adding functionality while separating out major differences using abstract classes
+  2.3 It is implemented by using two layers of abstraction.
+    2.3.1 Layer1: It needs two abstract classes,
+                  one abstract use the other by using composition (contain the other abstract class)
+          Layer2: both the two abstract classes can have different implementation classes, which are used to do specific jobs
+  2.4 When to use the bridge design pattern?
+      When you want to be able to change both the abstractions (abstract classes) and concrete classes independently
 
 3. Composite Pattern
 
@@ -75,6 +91,7 @@ Structural Patterns****************************
           we would like to get the same type of instance after it is decorated
 
 5. Facade Pattern
+  5.1 When you create a simplified interface that performs many other actions behind the scenes
 
 6. Flyweight Pattern
 
@@ -112,6 +129,11 @@ Behavioral Patterns****************************
 3. Interpreter Pattern
 
 4. Iterator Pattern
+  4.1 The Iterator pattern provides you with a uniform way to access different collections of Objects
+  4.2 If you get an Array, ArrayList and Hashtable of Objects,
+      you pop out an iterator for each and treat them the same
+  4.3 This provides a uniform way to cycle through different collections
+  4.4 You can also write polymorphic code because you can refer to each collection of objects because they will implement the same interface
 
 5. Mediator Pattern
 
@@ -148,5 +170,8 @@ Behavioral Patterns****************************
     9.7.1 Increased Number of Objects/Classes
 
 10. Template Method Pattern
-
+  10.1 Template pattern is used to create a group of subclasses that have to execute a similar group of methods
+  10.2 You create an abstract class that contains a method called the Template Method
+  10.3 The Template Method contains a series of method calls that every subclass object will call
+  10.4 The subclass objects can override some of the method calls
 11. Visitor Pattern
