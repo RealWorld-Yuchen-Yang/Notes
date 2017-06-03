@@ -74,6 +74,12 @@ Structural Patterns****************************
       When you want to be able to change both the abstractions (abstract classes) and concrete classes independently
 
 3. Composite Pattern
+  3.1 It allows you to treat individual objects and compositions of objects uniformly
+      This is implemented by letting the "Class representing the composition of objects" and the "individual objects" themselves
+      implement the same interface/extend the same super class
+  3.2 It allow you to represent the part-whole hierarchies,
+        Composition can be further divided into smaller components (e.g. file system's directories and files)
+  3.3 You can structure data, or represent the inner working of every part of a whole object individually
 
 4. Decorator Pattern
   4.1 composition is dynamic,
@@ -94,11 +100,29 @@ Structural Patterns****************************
   5.1 When you create a simplified interface that performs many other actions behind the scenes
 
 6. Flyweight Pattern
+  6.1 It is used when you need to create a large number of similar objects,
+      Note: here **large** means something like 100, 000...
+  6.2 To reduce the memory usage you share Objects that are similar in some way rather than creating new ones
+      e.g. Intrinsic State: Color
+           Extrinsic State: Size
+  6.3 performance-wise, it will usually decrease the time by 200% to 300%
 
 7. Proxy Pattern
+  7.1 It provides a class which will limit access to another class
+  7.2 You may do this
+      for security reasons, because an Object is intensive to create,
+      or is accessed from a remote location
+  7.3 both the proxy and the real "business object" should implement the same interface
+      (which defines business methods they should perform)
+      user can only talk to the proxy object instead of the business object,
+      the proxy will decorate and eventually let the business object to perform the business logic.
 
 Behavioral Patterns****************************
 1. Chain of Responsibility Pattern
+    1.1 This pattern sends data to an object
+        and if that object can't use it,
+        it sends the data to any number of other objects that may be able to use it.
+
 
 2. Command Pattern (currently watching)
   2.1 what is command design pattern
@@ -127,17 +151,35 @@ Behavioral Patterns****************************
     you create many small classes that store lists of commands
 
 3. Interpreter Pattern
+  3.1 It is used to convert one representation of data into another
 
 4. Iterator Pattern
   4.1 The Iterator pattern provides you with a uniform way to access different collections of Objects
-  4.2 If you get an Array, ArrayList and Hashtable of Objects,
+  4.2 If you get an Array, ArrayList and HashTable of Objects,
       you pop out an iterator for each and treat them the same
   4.3 This provides a uniform way to cycle through different collections
   4.4 You can also write polymorphic code because you can refer to each collection of objects because they will implement the same interface
 
 5. Mediator Pattern
+  5.1 It is used to handle communication between related objects (Colleagues)
+  5.2 All communication is handled by the Mediator and the Colleagues do not need to know anything about each other
+  5.3 Components in Mediator Patterns are
+    5.3.1 Mediator, and ConcreteMediator,
+            which contains a collection of Colleagues
+            and performs the communication between two colleagues registered in the colleague collection
+    5.3.2 Colleague, and Concrete Colleague,
+            contains a reference to the Mediator that itself is registered into
+            performs as the communication clients
 
 6. Memento Pattern
+  6.1 A way to store previous states of an Object easily
+  6.2 Components:
+    6.2.1 Memento: The basic object that is stored in different states
+    6.2.2 Originator: Sets and Gets values from the currently targeted Memento.
+                      Creates new Mementos and assigns current values to them
+    6.2.3 Caretaker: Holds a Collection that contains all previous versions of the Memento.
+                     It can store and retrieve stored Mementos
+    Note: the domain object should be stored in both Memento and Originator
 
 7. Observer Pattern
   7.1 When do you need observer pattern?
@@ -149,6 +191,30 @@ Behavioral Patterns****************************
   7.5 The observer can also store a reference to its subject, so that it can call methods of the object that it is observing
 
 8. State Pattern
+  8.1 It allows an object to alter its behavior when its internal state changes.
+      The object will appear to change its class
+  8.2 Context:
+        Maintains an instance of a ConcreteState subclass
+        that defines the current state
+  8.3 State:
+        Defines an interface
+        for encapsulating the behavior (business methods) associated with a particular state of the Context
+  8.4 Concrete State:
+        Each subclass implements a behavior associated with a state of Context
+        Also each ConcreteState should contain an instance of Context,
+        upon which it can perform state transition methods,
+        and of course state transition is performed by calling the "state transition methods" on the Context instance
+  8.5 From my opinion,
+      state pattern is a way of implementing the "state machine",
+      context is the object whose state that we mainly care about.
+      context can transfer from one ConcreteState into another by calling "transition methods"
+      Note: Context does not need to implement the "state" interface,
+            since the methods declared on Context does not have to be the same as the "behavioral methods" defined in State interface
+            each ConcreteState contains
+  8.6 When designing by using state pattern,
+      we should think ahead all the states available,
+      we can start from a long list and shrink it down
+      Then we need to think about methods how each state can transfer into its adjacent states
 
 9. Strategy Pattern
   9.1. Avoid Interfaces that Just Force Action
@@ -174,4 +240,25 @@ Behavioral Patterns****************************
   10.2 You create an abstract class that contains a method called the Template Method
   10.3 The Template Method contains a series of method calls that every subclass object will call
   10.4 The subclass objects can override some of the method calls
+
 11. Visitor Pattern
+  11.1 Visitor pattern allows you to add methods to classes of different types without much altering to those classes
+  11.2 You can make completely different methods depending on the class used
+  11.3 Allows you to define external classes that can extend other classes without majorly editing them
+  11.4 Components in Visitor pattern
+    11.4.1 Visitable and ConcreteVisitable: objects that accept() Visitors, (means of registering Visitors into Visitable objects)
+                                            Visitable Objects are used as the data to be manipulated by the passed in visitor
+    11.4.2 Visitor and ConcreteVisitors: used as passed in "Strategies" to the Visitable objects
+                                         visitor has visit() method defined on itself,
+                                         which accepts Visitable objects and perform operations on them
+
+Architectures****************************
+1. MVC (Model View and Controller)
+  1.1 View and Model are independent between each other,
+      Controller is the bridge linking the View and the Model
+  1.2. Components:
+    1.2.1 View: contains UI variables, input and output fields
+    1.2.2 Model: contain "calculation intermediate fields"
+    1.2.3 Controller: contain fields representing the view and the model,
+                      Controller get data from the View and pass such data into the model for calculation
+                      after the calculation, the controller transfer the result got from model into the view
