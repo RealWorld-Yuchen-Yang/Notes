@@ -122,4 +122,100 @@ Thread Safety
     the atomicity should be guaranteed.
 
 Sharing Objects
-1. 
+1. Synchronization also has another significant and subtle aspect: memory visibility
+   We should ensure that when a thread modifies the state of an object,
+   other threads can actually see the changes that were made
+
+2. Out-of-thin-air safety:
+    value a thread sees is a random value,
+    not even at least the thread a inconsistent/stale value that is actually put by other thread
+
+3. 64-bit numeric variables (double and long) are not declared volatile
+
+4. Intrinsic locking can be used to guarantee the one thread sees the effects of another in a predicable manner
+
+5. Volatile variables:
+    a weaker form of synchronization,
+    it ensures that updates to a variable are propagated predictably to other threads.
+    When a field is declared **volatile**,
+    the compiler and runtime are put on notice that this variable is shared and that operations on it should not be rendered with other memory operations
+    Volatile variables are not cached in registers or in caches where they are hidden from other processors.
+    so a read of a volatile variable always returns the most recent write by any thread
+
+6. accessing a volatile variable performs no locking
+   and so cannot cause the executing thread to block
+   making volatile variables a lighter weight synchronization mechanism than **synchronized**
+
+7. It is not recommended relying too heavily on volatile variables for visibility.
+   code that relies on volatile variables for visibility of arbitrary state is more fragile and harder to understand than code that uses locking
+
+8. The most common use for volatile variables is as a [completion| interruption| status] flag
+   You can use volatile variables only when all the following criteria are met:
+   8.1 writes to the variable do not depend on its current value,
+       or you can ensure that only a single thread ever update the value
+   8.2 The variable does not participate in invariants with other state variables
+   8.3 Locking is not required for any other reason while the variable is being accessed
+
+9. Publication and Escape
+  publishing an object means making it available to code outside of its current scope
+  An object that is published when it should not have been is said to have escaped
+
+10. Internal state can be published to its inner class, which is a case of Escape (bad idiom)
+
+11. Safe Construction practices:
+      an object is in a predictable, consistent state only after its constructor returns.
+      so publishing an object from within its constructor can publish an incompletely constructed object.
+
+12. A common mistake that can let the **this** reference escape during construction is to start a thread from a constructor
+
+13. There is nothing wrong with creating a thread in a constructor,
+    but it is best not to start the thread immediately
+
+14. Thread confinement:
+      data is only accessed from a single thread, no synchronization is needed.
+
+15. Stack confinement:
+      a special case of thread confinement,
+      in stack confinement, an object can only be reached through local variables
+
+16. ThreadLocal
+      a more formal means of maintaining thread confinement is ThreadLocal.
+      which allows you to associate a per-thread value with a value-holding object
+      ThreadLocal provides get and set accessors that maintain a separate copy of the value for each thread that uses it.
+
+17. Immutability
+      An object whose fields are **all final** may still be mutable,
+      since final fields can hold references to mutable objects
+      An object is immutable if:
+      17.1 Its state cannot be modified after construction
+      17.2 All its fields are final
+      17.3 It is properly constructed (the **this** reference does not escape during construction)
+
+18. It is the use of final fields that makes possible the guarantee of initialization safety
+    that lets immutable objects be freely accessed and shared without synchronization
+
+19. Just as it is a good practice (encapsulation) to make all fields **private**
+    It is a good practice to make all fields final unless they need to be mutable
+
+20. Safe publication idioms
+      To publish an object safely,
+      both the reference to the object and the object's state must be made visible to other threads at the same time.
+      A properly constructed object can be safely published by one of the following methods:
+      20.1 Initializing an object reference from a static initializer.
+      20.2 Storing a reference to it into a **volatile** field or **AtomicReference**
+      20.3 Storing a reference to it into a final field of a properly constructed object
+      20.4 Storing a reference to it into a field that is properly guarded by a lock
+
+21. Effectively immutable (a weaker form of immutable)
+      Objects that are not technically immutable,
+      but whole state will not be modified after publication,
+      are called effectively immutable
+
+22. If an object may be modified after construction,
+    safe publication ensures only the visibility of the **as-published state**
+    Synchronization must be used **not only to publish** a mutable object
+    **but also every time the object is accessed**, to ensure visibility of subsequent modifications
+
+23. A thread-safe object performs synchronization internally
+
+Composing Objects
