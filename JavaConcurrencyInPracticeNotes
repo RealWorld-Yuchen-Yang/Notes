@@ -256,4 +256,56 @@ Building Blocks
 1. Using iterators does not obviate the need to lock the collection during iteration
    if other threads can concurrently modify it.
 
-2. 
+2. ConcurrentHashMap,
+    It is a replacement for synchronized hash-based map implementations,
+
+3. CopyOnWriteArrayList,
+    It is a replacement for synchronized List implementations for cases where traversal is the dominant operation.
+    The copy-on-write collections derive their thread safety from the fact that as long as an effectively immutable object is properly published,
+    no further synchronization is required when accessing it.
+    They implement mutability by creating and republishing a new copy of the collection every time it is modified.
+    Iterators for the copy-on-write collections retain a reference to the backing array that was current at the start of iteration,
+    and since this will never change,
+    they need to synchronize only briefly to ensure visibility of the array contents.
+    Iterators return the elements exactly as they were at the creation time,
+    regardless of subsequent modifications
+
+4. CurrentMap interface,
+    adds support for common compound actions
+    such as put-if-absent, replace, and conditional remove
+
+5. Queue and BlockingQueue,
+  5.1 non-blocking queues (queue operations do not block), if queue is empty, the retrieval operation returns null
+    ConcurrentLinkedQueue, traditional FIFO queue,
+    PriorityQueue, a (non concurrent) priority ordered queue.
+  5.2 blocking queues, blocking insertion and retrieval. If queue is empty, retrieval is blocked, If queue is full, insertion is blocked
+    BlockingQueue
+
+6. ConcurrentSkipListMap, ConcurrentSkipListSet
+    are concurrent replacement for a synchronized SortedMap/SortedSet (such as TreeMap or TreeSet wrapped with synchronizedMap)
+
+7. Iterators returned by ConcurrentHashMap are weakly consistent instead of fail-fast
+   Weakly consistent iterator:
+    can tolerate concurrent modification,
+    traverses elements as they existed when the iterator was constructed,
+    and may (but is not guaranteed to) reflect modifications to the collection after the construction of the iterator
+
+8. Object pools exploit serial thread confinement,
+   "lending" an object to a requesting thread.
+   As long as the pool contains sufficient internal synchronization to publish the pooled object safely,
+   and as long as the client do not themselves publish the pooled object or use it after returning it to the pool,
+   ownership can be transferred safely from thread to thread
+
+9. Work Stealing pattern
+  9.1 Deque
+      work stealing pattern can be implemented by using Deque (pronounced "deck"), which is double-ended queue
+      it allows efficient insertion and removal from both the head and the tail.
+      e.g. ArrayDeque, LinkedBlockingDeque
+  9.2 compared with producer-consumer pattern
+    9.2.1 work stealing pattern,
+            every consumer has its own deque,
+            if a consumer exhausts the work in its own deque,
+            it can steal work from the tail of someone else's deque
+    9.2.2 producer-consumer pattern has one shared work queue for all consumers
+  9.3 Work stealing is well suited to problems in which consumers are also producers,
+      when performing a unit of work is likely to result in the identification of more work

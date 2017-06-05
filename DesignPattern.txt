@@ -262,3 +262,27 @@ Architectures****************************
     1.2.3 Controller: contain fields representing the view and the model,
                       Controller get data from the View and pass such data into the model for calculation
                       after the calculation, the controller transfer the result got from model into the view
+
+2. Producer-Consumer pattern
+  2.1 Kafka is an implementation of producer-consumer pattern
+  2.2 In a producer-consumer design built around a blocking queue,
+        Producers: place data onto the queue as it becomes available
+        Consumers: retrieve data from the queue when they are ready to take the appropriate action.
+        BlockingQueue simplifies the implementation of producer-consumer designs with any number of producers and consumers
+  2.3 One of the most common producer-consumer designs is
+        A thread pool + a work queue,
+          e.g. the Executor task execution framework
+
+3. Work Stealing pattern
+  3.1 Deque
+      work stealing pattern can be implemented by using Deque (pronounced "deck"), which is double-ended queue
+      it allows efficient insertion and removal from both the head and the tail.
+      e.g. ArrayDeque, LinkedBlockingDeque
+  3.2 compared with producer-consumer pattern
+    3.2.1 work stealing pattern,
+            every consumer has its own deque,
+            if a consumer exhausts the work in its own deque,
+            it can steal work from the tail of someone else's deque
+    3.2.2 producer-consumer pattern has one shared work queue for all consumers
+  3.3 Work stealing is well suited to problems in which consumers are also producers,
+      when performing a unit of work is likely to result in the identification of more work
