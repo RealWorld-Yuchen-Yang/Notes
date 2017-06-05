@@ -65,6 +65,7 @@ Thread Safety
     A race condition occurs when the correctness of a computation depends on the relative timing or interleaving of multiple threads by the runtime.
     The most common type of race condition is check-then-act, read-modify-write
     where a potentially state observation is used to make a decision on what to do next.
+    Solution is to introduce a common lock to make the "compound actions" atomic
 
 12. data race:
     arises when synchronization is not used to coordinate all access to a shared non-final field.
@@ -219,3 +220,40 @@ Sharing Objects
 23. A thread-safe object performs synchronization internally
 
 Composing Objects
+1. If the object has fields that are references to other objects,
+   its state will encompass fields from the referenced objects as well
+
+2. Operations with state-based preconditions are called state-dependent
+
+3. Java Monitor Pattern
+    An object following the Java monitor pattern encapsulates all its mutable state
+    and guards it with the object's own intrinsic lock.
+
+4. Thread-Safety Delegation
+  4.1 Definition:
+        The thread-safety of the current class depends on the thread-safety of its fields
+  4.2 Delegations successes,
+        when the underlying fields are thread-safe and independent
+  4.3 Delegations fails,
+    4.3.1 Scenario1, dependent fields
+        when the underlying fields are dependent,
+        even if they are all thread-safe respectively,
+        for the "dependency" can not be preserved,
+        which will result in invalid state of the current object when multiple threads tries to modify it.
+        Solution is to use a common lock of to make the operation on the dependent fields atomic
+    4.3.2 Scenario2, compound actions
+        Solution is also by introducing a common lock,
+        which will make the compound actions atomic
+
+5. @GuardedBy:
+      documentation purposed annotation,
+      documents which lock they should acquire to guarantee thread-safety
+
+6. Client side locking
+    explicitly lock object/methods on the client side (client means the user of the class)
+
+Building Blocks
+1. Using iterators does not obviate the need to lock the collection during iteration
+   if other threads can concurrently modify it.
+
+2. 
