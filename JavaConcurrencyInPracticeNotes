@@ -340,3 +340,54 @@ Building Blocks
           CyclicBarriers, allows a fixed number of parties to rendezvous repeatedly at a barrier point
 
 Task Execution
+1. The Executor Framework
+  1.1 The primary abstraction for task execution in the Java class libraries is not Thread, but Executor
+        public interface Executor{
+          void execute(Runnable command);
+        }
+
+      Executor is based on the producer-consumer pattern,
+      where activities that submit tasks are producers (producing units of work to be done)
+      and threads that execute tasks are the consumers (consuming those units of work).
+  1.2 Whenever you see code of the form:
+        new Thread(runnable).start()
+      and you think you might at some point want a more flexible execution policy,
+      seriously consider replacing it with the use of an Executor
+  1.3 Thread Pools
+        Worker threads have a simple life:
+        request the next task from the work queue, execute it, and go back to waiting for another task
+        **Executors.newFixedThreadPool(NUMBER)  , is an example of creating thread pool (ExecutorService) by using Executor's factory methods
+  1.4 Submitting task with Executor#execute() adds the task to work queue,
+      and the worker threads repeatedly dequeue tasks from the work queue and execute them
+  1.5 ExecutorService, adds lifecycle management methods to executors
+      public interface ExecutorService extends Executor{
+        void shutdown()
+        boolean isShutdown();
+        boolean isTerminated();
+        boolean awaitTermination(long timeout, TimeUnit unit)
+        ...
+      }
+  1.6 ExecutorService lifecycle states:
+    1.6.1 running
+    1.6.2 shutting down
+    1.6.3 terminated
+
+  1.7 Graceful shutting down:
+        no new tasks are accepted
+        but previously submitted tasks are allowed to complete
+        including those that have not yet begun execution
+
+  1.8 Abrupt shutdown:
+        cancel outstanding tasks
+        and does not start any tasks that are queued but not begun
+
+  1.9 Delayed and Periodic Tasks
+        Can be handled by ScheduledThreadPoolExecutor,
+        which is a replacement of Timer,
+        who manages execution on a "relative basis" in stead of Timer's absolute strategy,
+        it compensates the dependency to the system clock, which is error prone
+  1.10 Thread leakage:
+        Tasks that are already scheduled but not yet executed are never run.
+        (which can happen if an Exception is thrown in task scheduled by Timer)
+
+2. Finding Exploitable Parallelism
