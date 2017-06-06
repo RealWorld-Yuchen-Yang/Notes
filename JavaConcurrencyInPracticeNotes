@@ -37,7 +37,7 @@ Thread Safety
    your program is broken.
    There are three ways to fix it
   6.1 do not share the state variable across threads
-  6.2 make the state variable immutable
+  6.2 make the state variable immutable, immutable objects are automatically thread-safe
   6.3 use synchronization whenever accessing the state variable
 
 7. In any case, the concept of a thread-safe class makes sense only if the class encapsulates its own state.
@@ -309,3 +309,34 @@ Building Blocks
     9.2.2 producer-consumer pattern has one shared work queue for all consumers
   9.3 Work stealing is well suited to problems in which consumers are also producers,
       when performing a unit of work is likely to result in the identification of more work
+
+10. Synchronizer,
+      any object that coordinates the control flow of threads based on its state.
+      typical synchronizers are: BlockingQueue, semaphores, barriers, and latches.
+      All synchronizers share certain structural properties:
+        they **encapsulate state** that determines whether threads arriving at the synchronizer should be allowed to pass or forced to wait.
+        provide **methods to manipulate that state**
+        provide **methods to wait** efficiently for the synchronizer to enter the desired state.
+
+  10.1 Latches
+        A latch is a synchronizer that can delay the progress of thread until it reaches its terminal state.
+        once the latch reaches the terminal state, it cannot change state again.
+        latches can be used to ensure that certain activities do not proceed until one-time activities complete
+  10.2 FutureTask (acts like a latch)
+        FutureTask is used by the Executor framework,
+        to represent asynchronous tasks,
+        and the task may or may not have completed
+        FutureTask implements Runnable interface
+        and it tasks a Callable argument which represents the callback function
+  10.3 Semaphores
+        Counting semaphores are used to control **the number of activities**
+        that can access a certain resource or perform a given action **at the same time**.
+        counting semaphores can be used to implement resource pools or to impose a bound on a collection
+  10.4 Barriers
+        Similar to latches in that they block a group of threads until some event has occured.
+        The key difference is that with a barrier,
+        all the threads must come together at a barrier point **at the same time** in order to proceed
+        Latches wait for events, barriers wait for other threads
+          CyclicBarriers, allows a fixed number of parties to rendezvous repeatedly at a barrier point
+
+Task Execution
