@@ -361,8 +361,15 @@ Cascading state transitions
     This is a Hibernate specific and more fine-grained entity life-cycle event listener
 
 Writing queries
-
-
+1. Query hints
+  1.1 by default, Hibernate flushes the persistence context and all changes to the database before executing the query.
+      with the flush mode set to COMMIT, Hibernate will not flush the persistence context before executing the query.
+      default flushing mode is AUTO.
+2. ways of declaring queries
+  2.1 in program, by using the Query interface
+  2.2 in external xml files
+  2.3 by using class level annotations
+  2.4 on named queries in Hibernate annotations in a package-info.java file:
 
 ******************************************************************
 the following are Java Brains Notes
