@@ -391,3 +391,7 @@ Task Execution
         (which can happen if an Exception is thrown in task scheduled by Timer)
 
 2. Finding Exploitable Parallelism
+  Trying to increase concurrency by parallelizing heterogeneous activities can be a lot of work,
+  and there is a limit to how much additional concurrency you can get out of it.
+
+Cancellation and ShutDown
