@@ -395,3 +395,79 @@ Task Execution
   and there is a limit to how much additional concurrency you can get out of it.
 
 Cancellation and ShutDown
+1. There is no safe way to preemptively stop a thread in Java,
+   and therefore no safe way to preemptively stop a task.
+   There are only cooperative mechanisms,
+   by which the task and the code requesting cancellation follow an agreed-upon protocol.
+   the agreed-upon protocol is "setting a cancellation requested flag"
+
+2. Thread#join(),
+    means wait for the calling thread to die
+
+3. Daemon Threads
+  3.1 Sometimes you want to create a thread that perform some helper function
+      but you don't want the existence of this thread to prevent the JVM from shutting down.
+      You can use daemon threads
+  3.2 Threads are divided into two types:
+        When JVM starts,
+        all threads it creates are daemon threads, e.g. garbage collector and other housekeeping threads
+        except the main thread.
+        Normal threads and daemon threads differ only when they exit
+    3.2.1 Normal threads
+    3.2.2 Daemon threads,
+            when JVM halts,
+            any remaining daemon threads are abandoned,
+            daemon should be used sparingly, and should not perform anyI/O
+
+4. using FutureTask and Executor framework simplifies building cancellable tasks and services
+
+Applying Thread Pools
+1. Thread pools work best when tasks are homogeneous and independent
+  1.1 Mixing long-running and short-running tasks risks "clogging" the pool unless it is very large
+  1.2 submitting tasks that dependent on other tasks risks deadlock unless the pool is unbounded.
+
+2. Thread starvation deadlock
+    Tasks in a queue wait for results from other tasks to proceed,
+    but such results never come.
+
+3. Long-running tasks
+    If the wait times out, you can mark the task as failed and abort it or requeue it for execution later
+
+4. Sizing the thread pool
+  4.1 For compute-intensive tasks:
+        an Ncpu processor system usually achieves optimum utilization with a thread pool of (Ncpu+1) threads
+        Note: the extra runnable thread prevents CPU from going unused when page fault or pause for some other reason happens
+  4.2 For tasks that also include I/O or other locking operations:
+        you want a larger pool, since not all threads will be scheduled all the times.
+  4.3 Calculating thread pool size:
+        Ncpu = number of CPUs, int N_CPUS = Runtime.getRuntime().availableProcessors();
+        Ucpu = target CPU utilization, 0<=Ucpu<=1
+        W/C = ratio of wait time to compute time
+        The optimal pool size for keeping the processor at the desired utilization is
+          Nthreads = Ncpu * Ucpu * (1+W/C)
+  4.4 Other than CPU, other resources can contribute to sizing constraints are memory, file handles, socket handles, and database connections.
+      To calculate pool size constraints for these type of resources:
+        add up how much of that resource each task requires,
+        and divide that into the total quantity available.
+        The result will be an upper bound on the pool size
+
+5. Managing Queued Tasks
+  5.1 With fixed sized thread pools,
+      If the arrival rate for new requests exceed the rate at which they can be handled,
+      requests will still queue up,
+      they wait in a queue of Runnables managed by the Executor instead of queueing up as threads contending for the CPU.
+  5.2 ThreadPoolExecutor allows you to supply a BlockingQueue to hold tasks awaiting execution.
+      There are three basic approaches: unbounded queue, bounded queue, synchronous handoff.
+      Note: synchronous handoff means,
+            for very large or unbounded pools,
+            you can bypass queueing entirely and instead hand off tasks directly from producers to worker threads.
+            SynchronousQueue is not really a queue,
+            but a mechanism for managing handoffs between threads.
+            SynchronousQueue is a practical choice only if the pool is unbounded or if rejecting excess task is acceptable
+
+6. Bounding either the **thread pool** or the **work queue** is suitable only when tasks are independent.
+   With tasks that depend on other tasks,
+   bounded thread pools or queues can cause thread starvation deadlock.
+   instead, use an unbounded pool configuration like newCachedThreadPool.
+
+7. Saturation policies (are preformed when queue for storing coming threads is full)
