@@ -371,6 +371,51 @@ Writing queries
   2.3 by using class level annotations
   2.4 on named queries in Hibernate annotations in a package-info.java file:
 
+The Query Language
+1. Criteria comparison
+  '%', means any sequence of characters
+  '_', means any single character
+
+2. Logical operations can be created
+   by using Predicates, which concatenates Criteria
+
+3. Projection is defining the "columns" you want to return to the application:
+    the data you need
+
+4. In reporting, you write the SELECT clause for projection
+   and GROUP BY and HAVING clause for aggregation
+   Note: HAVING performs as a "match criteria" on groups
+
+5. Joins
+  5.1 Inner Join
+    5.1.1 Description
+        this is the default and most common Join strategy
+        , for inner join, no "NULL" field values are accepted
+    5.1.2 Steps:
+      5.1.2.1 make all combinations of two tables
+      5.1.2.2 filter to have only "Row Products" satisfy the "ON" clause
+    5.1.3 you can join data in arbitrary ways
+          no only limited to comparison of identifiers
+
+  5.2 Outer Join
+    5.2.1 Left Outer Join
+      the result sets contains all rows in the left table,
+      for fields does not exist in the corresponding right table, NULL is filled in the result
+
+    5.2.2 Right Outer Join (used rarely, for most programmers think from left to right)
+
+6. Join options in JPA
+  6.1 implicit association join with path expression
+      (taking advantage of the Object's metadata)
+  6.2 ordinary join in the "FROM clause" with join operator
+  6.3 A fetch join in the "FROM" clause with the join operator
+  6.4 A theta-style join in the "WHERE" clause
+    Note: in traditional SQL,
+          a theta-style join is a Cartesian Product (an exhausted left & right row combination)
+          with a JOIN condition on the WHERE clause.
+          which is applied on the product to restrict the result
+          In JPA queries, the theta-style syntax is useful when you join condition is not the foreign key
+
 ******************************************************************
 the following are Java Brains Notes
 ******************************************************************

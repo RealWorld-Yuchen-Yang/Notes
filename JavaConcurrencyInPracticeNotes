@@ -471,3 +471,94 @@ Applying Thread Pools
    instead, use an unbounded pool configuration like newCachedThreadPool.
 
 7. Saturation policies (are preformed when queue for storing coming threads is full)
+
+8. Hook:
+    the notion of hook is "methods" to be overwrite on a component class,
+    which will be further called by its manipulator (e.g. pool, container, etc.)
+
+9. Loops whose bodies contain nontrivial computation or perform potentially blocking I/O are frequently good candidates for parallelization,
+   as long as the iterations are independent.
+
+Avoid liveness Hazards
+1. A program will be free of locking-ordering deadlocks if all threads acquire the locks they need in a fixed global order.
+   solution can be inducing a Global Lock Ordering,
+   which can be implemented by using **System.identityHashCode()**,
+   1.1 if two locks' systemHashCode are not equal, always acquire the smaller/larger one
+   1.2 if two locks' systemHashCode are equal, means there is a hashCode collision, which can be solved by introducing another "tieLock" at the beginning
+
+2. Open call:
+    calling a method with no locks held
+    using open calls to avoid deadlock is analogous to using encapsulation to provide thread safety
+
+3. Restructuring a synchronized block to allow open calls can sometimes have undesirable consequences,
+   since it takes an operation that was atomic and makes it not atomic
+   Note: in many cases, the loss of atomicity is perfectly acceptable.
+   In cases, the loss of atomicity is a problem,
+   to reachieve atomicity, one technique is to structure a concurrent object so that only one thread can execute the code path following the open call
+   Thus, rather than using locking to keep the order threads out of a critical section of code,
+   this technique relies on constructing protocols so that other threads don't try to get in.
+
+4. Timed Lock Attempts
+  4.1 Intrinsic locks:
+        wait forever if they cannot acquire the lock
+  4.2 Explicit locks:
+        let you specify a timeout, by using a timeout that is much longer than you expect acquiring the lock to take,
+        you can regain control when something unexpected happens.
+
+5. Deadlock Analysis with Thread Dumps
+  5.1 Thread Dump is a JVM technique to analysis Deadlock
+  5.2 A thread dump includes a stack trace for each running thread.
+  5.3 Thread dump also include locking information, such as
+        which locks are held by each thread
+        in which stack frame they were acquired,
+        which lock a blocked thread is waiting to acquire
+  5.4 Trigger a thread dump:
+    5.4.1 option1, send JVM process a SIGQUIT signal (kill -3)
+    5.4.2 press ctrl-\ key
+    5.4.3 request from IDE
+  5.5 Thread dump tools
+    5.5.1 OS native command kill -3 <PID>,
+          Note: PID can be obtained from "ps -ef| grep java"
+    5.5.2 JDK jstack utility,
+          jstack <PID>
+    5.5.3 Java Visual VM
+    5.5.4 Oracle WebLogic Admin Console
+  5.6 Thread dump analysis with Tomcat
+        issue "kill -3 <TOMCAT_PID>", the dump will appear in TOMCAT/logs/catalina.out
+        issue "jstack <TOMCAT_PID>", the dump will appear in the current console
+  5.7 You can generate thread dump several times,
+      by comparing the dump sampling results,
+      you can better analysis the behavior
+  5.8 Thread dump analysis
+    5.8.1 Java head utilization is very useful for correlation with thread problem patterns such as internal contention
+    5.8.2 differentiate healthy and non-healthy threads
+      5.8.2.1 healthy: a thread waiting for a task
+      5.8.2.2 non-healthy: a thread is executing a task for too long or STUCK
+    5.8.3 Primary thread dump analysis objective: identify one or many **problem patterns**
+    5.8.4 Always analysis thread stack trace from bottom up
+    5.8.5 thread lock contention: identify the culprit thread holding the FLAT LOCK
+    5.8.6 thread dump analysis exposing abnormal slowdown conditions,
+          such as "logging", "class loading", "XML parsing", etc.
+          is often the symptom of excessive JVM garbage collection,
+          and/or Java Heap Depletion
+    5.8.7 When potential problems are identified by analyzing thread stack trace,
+          go to the "Heap Section" to see the root cause of the dead lock
+
+6. Other liveness hazard problems
+  6.1 Starvation:
+        occurs when a thread is perpetually access to resources it needs in order to make progress
+  6.2 Poor Responsiveness:
+        like GUI frozen caused by heavy back ground computation in one thread
+  6.3 Live Lock
+        Live lock is a form of liveness failure in which a thread, while not blocked,
+        still cannot progress because it keeps retrying an operation that will always fail
+        (poison message problem)
+        This form of livelock often caused from over eager error-recovery code that mistakenly treats an unrecoverable error as a recoverable one.
+        Live lock can also occur when multiple cooperating threads change their states in response to the other in such a way that no thread can ever make progress,
+        solution is to introduce randomness
+
+7. Avoid the temptation to use thread priority to resolve dead lock,
+   since they increase platform dependence and can cause liveness problems
+   most concurrent applications can use the default priority for all threads
+
+Performance and Scalability
