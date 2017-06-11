@@ -416,6 +416,59 @@ The Query Language
           which is applied on the product to restrict the result
           In JPA queries, the theta-style syntax is useful when you join condition is not the foreign key
 
+Building applications
+1. Building a stateless server
+  1.1 stateless server and rich client:
+        no application will be managed on the server between client requests.
+        Here state means "field",
+    1.1.1 if the server does not store the fields,
+    1.1.2 then they must be stored in the client side
+           which makes the client "rich|thick client"
+  1.2 advantages
+        any server can handle any client request.
+        if a server fails,
+        you can route the next request to a different server,
+        and the conversation process continues.
+        the server in a cluster "share nothing".
+        you can easily scale up your system horizontally by adding more servers,
+        Obviously, all application server still share the database system,
+        but at least you only have to worry about scaling up one tier of servers.
+
+2. Service classes are on the server,
+   they are used as a server side controller,
+   which calls Dao, Domain objects, and do validation, etc
+   Note: the traditional concept of controller can be the "front end controller", or this kind of service class
+         "front end controller" does the "dispatching service"
+
+3. building stateful server
+  3.1 stateful server and thin client
+    3.1.1 the server will hold the conversational state of the application,
+          Note: the server usually store state in some kind of session associated with a particular client
+                If the user walks away from the client and doesn't complete a conversation,
+                temporary conversation data must be removed on the server at some point.
+                The server typically handles this situation with timeouts
+                This kind of service can be implemented as EJB's stateful session beans
+
+    3.1.2 the client will only be a dumb input/output device.
+
+  3.2 Stateful server architecture doesn't mean you can only use stateful server-side components.
+      For those "simple" conversations, no state is needed to be stored on the server.
+
+  3.3 Maintain transaction atomicity
+        The conversation is atomic if you do not join the extended EntityManager with a transaction
+        until the last event in the conversation
+        Note: no dirty checking and flushing will occur if you only read data in unsynchronized mode.
+  3.4 The stateful server architecture may be more difficult to scale horizentally.
+      If a server fails, the state of the current conversation and indeed the entire session is lost.
+  3.5 An additional challenge with thin clients is parallel conversations by one user:
+        when one user is editing two items at the same time,
+          e.g. in two web browser tabs
+        This means the user has two parallel conversations with the server.
+        The server must separate data in the user session by conversation (introducing conversation identifier).
+
+Building Web Application
+1.
+
 ******************************************************************
 the following are Java Brains Notes
 ******************************************************************
