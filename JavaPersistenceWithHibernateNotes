@@ -467,7 +467,35 @@ Building applications
         The server must separate data in the user session by conversation (introducing conversation identifier).
 
 Building Web Application
-1.
+1. CDI: Context and Dependency Injection
+
+2. Conversation-scoped services
+  2.1 Start the conversation
+        you do not start a long-running conversation context on the server when rendering page,
+        instead you should begin the long-running conversation context and hold state across requests on the server
+        **when the user click the NEXT button for the first time.
+  2.2 End the conversation
+        The user may at any time click CANCEL or walk away from the terminal and let the conversation expire.
+  2.3 Conversation isolation
+        The user may work in two browser tabs and run several conversations in parallel.
+        so they must be isolated from each other on the server within the same user session.
+
+3. transient marked fields:
+    these fields will not be serialized
+
+4. Service Class in Conversation-scoped services should be marked as Serializable,
+   unlike a request-scoped implementation
+
+5. The **Conversation API** is provided by the container,
+   Call it to control the conversation context.
+   You need it when the user clicks the NEXT button for the first time,
+   promoting the transient conversation to long-running
+
+6. You can hold detached entity instances in a conversational service's state
+   and merge it when needed to persist changes.
+
+7. passived: means serialized
+
 
 ******************************************************************
 the following are Java Brains Notes
