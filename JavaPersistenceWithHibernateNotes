@@ -516,6 +516,38 @@ Scaling Hibernate
     is to scroll the returned query result.
     so the whole "result set" is not in the application memory
 
+5. Concurrency strategies, for configuring second level cache (which is shared among processes)
+    (
+      in the order of decreasing levels of strictness,
+      but increasing scalability and performance
+    ):
+  5.1 TRANSACTIONAL,
+        isolation level:
+          available only in environment with a system transaction manager.
+          guarantees full transactional isolation up to **repeatable read**.
+        usage:
+          use this strategy for read-mostly data where it's critical to prevent stale data.
+
+  5.2 READ_WRITE,
+        isolation level:
+          maintains **read committed** isolation
+        usage:
+          only works in a non-clustered environment.
+          enable this strategy for read-mostly data where it's critical to prevent stale data.
+  5.3 NONSTRICT_READ_WRITE
+        isolation level:
+          no guarantee of consistency between the cache and the database.
+          transaction may read stale data from the cache.
+        usage:
+          use this strategy if data hardly ever changes.
+          and a window of inconsistency isn't of critical concern.
+        availability:
+          available even in a cluster
+
+  5.4 READ_ONLY
+        usage:
+          for data never changes.
+
 
 ******************************************************************
 the following are Java Brains Notes
