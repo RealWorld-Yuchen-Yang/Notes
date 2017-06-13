@@ -496,6 +496,26 @@ Building Web Application
 
 7. passived: means serialized
 
+8. You must join the unsynchronized request-scoped persistence context with the system transaction
+   if you want to store data.
+
+Scaling Hibernate
+1. Hibernate has to keep your second-level cache synchronized to avoid returning stale data,
+   so it will invalidate and clear all second-level cache regions when you execute a native SQL UPDATE or DELETE statement.
+   (For Hibernate does not parse SQL statement to detect the affected tables)
+
+2. Every transient entity instance you pass to EntityManager#persist() is added to the persistence context cache.
+   To prevent memory exhaustion, you flush() and clear() the persistence context after a certain number of insertions,
+   effectively batching the inserts.
+
+3. The persistence context is an essential feature of the Hibernate engine.
+   without a persistence context,
+   you can not manipulate entity state and have Hibernate detect your changes automatically.
+
+4. Scrolling,
+    is to scroll the returned query result.
+    so the whole "result set" is not in the application memory
+
 
 ******************************************************************
 the following are Java Brains Notes
