@@ -1,0 +1,60 @@
+Getting started with MyBatis
+1. Hibernate and MyBatis
+  1.1 Hibernate:
+        full-fledged ORM framework,
+        statically map Java objects to database tables.
+        encourages working with entity objects and generate SQL queries under the hood.
+        even though Hibernate allows to execute native SQLs,
+        but that might defeat the promise of a database-independent persistence.
+  1.2 MyBatis
+        map query results to Java objects
+        embraces SQL, which can take advantage of database-specific features and prepare optimized SQL queries.
+
+2. Hibernate's benefits
+  If your application is driven by an object model
+  and wants to generate SQL dynamically,
+  MyBatis may not be a good fit for you.
+  Also if you want to have a transitive persistence mechanism
+  (saving the parent object should persist associated child object as well)
+  Hibernate will be better suited for it.
+
+3. MyBatis' benefit
+  Have native support for SqlSession level cache,
+  it caches query results by using ResultSets
+
+4. MyBatis' main configuration file:
+    mybatis-config.xml
+
+5. It is better off by using Mapper interfaces when doing SQL queries
+
+6. Each Service thread should have its own instance of SqlSession,
+   ,instances of SqlSession objects are not thread safe and should not be shared.
+   The best scope of SqlSession is "method scope"
+
+Bootstrapping MyBatis
+1. MyBatis supports two types of transaction managers:
+  1.1 JDBC
+    The JDBC transaction manager is used where the **application** is responsible for
+    managing the connection life cycle,
+    that is "commit", "rollback" and so on.
+
+  1.2 MANAGED
+    The MANAGED transaction manager is used where the **application server** is responsible for
+    managing the connection life cycle.
+
+2. Mappers
+  Mapper XML files contain the mapped SQL statements that will be executed by the application using **statement id**
+  We need to configure the location of SQL Mapper files in mybatis-config.xml
+
+3. DataSource
+    MyBatis supports three built-in DataSource types: UNPOOLED, POOLED and JNDI
+  3.1 UNPOOLED
+    creates a new database connection every time for each user request
+    and is not advisable for concurrent multiuser applications
+  3.2 POOLED
+    it will use one of the Connection objects readily available in the pool.
+    thereby increasing performance
+  3.3 JNDI
+    uses the Connection pool configured in the application server and obtains a connection using a JNDI lookup.
+
+SQL Mappers Using XML (important)
