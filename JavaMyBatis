@@ -20,7 +20,7 @@ Getting started with MyBatis
 
 3. MyBatis' benefit
   Have native support for SqlSession level cache,
-  it caches query results by using ResultSets
+  it caches query results by using ResultMaps
 
 4. MyBatis' main configuration file:
     mybatis-config.xml
@@ -58,3 +58,48 @@ Bootstrapping MyBatis
     uses the Connection pool configured in the application server and obtains a connection using a JNDI lookup.
 
 SQL Mappers Using XML (important)
+1. Invoking the mapped SQL queries defined in mapper xml
+    we can create a Mapper interface with
+      1.1 a fully qualified name that is the same as the namespace
+      1.2 method signatures match the statement IDs, input parameters and return types
+
+    e.g.
+      mapper xml:
+        <mapper namespace="com.mybatis3.mappers.StudentMapper">
+          <select id="findStudentById" parameterType="int" resultType="Student">
+            select stud_id as studId, name, email, dob from Students where
+            stud_id=#{studId}
+          </select>
+        </mapper>
+
+      mapper interface:
+        package com.mybatis3.mappers;
+        public interface StudentMapper
+        {
+          Student findStudentById(Integer id);
+        }
+
+2. ResultMaps are used to map the SQL SELECT statement's result to JavaBeans properties.
+    we can define ResultMaps and reference this resultMap query from several SELECT statements.
+    Note: this definition and reference are all in XML/Annotation
+
+3. Extending ResutlMaps
+    We can extend one <resultMap> query from another <resultMap> query,
+    thereby inheriting the column to do property mappings from the one that is being extended.
+
+4. We can set the properties of a nested object using the dot notation.
+
+5. one-to-one mapping
+  5.1 using nested result maps with association
+        the <association> element can be used to load the **has-one** relationship
+  5.2 using nested select
+
+6. one-to-many mapping by using <collection>
+    Note: the underlying SQL should use a join select
+  6.1 mapping with nested ResultMap
+  6.2 mapping with nested select
+        Note: nested select approach may result in N+1 problems
+              First the main query will be executed (1),
+              and for every row returned by the first query,
+              another select query will be executed (N queries for N rows)
+              For large datasets, this could result in poor performance.
