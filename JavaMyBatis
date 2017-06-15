@@ -119,4 +119,30 @@ SQL Mappers Using XML (important)
       with other potential modifications by other callers or threads.
 
 Integration with Spring
-1.
+1.By using the MyBatis-Spring module,
+  we can configure the MyBatis beans in Spring ApplicationContext,
+  and Spring will take care of
+  1.1 initiating the **SqlSessionFactory**
+  1.2 create a **SqlSession** object and inject it into the **DAO** or **Service** classes.
+
+2 Once the SqlSessionFactory bean is configured,
+  we need to configure the SqlSessionTemplate bean,
+  which is a thread-safe Spring bean from which we can obtain thread-safe SqlSession objects.
+  Because SqlSessionTemplate provides a thread-safe SqlSession objects,
+  you can share the same SqlSessionTemplate instance with multiple Spring beans.
+  Conceptually SqlSessionTemplate is similar to JdbcTemplate of the Spring DAO module.
+
+3. We can use Spring's annotation-based transaction-handling mechanism
+  3.1 configure the TransactionManager bean in Spring application context
+        <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+          <property name="dataSource" ref="dataSource" />
+        </bean>
+
+  3.2 enable the annotation-based transaction management feature in Spring
+        <tx:annotation-driven transaction-manager="transactionManager"/>
+
+  3.3 Annotate the Spring service bean with the @Transactional annotation.
+      **This indicates that each method in this service should run within a transaction**
+      Spring will commit the operation if the method is completed successfully,
+      and will rollback if any runtime exception occurs.
+      Also Spring will take care of converting MyBatis Exceptions into appropriatee DataAccessExceptions.
