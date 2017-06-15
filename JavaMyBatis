@@ -103,3 +103,20 @@ SQL Mappers Using XML (important)
               and for every row returned by the first query,
               another select query will be executed (N queries for N rows)
               For large datasets, this could result in poor performance.
+
+7. MyBatis supports passing multiple input parameters to a mapped statement
+   and referencing them using the
+    #{param}
+   syntax
+
+8. Cache
+  8.1 By default, the first-level cache is enabled
+    which means that if you invoke the same SELECT statement within the same SqlSession interface,
+    results will be fetched from the cache instead of the database
+  8.2 We can add global second-level caches by adding the <cache/> element in SQL Mapper XML files
+      The second-level cache will be treated as a read/write;
+      this means that the objects retrieved will not be shared and can safely be modified by the caller without it interfering
+      with other potential modifications by other callers or threads.
+
+Integration with Spring
+1.
