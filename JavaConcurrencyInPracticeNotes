@@ -562,3 +562,46 @@ Avoid liveness Hazards
    most concurrent applications can use the default priority for all threads
 
 Performance and Scalability
+1. When the performance of an activity is limited by availability of a particular resource,
+   we say it is bound by that resource:
+    CPU-bound, database-bound, etc.
+
+2. Performance:
+    Application performance can be measured in a number of ways,
+    such as service time, latency, throughput, efficiency, scalability, or capacity.
+    Tuning:
+      When tuning for performance,
+      the goal is usually to do the same work with less effort
+
+3. Scalability:
+    the ability to improve throughput or capacity when additional computing resources
+    (such as additional CPUs, memory, storage, or I/O bandwidth) are added.
+    Tuning:
+      When tuning for scalability,
+      you are trying to find ways to **parallelize the problem**
+      so you can take advantage of additional processing resources to do more work with more resources
+
+4. Amdahl's law:
+  4.1 it describes how much a program can theoretically be sped up by additional computing resources.
+      based on the portion of parallelizable and serial components.
+  4.2 Expression
+        Speedup <= 1/(F+(1-F)/N)
+        Utilization = Speedup/N
+        F: fraction of the calculation must be executed serially
+        N: number of processors in a machine
+
+5. Reducing Lock Contention
+  5.1 Reducing lock contention can improve both performance and scalability
+  5.2 Two factors influence the likelihood of contention for a lock:
+    5.2.1 how often that lock is requested
+    5.2.2 how long it is held once acquired
+    This is corollary of little's law:
+      the average number of customers in a stable system is equal to
+      their average arrival rate multiplied by their average time in the system
+
+6. Three ways to reduce lock contention
+  6.1 reduce the duration for which locks are held
+  6.2 reduce the frequency with which locks are requested
+  6.3 replace exclusive locks with coordination mechanisms that permit greater concurrency
+
+7. 
