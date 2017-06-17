@@ -621,3 +621,26 @@ Testing Concurrent Programs
    since they can disclose when a problem is not related to concurrency issues before you start looking for data races
 
 Advanced Topics
+
+Appendix Annotations for Concurrency (All for documentation purpose, also can be used by tools)
+1. Class level annotations, describes a class's intended thread-safety promises
+  1.1 @Immutable, which also implies @ThreadSafe
+  1.2 @ThreadSafe
+  1.3 @NotThreadSafe
+
+2. Field and Method Annotations
+  @GuardedBy(lock), documents that a field or method should be accessed only with a specific lock held.
+  The possible values for locks are:
+  2.1 @GuardedBy("this"),
+        meaning the intrinsic lock on the containing object
+  2.2 @GuardedBy("fieldName"),
+        meaning that lock associated with the object referenced by the named field,
+        either an intrinsic lock (for fields that do not refer to a lock)
+        or an explicit lock (for fields that refer to a lock)
+  2.3 @GuardedBy("ClassName.fieldName"),
+        like @GuardedBy("fieldName"),
+        but referencing a lock object held in a static field of another class
+  2.4 @GuardedBy("methodName()"),
+        meaning the lock object that is returned by calling the named method.
+  2.5 @GuardedBy("ClassName.class"),
+        meaning the class literal object for the named class
