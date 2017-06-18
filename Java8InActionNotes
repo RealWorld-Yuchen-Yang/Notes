@@ -1,0 +1,211 @@
+Why should you care
+1. free parallelism by using the Stream library
+
+2. behavior parameterization
+    pass methods (your code) as arguments to other methods
+
+3. functional programming V.S. imperative programming
+  3.1 functional programming:
+        does not share mutable data,
+        able to pass methods and functions to other methods
+        it behaves as a mathematical function and has no (visible) side effects
+  3.2 imperative programming,
+        describe a program in terms of a sequence of statements that mutate state.
+
+4. Java 8 method reference :: syntax (meaning "use this method as a value")
+   Note: this is "named functions, a counterpart of lambdas"
+    e.g. File::isHidden,
+          is a reference to File class's isHidden() method
+          which can be used (invoked) later on
+
+5. Lambdas: anonymous functions
+    As well as allowing (named) methods to be first-class values,
+    Java 8 allows a richer idea of functions as values, including lambdas (or anonymous functions)
+
+    compared with named methods:
+      new lambda syntax is more concise for cases where you do not have a convenient method and class available
+      they are used when such method is seldom used
+
+6. Predicate:
+  6.1 mathematics concept:
+        something functions like,
+        take a value for an argument and **returns true or false**
+
+7. Core: a synonym of CPU
+   computing cluster: computers connected together with fast networks
+
+8. Comparing Collections API and Streams API:
+  8.1 similarity:
+        both provide access to sequences of data items
+  8.2 differences:
+    8.2.1 Collections: mostly about storing and accessing data.
+    8.2.2 Streams: mostly about describing computations on data.
+            Note: the key point here is that Streams allows and encourages the elements within a Stream to be processed in parallel
+                  Often the fastest way to filter a Collection is to convert it to a Stream,
+                  process it in parallel,
+                  convert it back to a list
+
+9. Default methods on interfaces:
+    an interface can now contain method signatures for which an implementing class doesn't provide an implementation,
+    The missing method bodies are given as part of the interface (default implementations)
+    rather than in the implementing class
+    Note: default methods are declared by using the "default" key word
+
+10. Other interesting ideas from functional programming include
+  10.1 dealing with null (by using Optional<T>)
+  10.2 pattern matching (can be think of as "enhanced switch-case")
+
+Passing code with behavior parameterization
+1. Behavior parameterization:
+    the ability to tell a method to take multiple behaviors (or strategies) as parameters
+    and use them internally to accomplish different behaviors
+    (this is related to strategy design pattern, which lets you define a family of algorithms,
+    encapsulate each algorithm (strategy),
+    and select an algorithm at run-time)
+
+2. for passing behavior code snippets,
+   by using lambda expression,
+   it saves you the effort of creating multiple "ConcreteBehavior" classes,
+   which eliminates verbosity
+
+3. Runnable interface
+    In Java, you can use the Runnable interface to represent a block of code to be executed.
+    Thread class takes a Runnable parameter, which represents the code snippet the thread will run
+
+    //java.lang.Runnable
+    public interface Runnable{
+      public void run();
+    }
+
+Lambda Expressions
+1. For the passed in behavior (code snippet)
+   you can decide to run it when a certain event happens or at certain points in an algorithm
+
+2. Lambda expression:
+    can be understood as a concise representation of an anonymous function that can be passed around:
+      it doesn't have a name,
+      but it has a list of parameters, a body, a return type, and also possibility a list of exceptions that can be thrown
+  2.1 Function:
+        a lambda isn't associated with a particular class like a method is.
+  2.2 passed around:
+        a lambda expression can be passed as argument to a method or stored in a variable
+  2.3 syntax;
+        (lambda parameters) -> {lambda body}
+        Note:
+          2.3.1 lambda parameters:
+            2.3.1.1 the type of parameters are optional, since they can be indicated from the target (functional interface)
+            2.3.1.2 if there is only one parameter, the parenthesis surrounding the parameter list can also be omitted
+          2.3.2 lambda body
+            2.3.2.1 if the lambda body is composed of only one statement:
+                    no "return" need to specified,
+                    the return type is compatible with either "void" or the "statement's result"
+            2.3.2.2 if the lambda body is composed of more than one statements:
+                    if the return type is not "void",
+                    an explicit "return" statement should be supplied
+
+  2.4 Special cases:
+    () -> {}, represents a method taking no parameter, and has an empty body
+
+3. Where exactly can you use lambdas?
+    You can use a lambda expression in the context of a functional interface
+
+4. Functional interface:
+    Interfaces has exactly one abstract method.
+    Note: functional interface can still have many default methods
+
+5. lambda expressions let you provide the implementation of the abstract method of a functional interface directly inline
+   and treat the whole expression as an instance of a functional interface (a concrete implementation of the functional interface)
+
+6. When passing a lambda expression as an argument into a method,
+   it is registered into that method.
+   such method is defined in advance,
+   which takes a functional interface as a parameter,
+   and in its body,
+   it calls the only abstract method on that functional interface at some operational point
+
+7. Function descriptor
+    The signature of the abstract method of the functional interface essentially describes the signature of the lambda expression
+
+8. Common functional interfaces in Java 8
+      Functional Interface    Function descriptor  Function descriptor signature   Primitive specializations
+  8.1 Predicate<T>              T -> boolean       boolean test(T t)               IntPredicate, LongPredicate, DoublePredicate
+  8.2 Consumer<T>               T -> void          void accept(T t)                IntConsumer, LongConsumer, DoubleConsumer
+  8.3 Function<T>               T -> R             R apply(T t)                    IntFunction<R>, IntToDoubleFunction, IntToLongFunction,
+                                                                                   LongFunction<R>, LongToDoubleFunction,
+                                                                                   LongToIntFunction, DoubleFunction<R>, ToIntFunction<T>,
+                                                                                   ToDoubleFunction<T>, ToLongFunction<T>
+  8.4 Supplier<T>               () -> T                                            BooleanSupplier, IntSupplier, LongSupplier, DoubleSupplier
+  8.5 BinaryOperator<T>         (T, T) -> T                                        IntBinaryOperator, LongBinaryOperator, DoubleBinaryOperator
+  8.6 BiPredicate<L, R>         (L, R) -> boolean
+  8.7 BiConsumer<T, U>          (T, U) -> void                                     ObjIntConsumer<T>, ObjLongConsumer<T>, ObjDoubleConsumer<T>
+  8.8 BiFunction<T, U, R>       (T, U) -> R                                        ToIntBiFunction<T, U>, ToLongBiFunction<T, U>, ToDoubleBiFunction<T, U>
+
+9. @FunctionalInterface annotation
+    This annotation is used to indicate that the interface is intended to be a functional interface.
+    The compiler will return a meaningful error if you define an interface using the @FunctionalInterface annotation
+    and it isn't a functional interface
+    Note: this annotation is not mandatory,
+          but it is a good practice to use it when an interface is designed for that purpose
+
+10. Function descriptor syntax:
+      (T, U) -> R
+    represents:
+      a function with two arguments of respectively generic type T and U
+      and that has a return type of R
+
+11. Note that none of the functional interfaces allow for a checked exception to be thrown.
+    however unchecked exception (RuntimeException) can be thrown
+
+12. Functional interface is not does not inherit Object class, for Object does not have exactly one abstract method
+
+13. Using local variables
+  13.1 free variables:
+        variables that aren't the parameters and defined in an outer scope
+  13.2 capturing lambda:
+        lambda expressions who use free variables inside their expression body
+  13.3 lambda expressions can use free variables,
+       but those free variables should be explicitly declared "final" or are effectively final
+       (In other words, lambda expressions can capture local variables that are assigned to them only once)
+  13.4 Comparing "closure" with "lambda expression"
+        a closure is an instance of a function that can reference nonlocal variables of that function with no restrictions
+           that is the closure can access and modify variables defined outside its scope
+14. Method references let you reuse existing method definitions and pass them just like lambdas
+  14.1 remember that "no brackets" are needed in method references,
+       because you are not actually calling the method
+  14.2 Recipe for constructing method references
+    14.2.1 A method reference to a static method
+    14.2.2 A method reference to an instance method of an arbitrary type
+           Note: here the "arbitrary type" is in the parameter list
+    14.2.3 A method reference to an instance method of an existing object
+           Note: here, the "existing object" is not in the parameter list, but in the expression body
+
+15. constructor reference
+  15.1 syntax: ClassName::new
+  15.2 Note that no matter how many arguments the constructor takes,
+       the reference to a constructor is always represented as ClassName::new
+       however, when using a particular constructor reference,
+       we can pass the explicit parameter list
+
+16. Composing Predicates
+      The predicate interface includes three methods that let you reuse an existing Predicate to create more complicated ones:
+      16.1 negate()
+      16.2 and()
+      16.3 or()
+
+17. Composing Functions
+  17.1 f.andThen(g)
+        means f is computed first,
+        then the result is passed into g for further computation
+  17.2 f.compose(g)
+        means f(g()) in mathematical expression,
+        who compute g() first,
+        then input the result into f() for further computation
+
+  Note: f and g are of "Function" functional interface
+
+18 The "Execute Around Pattern"
+  18.1 description:
+         you need to execute a bit of behavior in the middle of code that is always required in a method.
+         e.g. resource allocation and cleanup
+  18.2 for such pattern,
+       we can use lambda expression to gain additional flexibility

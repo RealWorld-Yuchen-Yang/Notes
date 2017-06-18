@@ -286,3 +286,10 @@ Architectures****************************
     3.2.2 producer-consumer pattern has one shared work queue for all consumers
   3.3 Work stealing is well suited to problems in which consumers are also producers,
       when performing a unit of work is likely to result in the identification of more work
+
+3. The "Execute Around Pattern"
+  3.1 description:
+         you need to execute a bit of behavior in the middle of code that is always required in a method.
+         e.g. resource allocation and cleanup
+  3.2 for such pattern,
+       we can use lambda expression to gain additional flexibility
