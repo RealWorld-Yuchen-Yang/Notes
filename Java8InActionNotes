@@ -291,3 +291,51 @@ Working with Streams
  6.3 a terminal operation that executes the stream pipeline and produce a result
 
 Working with streams
+1. Filtering and Slicing
+  1.1 filtering with a predicate
+  1.2 filtering all unique elements in a stream by using "distinct()"
+  1.3 truncating a stream to allow only N elements at the beginning pass by using "limit(N)"
+  1.4 skipping N elements at the beginning by using "skip(N)",
+      if the stream has fewer element than N,
+      then an empty stream is returned.
+      Note: limit(N) and skip(N) are complementary
+
+2. Mapping
+  2.1 map(Function<T,R> f),
+        it applies the input function to each elements in the stream,
+        mapping it into a new element
+  2.2 flatMap(Function<T,R> f),
+        lets you replace each value of a stream with another stream,
+        then concatenates all the generated streams into a single stream
+        Note: "flat" means break the "outer structure" of each stream element
+
+3. Finding and Matching
+  3.1 anyMatch(Predicate<T> p),
+        checking to see if a predicate matches at least one element in the stream
+  3.2 allMatch(Predicate<T> p),
+        checking to see if a predicate matches all elements in the stream
+  3.3 noneMatch(Predicate<T> p),
+        checking to see if a predicate matches none of the elements in the stream
+  3.4 findAny(),
+        returns an arbitrary element of the current stream.
+        return type is Optional<T>
+  3.5 findFirst(),
+        returns the first element of a stream,
+        it has more constraint than findAny() in parallelism
+
+4. Optional<T> in a nutshell
+  4.1 java.util.Optional is a "container" class to represent the existence or absence of a value
+  4.2 Optional<T> force you to explicitly check for the presence of a value or deal with the absence of a value
+    4.2.1 isPresent(),
+            returns true if Optional contains a value
+    4.2.2 isPresent(Consumer<T> block),
+            executes the given block if a value is present
+    4.2.3 T get(),
+            returns the value if present,
+            otherwise it throws a "NoSuchElement" exception,
+            Note: the gist here is that it does not return null
+    4.2.4 T orElse(T other),
+            returns the value if present,
+            otherwise returns a default value
+
+5. Reducing
