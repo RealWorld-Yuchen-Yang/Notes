@@ -252,8 +252,8 @@ Behavioral Patterns****************************
                                          visitor has visit() method defined on itself,
                                          which accepts Visitable objects and perform operations on them
 
-Architectures****************************
-1. MVC (Model View and Controller)
+Additional patterns gathered from all kinds of technologies
+1. MVC (Model View and Controller) Architecture
   1.1 View and Model are independent between each other,
       Controller is the bridge linking the View and the Model
   1.2. Components:
@@ -293,3 +293,13 @@ Architectures****************************
          e.g. resource allocation and cleanup
   3.2 for such pattern,
        we can use lambda expression to gain additional flexibility
+
+4. map-reduce pattern,
+    chaining multiple map() and reduce() operations
+    4.1 map()
+      in Java 8,
+        map() takes a lambda to operate on the source
+        transform each element into another one or to extract information
+    4.2 reduce()
+      in Java 8,
+        reduce combines all the elements in the stream repeatedly to produce a single value.
