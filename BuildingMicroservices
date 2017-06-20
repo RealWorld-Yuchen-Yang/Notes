@@ -5,4 +5,59 @@ The Evolutionary Architect
 
 2. DRY (Don't Repeat Yourself) is a trade-off to coupling
 
-3. 
+How to Model Services
+1. Good Service
+    loose coupling and high cohesion,
+    where cohesion means related behaviors stay together
+
+    so we want to find boundaries within our problem domain help ensure that
+    related behavior is in one place,
+    and that communicate with other boundaries as loosely as possible
+
+2. information in an internal model does not need to be all exposed to the external model
+
+3. when you start to think about the bounded context that exist in your organization,
+   you should be thinking not in terms of data that is shared,
+   but about the capabilities those contexts provide the rest of the domain
+
+4. DDD (Domain-Driven-Development)
+
+Integration
+1. Synchronous Versus Asynchronous
+    These two different models of communication can enable two different idiomatic styles of collaborations:
+    1.1 request/response
+          request/response model can be either synchronous or asynchronous
+          1.1.1 synchronous structure: send request and wait for response
+          1.1.2 asynchronous structure: register callbacks, and send request later
+
+    1.2 event-based
+          client sends events (reporting changes on itself)
+          by nature, this idiom is asynchronous
+
+2. Orchestration Versus Choreography
+    When dealing with the problem of managing business processes that stretch across the boundaries of individual services
+    2.1 Orchestration:
+          we rely on a central brain to guide and drive the process.
+          Downside:
+            the central service can be too much of a central governing authority
+
+    2.2 Choreography (Better):
+          we inform each part of the system its job and let it work out the details
+          the instructions are emitted as events in an asynchronous manner.
+          This structure is more decoupled
+            e.g. publisher-subscriber pattern
+          Downside:
+            explicit business views are shifted to implicit
+          Solution:
+            one solution for dealing with this is to build a monitory system that explicitly matches the view of the business process
+
+3. Request/Response Pattern
+  3.1 RPC (Remote Procedure Call)
+    3.1.1 Definition:
+            technique of making a local call and having it execute on a remote service somewhere.
+    3.1.2 Examples:
+            RPCs relies on having an interface definition:
+              SOAP, Thrift, protocol buffers
+            RPCs does not require interface definition:
+              Java RMI
+  3.2 REST (REpresentational State Transfer)
