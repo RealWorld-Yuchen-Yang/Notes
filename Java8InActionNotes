@@ -396,3 +396,6 @@ Working with streams
             also you can not "sort", "reduce" an infinite stream
 
 Collecting data with streams
+1. Reducing and summarizing stream elements to a single value
+2. Grouping elements
+3. Partitioning elements
