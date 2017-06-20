@@ -1,0 +1,8 @@
+The Evolutionary Architect
+1. Guide lines:
+    we should be worried about what happens between the services
+    and be liberal in what happens inside
+
+2. DRY (Don't Repeat Yourself) is a trade-off to coupling
+
+3. 
