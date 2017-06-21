@@ -416,4 +416,96 @@ Collecting data with streams
         indicating the type is unknown (or can be any type)
 
 2. Grouping elements
+  2.1 classification: use groupingBy(CRITERIA_LAMBDA)
+
+  2.2 Multi-level grouping use nested groupingBy:
+        groupingBy(level1_key, groupingBy(level2_key, CRITERIA_LAMBDA))
+      The return type is Map<level1_key, Map<level2_key, item>>
+      Note:
+        n-level nested map is equal to n-dimensional classification table
+        it helps to think that groupingBy works in terms of "buckets"
+
+  2.3 adapting the collector result to a different type:
+        use Collectors.collectingAndThen(WrappedCollector, TransformationFunction)
+
+  2.4 use toSet(), I can not have control over which type of Set will be created, however,
+      use toCollection(HashSet::new), for example, I can generate a specific type of set (e.g. HashSet)
+
 3. Partitioning elements
+  3.1 partitioning is a special case of grouping,
+      which only have two keys: true/false
+
+4. The static factory methods of Collectors class
+  4.1 Factory Method: toList
+      Return Type: List<T>
+      Used To: Gather all the stream's items in a List
+      Example: List<Dish> dishes = menuSteam.collect(toList());
+
+  4.2 Factory Method: toSet
+      Return Type: Set<T>
+      Used To: Gather all the stream's items in a Set, eliminating duplicates
+      Example: Set<T> dishes = menuStream.collect(toSet());
+
+  4.3 Factory Method: toCollection
+      Return Type: Collection<T>
+      Used To: Gather all the stream's items in the collection created by the provided suppler
+      Example: Collection<Dish> dishes = menuStream.collect(toCollection(), ArrayList::new);
+
+  4.4 Factory Method: counting
+      Return Type: Long
+      Used To: Count the number of items in the stream
+      Example: long howManyDishes = menuStream.collect(counting());
+
+  4.5 Factory Method: summingInt
+      Return Type: Integer
+      Used To: Sum the values of an Integer property of the items in the stream
+      Example: int totalCalories = menuStream.collect(summingInt(Dish::getCalories));
+
+  4.6 Factory Method: averagingInt
+      Return Type: Double
+      Used To: Calculate the average value of an Integer property of the items in the stream
+      Example: double avgCalories = menuStream.collect(averagingInt(Dish::getCalories));
+
+  4.7 Factory Method: summarizingInt
+      Return Type: IntSummary-Statistics
+      Used To: Collect statistics regarding an Integer property of the items in the stream,
+               such as maximum, minimum, total, average
+      Example: IntSummaryStatistics menuStatistics = menuStream.collect(summarizingInt(Dish::getCalories));
+
+  4.8 Factory Method: joining
+      Return Type: String
+      Used To: Concatenate the strings resulting from the invocation of the toString method on each item of the stream
+      Example: String shortMenu = menuStream.map(Dish::getName).collect(joining(","));
+
+  4.9 Factory Method: maxBy
+      Return Type: Optional<T>
+      Used To: An Optional wrapping the maximal element in this stream according to the given comparator or Optional.empty() if the stream is empty
+      Example: Optional<Dish> fattest = menuStream.collect(maxBy(comparingInt(Dish::getCalories)));
+
+  4.10 Factory Method: minBy
+       Return Type: Optional<T>
+       Used To: An Optional wrapping the minimal element in this stream according to the given comparator or Optional.empty() if the stream is empty
+       Example: Optional<Dish> lightest = menuStream.collect(minBy(comparingInt(Dish::getCalories)));
+
+  4.11 Factory Method: reducing
+       Return Type: The type produced by the reduction operation
+       Used To: reduce the stream to a single value starting from an initial value used as accumulator
+                and iteratively combining it with each item of the stream using a BinaryOperator
+       Example: int totalCalories = menuStream.collect(reducing(0, Dish::getCalories, Integer::sum));
+
+  4.12 Factory Method: collectingAndThen
+       Return Type: the type returned by the transforming function
+       Used To: wrap another collector and apply a transformation function to its result
+       Example: int howManyDishes = menuStream.collect(collectingAndThen(toList(), List::size));
+
+  4.13 Factory Method: groupingBy
+       Return Type: Map<K, List<T>>
+       Used To: Group the items in the stream based on the value of one of their properties and use those values as keys in the resulting Map
+       Example: Map<Dish.Type, List<Dish>> dishByType = menuStream.collect(groupingBy(Dish::getType));
+
+  4.14 Factory Method: partitioningBy
+       Return Type: Map<Boolean, List<T>>
+       Used To: partition the items in the stream based on the result of the application of a predicate to each of them.
+       Example: Map<Boolean, List<Dish>> vegetarianDishes = menuStream.collect(partitioningBy(Dish::isVegetarian));
+
+5. 
