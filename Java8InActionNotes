@@ -397,5 +397,23 @@ Working with streams
 
 Collecting data with streams
 1. Reducing and summarizing stream elements to a single value
+  1.1 collect vs reduce
+    1.1.1 Semantic difference
+      1.1.1.1 reduce:
+                      meant to combine two values and produce a new one,
+                      it is an immutable reduction
+      1.1.1.2 collect:
+                      meant to mutate a container to accumulate the result it is supposed to produce
+    1.1.2 Practical difference
+      1.1.2.1 reduce:
+                      can not work in parallel,
+                      because the concurrent modification of the same data structure operated by multiple threads can corrupt the collection
+      1.1.2.2 collect:
+                      cam work in parallel
+
+  1.2 "?" generic wildcard:
+        this can be used in a place which requires generic type,
+        indicating the type is unknown (or can be any type)
+
 2. Grouping elements
 3. Partitioning elements
