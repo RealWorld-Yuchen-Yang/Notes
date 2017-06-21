@@ -61,3 +61,63 @@ Integration
             RPCs does not require interface definition:
               Java RMI
   3.2 REST (REpresentational State Transfer)
+
+4. keeping your middleware (MessageQueues) dumb and keep the smarts in endpoints
+
+5. HTTP can handle large scale, but not low latency
+
+6. If you already have a good resilient message broker,
+   consider using it to handle publishing and subscribing events.
+   But if you do not already have one,
+   give ATOM a look.
+   Note:
+    ATOM is REST-compliant specification that defines semantics among other things
+    for publishing feeds of resources
+
+7. Service as a state machine
+    services being fashioned around bounded context
+
+8. Reactive Extensions (Rx)
+    a mechanism to compose the results of multiple calls and run operations on them.
+    Rx observes operation outcomes and react on them
+
+9. DRY (Don't Repeat Yourself)
+    do not violate DRY within microservices
+    but be relaxed about violating DRY across all services
+
+10. Semantic versioning
+      Format: MAJOR.MINOR.PATCH
+      by using semantic versioning,
+      as a client, you could look at just the version number of a service and know if you can integrate with it
+  10.1 MAJOR:
+        When major number increments,
+        it means that the backward incompatible changes have been made.
+  10.2 MINOR:
+        When MINOR increments,
+        new functionality has been added that should be backward compatible.
+  10.3 PATCH:
+        a change to PATCH states that bug fixes have been made to existing functionality
+
+11. Backends for Frontends
+      restrict the use of backends to one specific user interface or application.
+      I allows the team focusing on any given UI to also handle its own server-side components.
+      You can see these backends as parts of the user interface that happen to be embedded in the server.
+      (If we need an API authentication and authorization layer, this can sit between our BFFs and our UIs.)
+      downside is that this approach can take on logic it shouldn't.
+
+12. Strangler Pattern, and its realization by using microservices
+      A strangler allows you capture and intercept calls to the old system.
+      This allows you to decide if you route these calls to existing, legacy code, or direct them to new code you may have written.
+      This allows you to replace functionality over time without requiring a big bang rewrite
+      When it comes to microservices,
+      rather than having a single monolithic application intercepting all calls to the existing legacy system,
+      you may instead use a series of microservices to perform this interception.
+      When capturing and redirecting the original calls become more complex,
+      you may require the use of a proxy.
+
+13. avoid database integration at all cost
+
+14. Postel's law (robustness principle):
+      be conservative in what you do,
+      be liberal in what you accept from others
+      Avoid breaking changes and the need to version by understanding Postel’s Law and using tolerant readers.
