@@ -508,4 +508,24 @@ Collecting data with streams
        Used To: partition the items in the stream based on the result of the application of a predicate to each of them.
        Example: Map<Boolean, List<Dish>> vegetarianDishes = menuStream.collect(partitioningBy(Dish::isVegetarian));
 
-5. 
+5. Identity function:
+    a function doing nothing more than returning its input argument as is.
+    this can be denoted as "Function.identity()"
+
+6. In the Collector interface, generic place holder's meaning
+  6.1 T, the generic type of the items in the stream to be collected
+  6.2 A, the type of the accumulator, the object on which the partial result will be accumulated during the collection process
+  6.3 R, the type of the object resulting from the collect operation
+
+7. The Collector interface
+  public interface Collector<T, A, R>{
+    Supplier<A> supplier(); //creates an empty accumulator used  during the collection process
+    BiConsumer<A, T> accumulator(); //returns the function that performs the reduction operation
+    Function<A, R> finisher(); //return a function that's invoked at the end of the accumulation process,
+                               //to transform the accumulator object into the final result of the whole collection operation
+    BinaryOperator<A> combiner(); //return a function used by reduction operation,
+                                  //defines how the accumulators resulting from the reduction of different subparts of the stream are combined
+                                  //when the subparts are processed in parallel
+    Set<Characteristics> characteristics();//returns an immutable set of Characteristics, defining the behavior of the collector
+                                           //providing hints about whether the stream can be reduced in parallel and which optimizations are valid
+  }
