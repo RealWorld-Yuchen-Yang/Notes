@@ -586,4 +586,31 @@ Parallel data processing and performance
 
 Effective Java 8 Programming
 Refactoring, testing, and debugging
-1.
+1. comparing "anonymous class" and "lambda expression"
+  1.1 anonymous class:
+    1.1.1 "this" keyword, refers to the anonymous class itself
+    1.1.2 allowed to access shadow variables from the enclosing class.
+  1.2 lambda expression:
+    1.2.1 "this" keyword, refers to the enclosing class
+    1.2.2 can not access shadow variables
+
+2. converting an anonymous class to a lambda expression can make the resulting code ambiguous in the context of overloading
+   solution is to explicitly cast the lambda expression to the desired functional interface type
+
+3. code pattern that can be refactored to leverage lambda expressions:
+  3.1 conditional deferred execution
+        If you see yourself querying the state of an object many times in client code (e.g. the state of the logger),
+        only to call some method on this object with arguments (e.g. log a message),
+        then consider introducing a new method that calls that method (passed as a lambda or method reference)
+        only after internally checking the state of the object
+
+  3.2 execute around
+        If you find yourself surrounding different code with the same preparation and cleanup phases,
+        you can often pull that "different code" into lambda
+
+4. Refactoring object-oriented design patterns with lambdas
+  4.1 Strategy
+  4.2 Template Method
+  4.3 Observer
+  4.4 Chain of Responsibility
+  4.5 Factory
