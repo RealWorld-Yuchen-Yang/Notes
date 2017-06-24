@@ -614,3 +614,51 @@ Refactoring, testing, and debugging
   4.3 Observer
   4.4 Chain of Responsibility
   4.5 Factory
+
+*****
+There are some notes on paper not recorded, will complete on Monday
+*****
+
+Default methods
+1. Java 8 allows "static methods" and "default methods" inside interfaces.
+
+2. existing classes implementing an interface will automatically inherit the default implementations if they do not provide one explicitly
+
+3. The main users of default methods are library designers
+
+4. level's of compatibility
+  4.1 Binary compatibility:
+        existing binaries running without errors continue to link without error after introducing a change
+  4.2 Source compatibility:
+        existing program will still compile after introducing a change.
+  4.3 behavioral compatibility:
+        running a program after a change with the same inputs results in the same behavior.
+
+5. after introducing "default method", interface and abstract class still have the following differences
+  5.1 a class can extend only from one abstract class,
+      but a class can implement multiple interfaces.
+
+  5.2 an abstract class can "enforce a common state" through instance variables (fields),
+      an interface can not have instance variables.
+
+6. Usage patterns for default methods
+  6.1 optional methods
+        so as to reduce boilerplate code
+
+  6.2 multiple inheritance of behavior
+
+7. code reusability can not only be achieved by "inheritance", but also by "delegation", etc.
+
+8. Resolution rules
+  8.1 Classes always win:
+        a method declaration in the class or a superclass takes priority over any default method declaration.
+        Note: if the class only inherit such default method from an interface, and not overriding it in the class itself, it does not count
+  8.2 otherwise, sub-interfaces win:
+        the method with the same signature in the most specific default-providing interface is selected.
+  8.3 Finally, if the choice is still ambiguous,
+        the class inheriting from multiple interfaces has to
+        explicitly select which default method implementation to use by overriding it and calling the desired method explicitly
+        Solution:
+          Java 8 introduces the new syntax X.super.m(),
+          where X is the superinterface whose method "m()" you want to call
+  8.4 diamond problem in C++: a class can inherit two methods with the same signature, which one gets chosen?

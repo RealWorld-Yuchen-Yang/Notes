@@ -121,3 +121,10 @@ Integration
       be conservative in what you do,
       be liberal in what you accept from others
       Avoid breaking changes and the need to version by understanding Postel’s Law and using tolerant readers.
+
+Splitting the Monolith
+1. Seam:
+    a portion of code that can be treated in isolation and worked on without impacting the rest of the codebase.
+    we want to identify seams that can become service boundaries
+
+2. 
