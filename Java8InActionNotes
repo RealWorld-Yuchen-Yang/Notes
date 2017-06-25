@@ -662,3 +662,54 @@ Default methods
           Java 8 introduces the new syntax X.super.m(),
           where X is the superinterface whose method "m()" you want to call
   8.4 diamond problem in C++: a class can inherit two methods with the same signature, which one gets chosen?
+
+Using Optional as a better alternative
+1. Creating an optional object
+  1.1 empty optional
+        e.g. Optional<Car> optCar = Optional.empty();
+  1.2 from a non-null value
+        e.g. Optional<Car> optCar = Optional.of(car);
+        Note: of() will throw a NullPointerException if the value is null
+  1.3 from potentially null value
+        e.g. Optional<Car> optCar = Optional.ofNullable(car);
+
+2. Optional#map(Function),
+    this is similar to Stream#map(),
+    which can be used to extract properties of the contained optional object,
+    the return type is also an optional container
+
+3. Optional#flatMap(Function)
+    this is used when you want to chain "property extracting" calls on Optional objects
+
+4. Optional#orElse(DefaultValue)
+
+5. Optional is to support the optional-return idiom only,
+   it is not intended for use as a field type,
+   it also does not implement the Serializable interface
+
+6. Optional class's instance methods used to read value contained by an Optional instance
+  6.1 get(),
+        return value or throw NoSuchElementException,
+        it is the least safe,
+        similar to null
+  6.2 orElse(T other)
+        provide default value
+  6.3 orElseGet(Supplier<? extends T> other)
+        lazy counterpart of orElse(T other)
+  6.4 orElseThrow(Supplier<? extends X> exceptionSupplier)
+  6.5 ifPresent(Consumer<? super T? consumer)
+        lets you execute the action given as argument if a value is present
+        otherwise no action is taken
+
+7. you can think of an Optional instance as a stream containing at most a single element.
+
+8. Optional#filter(),
+    if the value is present and matches the given predicate,
+    return this optional,
+    otherwise returns the empty one
+
+9. unlink we promote using primitive streams,
+   we discourage using primitive optionals
+
+CompletableFuture: composable asynchronous programming
+1. 
