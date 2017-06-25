@@ -712,4 +712,54 @@ Using Optional as a better alternative
    we discourage using primitive optionals
 
 CompletableFuture: composable asynchronous programming
+1. Future models an asynchronous computation and provides a reference to its result.
+   To work with a Future,
+   you typically have to wrap the time-consuming operation inside a "Callable" object
+   and submit it to an Executor-Service.
+
+2. CompletableFuture is to a plain Future
+   what Stream is to a Collection
+
+3. When to get the result of the "Future task":
+    the time when there are no other meaningful jobs that the client could do without the Future task's result.
+    By doing so,
+    the client either unwraps the value contained in the Future (if the asynchronous task is already finished)
+    or remains blocked until that value is available.
+
+4. Dealing with asynchronous call's errors,
+    traditionally, we will introduce the "timeout" indicating the asynchronous call's failure,
+    but such timeout will give no further information indicating the cause of the failure.
+    With CompletableFuture,
+    we can propagate the asynchronous method's Exception (which cause the problem) through its "completeExceptionally()" method
+
+5. Two different ways to do parallel computing on a collection:
+  5.1 convert it to a parallel stream and use operations like map on it
+        this is suitable for "computation-heavy" operations with no I/O.
+        (if all threads are compute-bound, then there's no point in having more threads than processor cores)
+
+  5.2 iterate over the collection and spawn operations within a CompletableFuture.
+        this provides more control using resizing  of thread pools,
+        which helps ensure that your overall computation does not block just because all of your fixed number of threads are waiting for I/O
+        it is suitable for parallel units of work involve waiting for I/O (including network connections)
+        Another reason to avoid using parallel streams when I/O waits are involved in the stream-processing pipeline is that
+        the laziness of streams can make it harder to reason about when the waits actually happen.
+
+6. CompletableFuture#thenApply(Function)
+    thenApply(Function) will be executed synchronously in the same thread
+
+7. CompletableFuture#thenCompose(Function)
+    will compose another asynchronous operation, which will be executed in the same the first asynchronous task
+
+8. CompletableFuture#thenComposeAsync(Function)
+    will compose another asynchronous operation in another thread other than the first asynchronous task
+
+9. CompletableFuture#thenCombine(Function)
+    combines two CompletableFutures' results
+    also has a asynchronous counterpart: thenCombineAsync
+
+10. CompletableFuture#thenAccept(Consumer),
+      is used to register callbacks,
+      which will react immediately once the result returns
+
+New Data and Time API
 1. 
