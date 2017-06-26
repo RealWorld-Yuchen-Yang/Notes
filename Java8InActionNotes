@@ -762,4 +762,50 @@ CompletableFuture: composable asynchronous programming
       which will react immediately once the result returns
 
 New Data and Time API
+1. Stateless behaviors
+    functions in your stream-processing pipeline do not interact by one reading from or writing to a variable that is written by another
+
+2. "functional programming" promotes "no side effects" and "immutability"
+
+3. pure and side-effect free methods:
+    methods does not modify the state of its enclosing class or any other objects,
+    and returns its entire results using return.
+    Note: side effects are
+            3.1 modifying a data structure in place, including assigning to any field, apart form initialization inside a constructor (e.g. setters)
+            3.2 Throwing an exception
+            3.3 Doing I/O operations such as writing a file.
+
+4. functional programming is based on the idea of "Declarative programming"
+   declarative programming:
+    declares "what to do", instead of "how to do" (which is the gist of imperative programming)
+
+5. In Java,
+   to be regarded as functional style,
+   a function or method can mutate only local variables
+   In addition,
+   objects it references should be immutable (all fields are final, and all fields of reference type refer transitively to other immutable objects)
+   Also, to be regarded as functional style,
+   a function or method should not throw any exceptions. (which can be implemented by using "Optional")
+   Finally, your function or method should call only those side-effecting library functions for which you can hide their nonfunctional behavior
+   (that is, ensuring any mutation they make on data structures is hidden from your caller, perhaps by copying first and by catching any exceptions they might raise)
+
+6. recursion v.s. iteration
+  6.1 functional programming promotes "recursion", rather than "iteration"
+      because recursion hides mutation from the users
+
+  6.2 to be efficient, "tail-recursion" is the best choice
+    6.2.1 tail-recursion Definition: recursive call is the last thing that happens in the function
+    6.2.2 the reason why tail-recursion is efficient:
+          instead of storing each intermediate result of the recursion onto different stack frames,
+          the compiler can decide to reuse a single stack frame.
+          this saves time of allocating new stack frame.
+          Note:
+            bad news is that Java does not support such optimization,
+            good news is that Scala and Groovy support it.
+
+7. Functional-style methods are characterized only by their input arguments and their output result
+
+8. a function is referentially transparent if it always returns the same result value when called with the same argument value.
+
+Functional programming technique
 1. 
