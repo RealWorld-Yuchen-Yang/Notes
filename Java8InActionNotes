@@ -808,4 +808,35 @@ New Data and Time API
 8. a function is referentially transparent if it always returns the same result value when called with the same argument value.
 
 Functional programming technique
-1. 
+1. high-order functions (can do at least one of the following)
+  1.1 Take one or more functions as parameter
+  1.2 Return a function as result
+
+2. currying:
+    currying is a technique where a function f of two argument (say x and y) is seen instead
+    as a function g of one argument that returns a function also of one argument.
+    The value returned by the latter function is the same as the value of the original function, that is:
+    f(x, y) = (g(x))(y)
+    2.1 partially applied:
+        when some but fewer than the full complement of arguments have been passed,
+        we say the function is partially applied
+
+3. Persistent (also called functional/immutable) data structures
+  3.1 a functional-style method is not allowed to update any global data structure or any structure passed as a parameter,
+      because calling it twice is likely to produce different different answers,
+      which violates referential transparency and the ability to understand the method as a simple mapping from arguments to results
+
+3. "final" protects only a field and not the object pointed to,
+   which may need its own fields to be final to protect it, and so on.
+
+4. if you do want to see changes in your data structure, there are two options
+  4.1 (Bad) classical Java solution
+            Note: you should be very careful when updating something to check whether you need to copy it first
+
+  4.2 (good) functional-style solution:
+        you "logically make a new data structure" whenever you do an update (so nothing is ever mutated)
+        and just arrange to pass the correct version of the data structure to users as appropriate.
+        this idea could be enforced through an API
+        Java garbage collection will clean the unchanged old data structure.
+
+5. Lazy evaluation with streams
