@@ -854,3 +854,27 @@ Functional programming technique
 8. Combinators are a functional idea that combines two or more functions or other data structures.
 
 Blending OOP and FP: comparing Java 8 and Scala
+1. Scala has String interpolation, which allows you to embed variables and expressions directly in string literals.
+   Syntax: ${STRING_VARIABLE}
+
+2. In Scala,
+    "val" keyword, means that the variable is read-only (like final in Java)
+    "var" keyword, means that the variable is read-write
+
+3. Collections in Scala are persistent (by default):
+    updating a collection produces a new collection that shares as much as possible with its previous version
+    Note: Scala doesn't force you to use immutable collections
+          There are also mutable versions available in package scala.collection.mutable
+
+4. closure:
+    an instance of a function that can reference nonlocal variables of that function with no restrictions.
+  4.1 Java 8:
+        does not allow referencing nonlocal variables.
+        it has a notion of "close over values"
+  4.2 Scala:
+        allows referencing nonlocal variables.
+        So it has the notion of "closure", which can "capture variables"
+        however, it does not promote such referencing
+
+5. Scala supports traits:
+    interfaces that can include both fields and default methods
