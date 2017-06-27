@@ -817,6 +817,7 @@ Functional programming technique
     as a function g of one argument that returns a function also of one argument.
     The value returned by the latter function is the same as the value of the original function, that is:
     f(x, y) = (g(x))(y)
+    Currying is used to modularize functions and reuse code
     2.1 partially applied:
         when some but fewer than the full complement of arguments have been passed,
         we say the function is partially applied
@@ -839,4 +840,17 @@ Functional programming technique
         this idea could be enforced through an API
         Java garbage collection will clean the unchanged old data structure.
 
-5. Lazy evaluation with streams
+5. Functional-style programming generally use "equals()" to compare structured values, rather than "==" (reference equality)
+   if equals() return true, then the method can be seen as referentially transparent
+   "referential transparency" allows computations to be cached.
+
+6. Pattern matching is a functional feature (which Java does not have currently)
+   that lets you unwrap data types.
+   It can be seen as generalizing Java's switch statement
+
+7. A lazy list is a more expressive version of a Java Stream.
+   A lazy list lets you produce elements of the list on demand by using a supplier that can create more of the data structure
+
+8. Combinators are a functional idea that combines two or more functions or other data structures.
+
+Blending OOP and FP: comparing Java 8 and Scala
