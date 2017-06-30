@@ -102,7 +102,7 @@ Introduction to Apache ActiveMQ
   13.1 ConnectionFactory, Connection and Destination objects are required to support concurrent access
   13.2 Session, MessageProducer and MessageConsumer do not support concurrent access. (because they should not be shared across threads)
 
-Connecting to ActiveMQ over the network
+Connecting to ActiveMQ over the network (all by configuration, in stead of code modification)
 1. summary of network protocols used for client-broker communication
   1.1 TCP, default network protocol for most use cases.
            Note: TCP protocol ensures that messages will not be lost on the network
@@ -112,4 +112,49 @@ Connecting to ActiveMQ over the network
   1.5 HTTP(S), when you need to deal with the firewall between the clients and the broker
   1.6 VM, when your broker and clients communicate with a broker that is embedded in the same Java Virtual Machine (JVM)
 
-2.
+2. Transport connectors:
+    are connections between clients (consumers/publishers) and brokers
+   Network connectors:
+    are channels that are configured between brokers so that brokers can communicate with one another.
+
+3. failover protocol
+    used to implement automatic reconnection.
+
+4. Multicast-connector
+    One of the fundamental concepts of IP multicast is "group address"
+    The group address is an IP address in the range of
+      "224.0.0.0 to 239.255.255.255"
+    used by both sources and receivers
+
+5. multicast is used for discovery on the broker side,
+   discovery protocol is used on the client side
+    Note: discovery protocol use multicast to discover available brokers and randomly choose one to connect to
+
+6. peer connector
+    a utility transport that is a superset of a VM connector that creates a peer-to-peer network of embedded brokers
+    when broker is started with the peer protocol URI,
+    the application will automatically start an embedded broker (just as was the case with the VM protocol),
+    but will also configure the broker to establish network connections to other brokers in the local network with the same group name
+
+7. Fanout connector
+    is another utility connector used by clients to simultaneously connect to multiple brokers and replicate operations to those brokers
+    Note:
+      fanout is recommended only for producing messages instead of consuming messages
+      and to multiple nonconnected brokers
+
+8. summary of protocols used to network brokers
+  8.1 Static,
+        used for defining networks of brokers with known addresses
+  8.2 Failover,
+        used to provide reconnection logic for clients to the network of brokers or a single broker
+  8.3 Multicast,
+        used for defining dynamic networks of brokers (broker addresses are not statically defined)
+  8.4 Discovery,
+        used for clients to connect to dynamic network of brokers
+  8.5 Peer,
+        used to easily connect multiple embedded brokers
+  8.6 Fanout,
+        used to produce messages to multiple unconnected brokers
+
+ActiveMQ message storage
+1.
