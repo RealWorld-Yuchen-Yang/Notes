@@ -85,8 +85,31 @@ Introduction to Apache ActiveMQ
         message destination is "topic"
         any message sent to the topic are automatically delivered to all subscribers
 
+11. distinguishing "message durability" from "message persistence"
+  11.1 message durability can only be achieved with "pub/sub domain"
+       It's registered with the topic subscription to tell tell the JMS provider to preserve the subscription state in the event that the subscriber disconnects.
+  11.2 message persistence is independent of the message domain.
+       It is a "QoS" used to indicate the JMS application's ability to handle missing messages in the event of a JMS provider failure.
 
+12. administrative objects
+  12.1 ConnectionFactory
+        JMS clients use the ConnectionFactory object to create connections to a JMS provider.
+        JMS connections are used by JMS clients to create javax.jms.Session objects that represent an interaction with the JMS provider
+  12.2 Destination
+        encapsulates the provider-specific address to which messages are sent and from which messages are consumed.
 
+13. Multithreading in JMS applications
+  13.1 ConnectionFactory, Connection and Destination objects are required to support concurrent access
+  13.2 Session, MessageProducer and MessageConsumer do not support concurrent access. (because they should not be shared across threads)
 
+Connecting to ActiveMQ over the network
+1. summary of network protocols used for client-broker communication
+  1.1 TCP, default network protocol for most use cases.
+           Note: TCP protocol ensures that messages will not be lost on the network
+  1.2 NIO (New I/O), provide better scalability for connections from producers and consumers to the broker
+  1.3 UDP, when need to deal with the firewall between client and the broker.
+  1.4 SSL (Secure Sockets Layer), when you want to secure communication between clients and the broker
+  1.5 HTTP(S), when you need to deal with the firewall between the clients and the broker
+  1.6 VM, when your broker and clients communicate with a broker that is embedded in the same Java Virtual Machine (JVM)
 
-9.
+2.
