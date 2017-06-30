@@ -1,0 +1,92 @@
+Introduction to Apache ActiveMQ
+1. classic RPC (Remote Procedure Calls) is considered tightly coupled
+
+2. loose coupling throughout a system can lead to EDA (Event-Driven Architecture)
+
+3. SOA (Service-Oriented Architecture), whose backbone is using a service for a specific task
+
+4. brew installed activemq location:
+    /usr/local/Cellar/activemq/5.13.3
+
+5. JMS,
+    it is not a MOM (Message-Oriented Middleware),
+    It is an API that abstracts the interaction between messaging clients
+
+6. concepts:
+  6.1 JMS producer: a client application that creates and sends JMS messages.
+  6.2 JMS provider: the implementation of the JMS interfaces, which is ideally written in 100% pure Java
+  6.3 JMS domains: the two styles of messaging that include "point-to-point" and "publish/subscribe"
+  6.4 JMS client: an application is written using 100% pure Java to send and receive messages.
+  6.5 Non-JMS client: an application is written using the JMS provider's native client API to send and receive messages instead of JMS
+  6.6 JMS consumer: a client application that receives and processes JMS messages.
+  6.7 JMS message: the most fundamental concept of JMS; sent and received by JMS clients
+  6.8 administrative object: preconfigured JMS objects that contain provider-specific configuration data for use by clients.
+                             These objects are typically accessible by client via JNDI
+  6.9 connection factory: clients use a connection factory to create connections to the JMS provider
+  6.10 destination: an object to which messages are addressed and sent and from which messages are received.
+
+7. The MessageConsumer can consume messages either synchronously by using one of the receive() methods,
+   or asynchronously by providing a MessageListener implementation to the consumer.
+   The MessageListener.onMessage() method is invoked as messages arrive on the destination.
+   Note:
+    there is no method for setting the destination on the MessageConsumer.
+    Instead the destination is set when the consumer is created using the Session.createConsumer()
+
+8. Headers set automatically by the client's send() method:
+  8.1 JMSDestination, destination to which the message is being sent
+  8.2 JMSDeliveryMode,
+    8.2.1 persistent:
+            default, advises the JMS provider to persist the message.
+            message will not be lost if the provider fails.
+            A JMS provider must deliver a persistent message once and only once
+    8.2.2 nonpersistent:
+            instructs the JMS provider not t persist the message.
+            if the JMS provider fails, the message may be lost,
+            but it won't be delivered twice.
+  8.3 JMSExpiration,
+        The time that a message will expire. (in milliseconds)
+        default is 0, which has a special meaning of never expire.
+  8.4 JMSMessageID,
+        a string that uniquely identifies a message that's assigned by the JMS provider and must begin with ID.
+        The message ID can be used for message processing or for history purpose in a message storage mechanism.
+        It can also be turned of
+  8.5 JMSPriority,
+        used to assign a level of importance to a message.
+  8.6 JMSTimestamp,
+        denotes the time the message was sent by the producer to the JMS provider.
+  8.7 JMSCorrelationId
+        Used to associate the current message with a previous message.
+        This header is commonly used to associate a response message with a request message.
+        The value of the JMSCorrelationID can be one of the following:
+        8.7.1 a provider-specific message ID
+        8.7.2 an application-specific String
+        8.7.3 a provider-native byte[] value
+  8.9 JMSReplyTo
+        used to specify a destination where a reply should be sent.
+        commonly used for request/reply style messaging
+  8.10 JMSType
+        used to semantically identify the message type.
+        has nothing to do with the payload Java type of the message
+  8.11 JMSRedelivered,
+        used to indicate the liklihood that a message was previously delivered but not acknowledged.
+
+9. JMS message properties
+    they are simply additional headers that can be specified on a message.
+    9.1 Custom properties
+    9.2 JMS-defined properties
+    9.3 provider specific properties
+
+10. JMS domains
+  10.1 point-to-point domain,
+        similar to "email system",
+        message destination is "queue"
+        one message is delivered from one producer to one consumer, and only once
+  10.2 publish/subscribe domain
+        message destination is "topic"
+        any message sent to the topic are automatically delivered to all subscribers
+
+
+
+
+
+9.
