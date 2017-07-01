@@ -156,5 +156,33 @@ Connecting to ActiveMQ over the network (all by configuration, in stead of code 
   8.6 Fanout,
         used to produce messages to multiple unconnected brokers
 
-ActiveMQ message storage
-1.
+Securing ActiveMQ
+1. Authentication
+    the process used to verify the integrity of an entity or a user that's requesting access to a secured resource
+
+2. Authorization
+    the process used to determine the access rights of a user or an entity to a secured resource
+
+3. Authentication and Authorization's relationship
+    Authorization depends upon authentication to prevent unauthorized users from entering the system.
+    Authorization determines whether a user has the privileges to perform certain actions.
+    such privileges are often referred to as ACL (Access Control List)
+
+4. JAAS
+    Java Authentication and Authorization Service
+
+Creating Java application with ActiveMQ
+1. Using a pure Spring XML syntax is easy to do with ActiveMQ.
+   All you have to do is define the BrokerService as a bean
+   and any dependencies in the Spring configuration file.
+
+2. It is common in enterprise Java development to use Spring factory beans to expose beans that are themselves factories.
+   The purpose of Spring factory beans is to instantiate a factory that requires a complex configuration.
+   An ActiveMQ broker can be started up using the BrokerFactoryBean (an alternative)
+
+3. create and sending JMS messages
+    we create an appropriate JMS map message to hold all of the event data.
+    to send the message, the JmsTemplate's send() method will be used
+
+4. ActiveMQ can be viewed not only as a separate Java infrastructure application,
+   but also as a Java module that can be easily integrated in your Java applications.
