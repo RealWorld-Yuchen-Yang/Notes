@@ -186,3 +186,33 @@ Creating Java application with ActiveMQ
 
 4. ActiveMQ can be viewed not only as a separate Java infrastructure application,
    but also as a Java module that can be easily integrated in your Java applications.
+
+Integrating ActiveMQ with application servers
+1. application server
+    application servers provide a container architecture that accepts the deployment of an application
+    and provides an environment in which it can run.
+  1.1 web container: application server implements the Java Servlet specification, e.g. Tomcat, Jetty
+  1.2 Java EE Container: application server implements Java EE family of specification, e.g. JBoss, Apache Geronimo
+
+2. JMS connections can be created from a connection factory that's registered with the application server.
+   JNDI (Java Naming and Directory Interface) implementation can be used to expose objects to be used by applications deployed to the container.
+   Objects such as JDBC drivers, JMS resources, transaction mangers and so forth can be configured to be accessed using the JNDI API.
+
+3. local JNDI and global JNDI
+  3.1 local JNDI,
+        used to configure objects that will only be exposed to a specific application
+  3.2 global JNDI,
+        used to expose objects to any application in the entire we container
+
+4. Integrating with Tomcat
+  4.1 using local JNDI to integrate ActiveMQ
+        the JNDI resources are defined in a file named META-INF/context.xml
+  4.2 using global JNDI to integrate ActiveMQ with Tomcat
+        the global JNDI configuration in Tomcat requires a bit additional configuration
+        and copying some JARs into the Tomcat lib directory
+        In this style of configuration, the JNDI resources are defined in configuration files that live with the Tomcat application server named
+        conf/server.xml and conf/context.xml
+
+5. resources like ActiveMQ are registered in (exposed by) "containers",
+   which can later be accessed by using JNDI lookup by the application.
+   Spring supports such JNDI look up.
