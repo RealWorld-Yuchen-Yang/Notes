@@ -1,0 +1,67 @@
+Getting started with jquery
+1. $(),
+    is equal to jQuery(),
+    its whole job is grabbing the elements you put into the parentheses
+    the inputs can be three types:
+    1.1 CSS selectors,
+          jQuery will return you the set of elements that match that selector
+    1.2 HTML,
+          if you put a string of HTML, you can add DOM elements to the browser on the fly
+    1.3 Javascript Object
+
+2. CSS selectors
+  2.1 element selector：
+        syntax: HTML element
+        e.g. h1, which represents header1
+  2.2 class selector:
+        syntax .class
+        e.g.
+          .my_class
+          div.my_class, selects only the **divs** that have the **my_class** class
+  2.3 ID selector:
+        syntax: #ID
+        e.g. #my_id
+  2.4 Descendent selector:
+        syntax: parent child grandChild ...
+        e.g. div p
+
+  Note: in CSS, selectors select elements to add **style** to those elements
+        in jQuery, selectors select elements to add **behavior** to those elements
+
+3. jQuery statements should end with ';'
+
+Selectors and methods: Grab and go
+1. <script> tag is better to be written in end of <body>,
+   because this style will not hinder the browser from parallel download images,
+   which increase performance
+
+2. structure, style, and script
+   for an element,
+   it defines its **structure** in HTML,
+   further has its style configured in CSS,
+   and finally get its behavior configured in Javascript/its corresponding libraries (like jQuery)
+
+3. you can write Javascript inside jQuery function.
+   after all, jQuery is just a Javascript library
+
+4. '*', is a wildcard in jQuery which represents all the elements in the DOM
+
+5. $(this),
+    represents the current element
+    it is context-dependent,
+    one of the best place to use it is within a function that runs when a jQuery method is called.
+    Note:
+      this,
+        is a Javascript reference to the DOM element we want to work with
+        by wrapping it with $(), we can use it with jQuery methods
+
+6. Using DOM inspectors, like Chrome Developer tools or Firebug for Firefox,
+   should show you the DOM as it is displayed on the page
+   (which is after Javascript manipulation, if there is any)
+
+7. jQuery methods:
+    reusable codes defined in the jQuery library.
+  7.1 .append,
+        inserts the specified content into the DOM.
+  7.2 .remove,
+        takes elements out of the DOM.
