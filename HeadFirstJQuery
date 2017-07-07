@@ -65,3 +65,19 @@ Selectors and methods: Grab and go
         inserts the specified content into the DOM.
   7.2 .remove,
         takes elements out of the DOM.
+
+Making things happen on your page
+1. Events
+    jQuery groups events into five different categories:
+  1.1 browser events
+  1.2 document loading events
+  1.3 form events
+  1.4 keyboard events
+  1.5 mouse events
+
+2. adding/removing events by using:
+    bind/unbind('event', handler)
+
+3. loop through groups of elements, no matter which selector we choose
+   syntax:
+    elements.each(handler)
