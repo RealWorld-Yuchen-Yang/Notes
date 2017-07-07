@@ -21,9 +21,18 @@ Getting started with jquery
   2.3 ID selector:
         syntax: #ID
         e.g. #my_id
+
+  Combined Selectors
   2.4 Descendent selector:
         syntax: parent child grandChild ...
         e.g. div p
+  2.5 type and ID selector
+        syntax: type#ID
+        e.g. button#removeMe
+
+  2.6 type (type means predefined HTML elements) and class (class is user defined) selector
+        syntax: type.CLASS
+        e.g. li.fish
 
   Note: in CSS, selectors select elements to add **style** to those elements
         in jQuery, selectors select elements to add **behavior** to those elements
@@ -128,3 +137,10 @@ Selectors and methods: Grab and go
 
 18. jQuery method: add/removeClass("CLASS_NAME")
     can be easily used to add/remove CSS classes
+
+Web page manipulation: Mod the DOM
+1. remove() and detach()
+    remove() will remove the selected element permanently,
+    detach() will detach the selected element from DOM, but still hold it in memory
+
+2.
