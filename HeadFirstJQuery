@@ -21,9 +21,18 @@ Getting started with jquery
   2.3 ID selector:
         syntax: #ID
         e.g. #my_id
+
+  Combined Selectors
   2.4 Descendent selector:
         syntax: parent child grandChild ...
         e.g. div p
+  2.5 type and ID selector
+        syntax: type#ID
+        e.g. button#removeMe
+
+  2.6 type (type means predefined HTML elements) and class (class is user defined) selector
+        syntax: type.CLASS
+        e.g. li.fish
 
   Note: in CSS, selectors select elements to add **style** to those elements
         in jQuery, selectors select elements to add **behavior** to those elements
@@ -65,19 +74,88 @@ Selectors and methods: Grab and go
         inserts the specified content into the DOM.
   7.2 .remove,
         takes elements out of the DOM.
+8. how javascript or jQuery works
+    most of the time,
+    we use the scripts to introduce behavior to the HTML DOM,
+    it is an asynchronous process,
+    when loading the page, we register all the behaviors into those DOM elements,
+    the actual calling time is later,
+    when event triggering the behaviors
 
-Making things happen on your page
-1. Events
-    jQuery groups events into five different categories:
-  1.1 browser events
-  1.2 document loading events
-  1.3 form events
-  1.4 keyboard events
-  1.5 mouse events
+    So there is no "main entry point" for the script file,
+    but many separate small entry points,
+    which triggers by events
 
-2. adding/removing events by using:
-    bind/unbind('event', handler)
+    javascript fragments does not have a global sequence among each other
 
-3. loop through groups of elements, no matter which selector we choose
-   syntax:
-    elements.each(handler)
+9. syntax of defining a javascript function
+    function NAME(){
+      //statements
+    }
+
+    there are two ways of giving a function a name
+    9.1 by function declaration as shown above
+    9.2 by function expression:
+          e.g. var myFunction = function(){}
+          Note: as we can see here, function is used as a first class variable in Javascript
+
+10. function names and method names are case sensitive
+
+11. two ways of using NamedFunctions
+  11.1 using them directly, parentheses are needed
+        e.g. myFunction()
+  11.2 using them as event handlers, only the function name is needed, no parentheses
+        e.g. $("#myElement").click(myFunction)
+
+12. binding/unbinding events
+  12.1 bind:
+        element.bind('event', handler);
+  12.2 unbind:
+        element.unbind('event');
+
+13. functions can return values by using the "return" keyword
+    return types can be 'number', 'string' or 'DOM element"
+    unlike java,
+    we do not need to explicitly declare return type
+
+14. jQuery methods can not only originated from an DOM element,
+    it can also act as a global method, which can be called directly by a '.'
+    e.g. $.contains
+
+15. Technically, return value is not mandatary to functions.
+    but it is a good practice to return a value,
+    for if we do not return value, the function's default return value is 'undefined', which is not able to be handled by code
+
+16. you can pass arbitrary number of arguments into a functions
+  16.1 if the passed in arguments are less than defined, the rest will be undefined
+  16.2 if the passed in arguments are more than defined, the exceeding will be ignored
+
+17. in a loop,
+    if the current iteration returns 'false', it acts like Java's 'break'
+    if the current iteration returns 'true', it will just move on to the next iteration
+
+18. jQuery method: add/removeClass("CLASS_NAME")
+    can be easily used to add/remove CSS classes
+
+    Making things happen on your page
+    1. Events
+        jQuery groups events into five different categories:
+      1.1 browser events
+      1.2 document loading events
+      1.3 form events
+      1.4 keyboard events
+      1.5 mouse events
+
+    2. adding/removing events by using:
+        bind/unbind('event', handler)
+
+    3. loop through groups of elements, no matter which selector we choose
+       syntax:
+        elements.each(handler)
+
+Web page manipulation: Mod the DOM
+1. remove() and detach()
+    remove() will remove the selected element permanently,
+    detach() will detach the selected element from DOM, but still hold it in memory
+
+2.
