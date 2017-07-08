@@ -152,10 +152,184 @@ Selectors and methods: Grab and go
     3. loop through groups of elements, no matter which selector we choose
        syntax:
         elements.each(handler)
+        if you need the index of each element,
+        it has to be included as a input parameter of the handler method
+        e.g.
+         $(".tofu").each(function(i){
+          $(this).after($m[i]);
+         });
 
 Web page manipulation: Mod the DOM
 1. remove() and detach()
     remove() will remove the selected element permanently,
     detach() will detach the selected element from DOM, but still hold it in memory
 
-2.
+2. traverse the DOM tree by using
+  2.1 parent()
+  2.2 children()
+  2.3 prev()
+  2.4 next()
+
+3. delete the content inside an element, instead of deleting the whole elemetn:
+    by using empty()
+
+4. '$' used in defining variable names
+      it is common practice among jQuery coders to place a dollar sign in front of a variable
+      that will be used to store **elements** returned from jQuery.
+
+5. $("ELEMENT1").replaceWith("ELEMENT2")
+
+6. filter methods to narrow down your selection
+  6.1 first()
+  6.2 eq(INDEX)
+  6.3 last()
+  6.4 slice(START_INDEX, END_INDEX)
+  6.5 filter(SELECTOR), Note: the filter method will filter out everything but elements that match the selector you put in this parentheses
+  6.6 not(SELECTOR)
+
+7. find(SELECTOR)
+    can be used to find element conforming the SELECTOR inside a jQuery array
+
+8. CHILD.wrap(PARENT)
+    wrap the CHILD element into the PARENT element
+
+jQuery Effects and Animation
+1. setTimeout("FUNCTION()", TIME_IN_MILLISECONDS)
+    the setTimeout method tells the JS interpreter to run a function and then wait for a while before running it again
+
+2. function can be used at the front and defined at the bottom of the javascript file.
+   the sequence of usage and definition do not matter
+
+3. the 'animate()' method is powerful,
+   but it only let you work on CSS properties that use numbers for their settings
+   Elements can be moved either absolutely or relatively.
+   use of animate() method and examples:
+      $("#my_div").animate({left:"100px"}, 500);
+      select the element, call the animate method, pass CSS properties that you want to animate and the animation duration (in milliseconds)
+  3.1 borders, margin, padding
+  3.2 element height, min-height, max-height
+  3.3 element width, min-width, max-width
+  3.4 bottom, left, right, top position
+  3.5 background position
+  3.6 letter spacing, word spacing
+  3.7 text indent
+  3.8 line height
+  Note: the parameters for CSS properties have to be set using the DOM standard, not the CSS standard.
+
+4. If you want users to turn off your web page animation,
+   you can wire up a click button,
+   whose handler is
+    $.fx.off = true
+
+5. Fade effects, change the 'opacity' property of CSS
+  5.1 fadeIn
+  5.2 fadeOut
+  5.3 fadeTo
+
+6. Slide effects, change the 'height' property of CSS
+  6.1 slideUp
+  6.2 slideDown
+  6.3 slideToggle
+
+7. For JSON objects,
+   you can assign the value of properties using either '=' or ':'
+   properties can be accessed by either '.' or '['PROPERTY_NAME']'
+
+8. $.inArray(VALUE, ARRAY)
+    static method, which is used to determine if the VALUE is inside the ARRAY
+
+9. To empty an array in JavaScript, you simply set its length to 0
+
+10. jQuery method ELEMENT.attr(NAME, VALUE)
+    can be used to add additional properties to the ELEMENT
+
+11. .trigger(EVENT, EXTRA_PARAMETERS...)
+    used to manually generate an event
+
+custom functions for custom effects
+1. In the world of JavaScript, the "window" object is the "global" object.
+   in other words,
+   "window" is the "topmost object"
+   More precisely,
+   every time a new "tab/page/frame" is opened, a window object is created
+
+2. window object name and methods
+  2.1 window.name
+        name of the window
+
+  2.2 window.history
+        lets you access different URLs that the window has loaded over time
+
+  2.3 window.document
+        refers to the main content of the loaded document
+
+  2.4 window.onfocus
+        detects when the window receives a click, keyboard input, or some other kind of input
+
+  2.5 window.onblur
+        detects when the window loses focus
+
+  2.6 window.setTimeout()
+        used to set a period of time to wait before calling a function or other statement
+
+  2.7 window.clearTimeout()
+        used to cancel the period of time to wait.
+
+  2.8 window.setInterval()
+        used to set a period of time to wait between repetitions of a function call or other statement
+
+  2.9 window.clearInterval()
+        used to cancel the period of time to wait between repetitions.
+
+jQuery and Ajax (Asynchronous JavaScript and XML)
+1. plug-in:
+    extensions to the base jQuery library that improve functionality
+
+2. $.ajax({}); method:
+      the jQuery Ajax method returns an object with data about the particular action you are trying to perform.
+      The ajax method can accept many different parameters,
+      and can POST data to or GET data from a server
+
+3. setInterval() normally would work to schedule regular events on a page,
+   but when dependent on outside resources (like Ajax calls), it can cause problem
+   setInterval will run even if the function it is calling isn't finished yet.
+   solution to scheduling such tasks (tasks depend on outside resources) is to use self-referencing functions with setTimeout()
+
+4. Self-referencing function
+    calls itself during its normal operations.
+    it is particularly useful when you need to wait for the function's currently running operation to complete before running it again.
+
+5. convenience methods for Ajax in jQuery
+    jQuery has five convenience or shorthand methods for Ajax (but ultimately calling the $.ajax() method):
+    5.1 get
+
+    5.2 getJSON
+          syntax:
+            $.getJSON(URL_TO_LOAD, function(json){});
+          Note: the URL_TO_LOAD, is a URL to access the server resource, which produces JSON data
+
+    5.3 getScript
+
+    5.4 post
+
+    5.5 load
+
+    Note:
+      the first 4 are called using the jQuery object ('$'),
+      but 'load' can be called from any element.
+      which will be the destination of the returned data
+
+
+Handling JSON data
+1. jQuery provides a shortcut method, **post()**, dedicated to sending data to the server.
+  1.1 syntax:
+      $.post(URL_TO_SEND, DATA, FUNCTION(JOSON){});
+  1.2 if you would like to use jQuery's $.post() to work for submitting form data,
+      you should disable the default "form submission" action by
+      set the button's **submit** callback function to return false
+
+2. When we were using XML, we had to scan through the data to 'find' the desired data.
+   However, JSON objects that gets returned from server can be directly access as javascript objects,
+   whose properties can be extracted by using '.'
+
+3. 
