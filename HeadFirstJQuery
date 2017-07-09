@@ -332,6 +332,19 @@ Handling JSON data
    However, JSON objects that gets returned from server can be directly access as javascript objects,
    whose properties can be extracted by using '.'
 
+3. jQuery form selectors:
+  3.1 $(":input"), select all input elements
+  3.2 $(":text"), select all elements of type text
+  3.3 $(":radio"), select all input elements of type radio
+  3.4 $(":checkbox"), select all elements of type checkbox
+  3.5 $(":submit"), select all input elements of type submit
+  3.6 $(":reset"), select all input elements of type reset
+  3.7 $(":checked"), select all inputs that have been checked
+  3.8 $(":selected"), select all inputs that have been selected
+  3.9 $(":enabled"), select all inputs that are enabled
+  3.10 $(":disabled"), select all inputs that are disabled
+  3.12 $(":password"), select all inputs that are intended for password
+
 jQuery UI: Extreme form makeover
 1. the way jQuery plug-in works
     plug-in is just a fancy name for already built API,
@@ -339,4 +352,85 @@ jQuery UI: Extreme form makeover
     by calling the methods in the included library,
     the method will return customized objects/effects
 
-2. 
+2. $("<TAG/>"),
+    in jQuery, this syntax can be used to select and create a particular typed tag
+
+3. jQuery selectors
+  '*', all selector
+  ("#ID"), ID selector
+  (".CLASS"), class selector
+  ("ANCESTOR DESCENDANT"), descendant selector
+  ("ELEMENT"), element selector
+  ("PREV + NEXT"), next adjacent selector
+  ("PREV ~ SIBLINGS"), next siblings selector
+  ("PARENT > CHILD"), child selector
+  [name], Has Attribute Selector
+  [name |= "VALUE"], attribute contains prefix selector
+  [name *= "VALUE"], attribute contains selector
+  [name ~= "VALUE"], attribute contains word selector
+  [name $= "VALUE"], attribute ends with selector
+  [name = "VALUE"], attribute equals selector
+  [name != "VALUE"], attribute Not equal selector
+  [name ^= "VALUE"], attribute starts with selector
+  [name="VALUE"] [name2="VALUE2"] ..., multiple attribute selector
+  ("SELECTOR1, SELECTOR2, ..."), multiple selector
+
+  :empty SELECTOR
+  :enabled SELECTOR
+  :disabled SELECTOR
+  :selected SELECTOR
+  :visible SELECTOR
+  :checked SELECTOR
+  :contains() SELECTOR
+  :has() SELECTOR
+  :hidden SELECTOR
+  :focus SELECTOR
+
+  :first-child SELECTOR
+  :first SELECTOR
+  :last-child SELECTOR
+  :last SELECTOR
+  :nth-child() SELECTOR,
+  :only-child  SELECTOR
+  :parent SELECTOR
+
+  :eq() SELECTOR
+  :gt() SELECTOR
+  :lt() SELECTOR
+  :not SELECTOR
+
+  :odd SELECTOR
+  :even SELECTOR
+
+  :file SELECTOR
+  :image SELECTOR
+  :input SELECTOR
+  :password SELECTOR
+  :radio SELECTOR
+  :reset SELECTOR
+  :header SELECTOR
+  :submit SELECTOR
+  :text SELECTOR
+  :animated SELECTOR
+  :button SELECTOR
+  :checkbox SELECTOR
+
+4. CDN,
+    content delivery networks,
+    they are large networks of servers,
+    designed to store and deliver information (data, software, API code, media files or videos, etc.),
+    making it easily accessible on the Web.
+
+5. debugging jQuery,
+   you can debug jQuery code by using plugins
+   5.1 Dump,
+        http://plugins.jquery.com/project/Dump (For seeing what your object contains.)
+   5.2 VariableDebugger,
+        http://plugins.jquery.com/project/VariableDebugger (Similar, but displays info in pop up.)
+    Note: for everything else, there's always the browser tools
+
+6. search for more plugins
+    http://plugins.jquery.com/
+
+7. Form validation plugin
+    http://docs.jquery.com/Plugins/validation
