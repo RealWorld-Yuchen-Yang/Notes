@@ -332,4 +332,11 @@ Handling JSON data
    However, JSON objects that gets returned from server can be directly access as javascript objects,
    whose properties can be extracted by using '.'
 
-3. 
+jQuery UI: Extreme form makeover
+1. the way jQuery plug-in works
+    plug-in is just a fancy name for already built API,
+    in order to work with plug-ins, you need to include the library as a script into the HTML.
+    by calling the methods in the included library,
+    the method will return customized objects/effects
+
+2. 
