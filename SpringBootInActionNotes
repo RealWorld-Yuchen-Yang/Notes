@@ -1,0 +1,37 @@
+Bootstarting Spring
+1. you can start a Spring Boot project either through Spring Boot CLI or by using Spring Initializr
+
+2. The Spring Initializr
+    is ultimately a web application that can generate a Spring Boot project structure for you.
+    It doesn't generate any application code,
+    but it will give you a basic project structure and either a Maven or a Gradle build specification to build your code with
+
+3. For the generated bare-bone project
+  3.1 static directory:
+        where you can put any static content (JavaScript, stylesheets, images, etc.)
+  3.2 templates directory:
+        where you can put templates that render model data
+
+4. Create a new Spring Boot application in SpringToolSuite
+  4.1 File -> New -> Spring Starter Project
+  4.2 Location field specifies where the project will reside on the file system.
+  4.3 Site Info
+        describes the URL that will be used to contact the Initializr (Web Application).
+        for the most part, you can ignore this section.
+        If, however, you were to deploy your own Initializr server (by cloning the code at https://github.com/spring-io/initializr),
+        you could plug in the base URL of your Initializr here.
+
+5. using the Initializr from the Spring Boot CLI
+    Syntax:
+      $spring init -dweb,jpa,security --build gradle -p war myapp
+  5.1 init: create a baseline Spring Boot project
+  5.2 -d: specify the dependencies,
+        Note:
+          1. there is no space between '-d' and dependency parameters
+          2. Spring Boot starters enable you to specify build dependencies by "what they offer"
+             rather than use explicit library names and version.
+  5.3 --build: specify build file, default is Maven
+  5.4 -p: packing option, default is 'jar'
+  5.5 -x or directory: extract the downloaded '.zip' file to the current directory/specified directory
+  5.6 $spring help init: discover all of the parameters
+  5.7 $spring init -l: find out what choices are available for those parameters
