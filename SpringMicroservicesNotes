@@ -1,0 +1,25 @@
+Demystifying Microservices
+1. In traditional layered web applications,
+   layers are physically spreadable,
+   where as modules within a layer are hardwired.
+
+2. in Microservices, the above mentioned hardwired modules are separated
+
+3. principles of microservices
+  3.1 single responsibility per service
+  3.2 microservices are autonomous
+      Note:
+        one of the major differences between microservices and SOA is in their level of autonomy.
+        while most SOA implementations provide service-level abstraction,
+        microservices go further and abstract the realization and execution environment.
+
+4. Jenkins is a CI tool
+
+5. Scale Cube
+    Scaling the x axis by horizontally cloning the application
+    Scaling the y axis by splitting different functionality
+    Scaling the z axis by partitioning or sharding the data
+
+6. Microservices are one of the key enablers of DevOps.
+   DevOps is widely adopted as a practice in many enterprises,
+   primarily to increase the speed of delivery and agility.
