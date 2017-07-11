@@ -23,7 +23,7 @@ Bootstarting Spring
 
 5. using the Initializr from the Spring Boot CLI
     Syntax:
-      $spring init -dweb,jpa,security --build gradle -p war myapp
+      $ spring init -dweb,jpa,security --build gradle -p war myapp
   5.1 init: create a baseline Spring Boot project
   5.2 -d: specify the dependencies,
         Note:
@@ -33,5 +33,121 @@ Bootstarting Spring
   5.3 --build: specify build file, default is Maven
   5.4 -p: packing option, default is 'jar'
   5.5 -x or directory: extract the downloaded '.zip' file to the current directory/specified directory
-  5.6 $spring help init: discover all of the parameters
-  5.7 $spring init -l: find out what choices are available for those parameters
+  5.6 $ spring help init: discover all of the parameters
+  5.7 $ spring init -l: find out what choices are available for those parameters
+
+Developing your first Spring Boot application
+1. Remember that CLI's init command does not let you specify the project's root package or project name.
+   The package name will default to "demo" and project name will default to "Demo"
+
+2. Layout of typical Maven/Gradle projects
+  2.1 the main application code is placed in src/main.java
+  2.2 resources are placed in src/main/resources
+  2.3 test code is placed in src/test/java
+  2.4 optional test resources are placed in src/test/resources
+
+3. The main class has two purposes in Spring Boot application: configuration and bootstrapping
+   It is annotated with @SpringBootApplication
+   It equals @Configuraion + @ComponentScan + @EnableAutoConfiguration
+   You will almost never need to change this main class.
+   If your application requires any additional Spring configuration beyond what Spring Boot auto-configuration provides,
+   it is usually best to write it into separate @Configuration-configured classes.
+
+4. The easiest way to build and run the application is to use the bootRun task with Gradle:
+    $ gradle bootRun
+   which is equal to:
+    $ gradle build
+    $ java -jar build/libs/XXX.jar
+
+5. $ gradle dependencies
+  display dependency tree that includes every library your project is using and their versions
+
+6. @Entity, designating the class is a JPA entity
+
+Customizing configuration
+1. For Gradle, adding security to the application requires
+    compile("org.springframework.boot:spring-boot-starter-security")
+
+2. Although Spring Boot's auto-configuration and @ConditionalOnMissingBean make it possible for you to explicitly override any of the beans
+   that would otherwise be auto-configured,
+   it is not always necessary to go to that extreme.
+   I can externalizing configuration with properties in stead.
+
+3. Several ways to set properties for a Spring Boot application.
+   (the following list is in order of precedence, any property set from a source higher in the list will override the same property set on a source lower in the list)
+   3.1 Command-line argument
+   3.2 JNDI attributes from java:comp/env
+   3.3 JVM system properties
+   3.4 Operating system environment variables
+   3.5 Randomly generated values for properties prefixed with random.*
+       (preferred when setting other properties, such as ${random.long})
+   3.6 An application.yml or application.properties file outside of the application
+   3.7 An application.yml or application.properties file packaged inside of the application
+   3.8 Property sources specified by @PropertySource
+   3.9 Default properties
+   Note:
+    as for the application.yml or application.properties files, they can reside in any of four locations
+    Externally, in a /config subdirectory of the directory from which the application is run
+    Externally, in a directory from which the application is run
+    Internally, in a package named "config"
+    Internally, at the root of the classpath
+
+4. Spring Boot's property resolver is clever enough to treat camel-cased properties as interchangeable with similarly named properties with hyphens or underscores.
+  e.g. the following are equivalent
+    amazon.associatedId
+    amazon.associated_id
+    amazon.associated-id
+
+5. Profiles can be activated by setting the 'spring.profiles.active' property
+
+6. Working with profile-specific properties files
+  6.1 If you are using application.properties to express configuration properties,
+      you can provide profile-specific properties by creating additional properties files named with the pattern
+      "application-{profile}.properties"
+  6.2 meanwhile, any properties that are not specific to any profile or that serves as defaults can continue to be expressed in application.properties.
+
+7. Customizing application error pages
+    the easiest way to customize the error page is to create a custom view that will resolve for a view named "error"
+    ultimately, this depends on the view resolver in place when the error view is being resolved.
+    7.1 any bean that implements Spring's View interface and has a bean ID of "error" (resolved by Spring's BeanNameViewResolver)
+    7.2 a Thymeleaf template named "error.html" if Thymeleaf is configured
+    7.3 a FreeMarker template named "error.ftl" if FreeMarker is configured
+    7.4 a Velocity template named "error.vm" if Velocity is configured
+    7.5 a JSP template named "error.jsp" if using JSP views
+
+8. default Spring Boot error attributes available to the error view
+  8.1 timestamp,
+        the time that the error occured
+  8.2 status,
+        the HTTP status code
+  8.3 error,
+        the error reason
+  8.4 exception,
+        the class name of the exception
+  8.5 message,
+        the exception message (if error was caused by an exception)
+  8.6 errors,
+        any errors from a BindingResult exception (if the error was caused by an exception)
+  8.7 trace,
+        the exception stack trace (if the error was caused by an exception)
+  8.8 path,
+        the URL path requested when the error occurred.
+
+Testing with Spring Boot
+1. you need to used @SpringApplicationConfiguration instead of @ContextConfiguration in integration test classes
+   so as to get additional features, such as logging, loading of external properties, etc.
+   other than loading the "application context"
+
+2. Testing web applications
+  2.1 Spring Mock MVC,
+        enables controllers to be tested in a mocked approximation of a servlet container without actually starting an application server
+  2.2 Web integration test,
+        actually starts the application in an embedded servlet container (such as Tomcat or Jetty)
+        enabling tests that exercises the application in a real application server
+  2.3 when testing Spring MVC,
+      "model is correctly created" and "redirected to correct view" should be the main concern.
+      However, we do "not verify database manipulation"
+  2.4 testing web security
+        in order to test spring security,
+        you must add Spring Security's test module to your build, for Gradle,
+        testCompile("org.springframework.security:spring-security-test")
