@@ -151,3 +151,18 @@ Testing with Spring Boot
         in order to test spring security,
         you must add Spring Security's test module to your build, for Gradle,
         testCompile("org.springframework.security:spring-security-test")
+
+3. @WebIntegrationTest,
+    by annotating a test class with @WebIntegrationTest,
+    you declare that you want Spring Boot to not only create an application context for your test,
+    but also to start an embedded servlet container.
+
+4. Testing HTML pages with Selenium
+  4.1 Selenium actually fires up a web browser and executes your test within the context of the browser.
+  4.2 By creating a specific browser driver,
+      Selenium use the driver to perform browser operations.
+      Selenium test's gist
+        for get, is to test if the desired element in the HTML page can be found
+        for post, it first fills the form, then it test the corresponding result element's correctness
+
+5. 
