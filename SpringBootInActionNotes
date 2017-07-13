@@ -165,4 +165,147 @@ Testing with Spring Boot
         for get, is to test if the desired element in the HTML page can be found
         for post, it first fills the form, then it test the corresponding result element's correctness
 
-5. 
+Taking a peed inside with the Actuator
+1. Getting a bean wiring report
+    by performing a GET request to /beans
+    (http://localhost:8080/beans when running locally)
+    you will be returned a JSON document describing every single bean in the application, its Java type, and any of the other beans it is injected with.
+    all of the bean entries carry five pieces of information about the bean:
+    1.1 bean,
+          the name or ID of the bean in the Spring application context
+    1.2 resource
+          the location of the physical .class file (often a URL into the built JAR file, but this might vary depending on how the application si built and run)
+    1.3 dependencies
+          a list of bean IDs that bean is injected with
+    1.4 scope
+          the bean's scope (usually singleton, as that is the default scope)
+    1.5 type
+          the bean's Java type
+
+2. /autoconfig endpoint
+    describes why/why not beans are configured.
+    2.1 positive matches, means they are activated.
+    2.2 negative matches, means they are not activated.
+
+3. Inspecting configuration properties
+    The /env endpoint produces a list of all the environment properties available to the application
+
+4. /mappings endpoint,
+    producing endpoint-to-controller map,
+    the "key" of each mapping is a string containing what appears to be the attributes of Spring MVC's @RequestMapping annotation
+    the "value" of each mapping has two properties: "bean" and "method",
+    4.1 bean,
+          identifies the name of the Spring bean that the mapping comes from.
+    4.2 method,
+          gives the fully qualified method signature of the method for which the mapping is being reported.
+
+5. /metrics endpoint
+    gives runtime information of the application,
+    the following is the gauges and counters reported by the /metrics endpoint
+  5.1 gc.*, Garbage collector, information is from "java.lang.management.GarbageCollectorMXBean"
+  5.2 mem.*, Memory, information is from "java.lang.Runtime"
+  5.3 heap.*, Heap, information is from "java.lang.management.MemoryUsage"
+  5.4 classes.*, Class loader, information is from "java.lang.management.ClassLoadingMXBean"
+  5.5 processors,         System, from "java.lang.Runtime"
+      uptime,                     from "java.lang.management.RuntimeMXBean"
+      instance.uptime,            from "java.lang.management.RuntimeMXBean"
+      systemload.average          from "java.lang.management.OperatingSystemMXBean"
+  5.6 threads.*, Thread pool,     from "java.lang.management.ThreadMXBean"
+  5.7 datasource.*, Data source, only available if there are one or more DataSource beans in the Spring application context
+  5.8 httpsessions.*, only available if the application is served via an embedded Tomcat server
+  5.9 counter.status.*,    HTTP, various gauges and counters for HTTP requests that the application has served.
+      gauge.response.*,
+
+6. /trace endpoint,
+    reports details of all web requests,
+    including request method, path, timestamp, request/response headers
+
+7. /dump endpoint,
+    produces a snapshot of current thread activity
+
+8. /health endpoint,
+    shows the system' status
+
+9. /shutdown endpoint,
+    once enabled (endpoints.shutdown.enabled=true),
+    you can shutdown a specific application via
+    $ curl -X POST http://localhost:8080/shutdown
+
+10. /info endpoint,
+    reports any information about your application that you might want to expose to callers
+    Note: you can add any information to the /info endpoint's response by simply configuring properties prefixed with info.
+
+11. Connecting to the Actuator remote shell
+  11.1 It is an optional way to dig into the internals of a running application
+  11.2 in order to use the remote shell, you need to add the following dependency to Gradle
+        compile("org.springframework.boot:spring-boot-starter-remote-shell")
+  11.3 after starting the application with the remote shell starter,
+       you can use SSH to connect to the shell
+       ssh user@localhost -p 2000
+  11.4 CRaSH shell commands
+    11.4.1 autoconfig
+    11.4.2 beans
+    11.4.3 endpoints
+    11.4.4 metrics
+  11.5
+    endpoint list, lists all available end points
+    endpoint invoke ENDPOINT_NAME, enables the endpoint
+
+Deploying Spring Boot applications
+1. Spring Boot applications can be packaged for deployment in several ways.
+  1.1 Raw Groovy source,
+      which is written by hand,
+      whose target environment is Cloud Foundry and container deployment, such as Docker
+  1.2 Executable JAR,
+      which is produced by Maven, Gradle or Spring Boot CLI,
+      whose target environment is Cloud environments, including Cloud Foundry, Heroku, as well as container deployment, such as Docker
+  1.3 WAR,
+      which is produced by Maven or Gradle,
+      whose target environment is Java application servers or cloud environments such as Cloud Foundry
+
+2. Deploying to an application server
+  2.1 building a WAR file by using Gradle
+    2.1.1 apply plugin: 'war'
+    2.1.2 replace the existing 'jar' configuration with the 'war' configuration
+      war{
+        baseName = 'BASE_NAME'
+        version = 'VERSION'
+      }
+  2.2 For Tomcat, deploying the WAR is just copying the WAR file into Tomcat's webapps directory
+  2.3 For Tomcat, to access the webapp， point your browser to http://SERVER_ADDR:PORT/WAR_NAME
+  Note:
+    building Spring Boot applications for deployment into a conventional Java application server is largely a matter of creating
+    a subclass of SpringBootServletInitializer and adjusting the build specification to produce a WAR file.
+
+3. to enable the "production" profile before starting Tomcat,
+   $ export SPRING_PROFILES_ACTIVE=production
+
+4. enabling database migration
+    By default, Spring Boot configures Hibernate to create schema automatically when using the embedded H2 database.
+    More specifically,
+    it sets Hibernate's 'hibernate.hbm2ddl.auto=create-drop'
+    but it is not set when using other databases
+    to enable such config, you should
+    set 'spring.jpa.hibernate.ddl-auto=create-drop/create'
+    A better option is to use a migration library,
+    Spring Boot includes auto-configuration support for two popular database migration libraries
+      Flyway, by adding Gradle dependency compile("org.flywaydb:flyway-core")
+      Liquibase, by adding Gradle dependency compile("org.liquibase:liquibase-core")
+
+5. Pushing to the Cloud
+  5.1 Cloud Foundry,
+        accepts built projects
+  5.2 Heroku,
+        arranges a Git repository for your application,
+        it builds and deploys the application for you every time you push it to the repository
+
+Spring boot developer tools
+  Spring Boot's developer tools come in the form of a library that can be added to a project as a dependency
+  For Gradle,
+    compile "org.springframework.boot:spring-boot-devtools"
+1. Automatic restart
+    if activated, any changes to files on the classpath will trigger an application restart.
+2. LiveReload support
+    allows developers to see the result of rendered content  on the fly without refresh
+3. Remote development
+4. Development property defaults
