@@ -23,3 +23,109 @@ Demystifying Microservices
 6. Microservices are one of the key enablers of DevOps.
    DevOps is widely adopted as a practice in many enterprises,
    primarily to increase the speed of delivery and agility.
+
+7. In the cloud,
+   the infrastructure is transparent to the application.
+   and especially, the physical IP address cannot be assumed
+
+8. Cloud Native
+    a term used for developing applications that can work efficiently in a cloud environment
+    understanding the cloud behaviors such as elasticity, utilization based charging, fail aware, etc.
+
+9. Twelve-Factor App
+    is a methodology describing the characteristics expected from modern cloud-ready applications.
+  9.1 a single code base
+  9.2 bundling dependencies
+        all applications should bundle their dependencies along with the application bundle.
+  9.3 externalizing configurations
+  9.4 backing services are addressable
+  9.5 Isolation between build, release and run
+  9.6 Stateless, shared nothing processes
+        If there is any requirement to store a state,
+        it should be done with a backing database or in an in-memory cache
+  9.7 exposing services through port bindings
+        application does not depend on the external servers,
+        instead, they embed server inside themselves.
+        microservices embed service listeners as a part of the service itself
+  9.8 concurrency to scale out
+  9.9 disposability with minimal overhead
+  9.10 development and production parity
+        keep development and production environments as identical as possible.
+  9.11 externalizing logs
+        in order to avoid local I/O bottleneck,
+        the recommended approach is to ship logs to a central repository by tapping the logback appenders
+        and write to one of the shippers' endpoints.
+  9.12 package admin processes
+        use the same release bundle as well as an identical environment for both application services and admin tasks.
+
+Building Microservices with Spring Boot
+1. @RestController = @Controller + @ResponseBody
+
+2. In stead of a code generator,
+   Spring Boot only autoconfigures build files.
+
+3. Spring Boot also enables microservices' development by packaging all the required runtime dependencies in a fat executabl JAR FILE.
+
+4. @SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan
+
+5. There are number of tools available to test RESTful services, such as
+   Postman, Advance REST client, SOAP UI, Paw, etc.
+
+6. curl command can be used to visit an URL
+
+7. In tests,
+   @WebIntegrationTest annotation ensures that the tests are fired against a fully up-and-running server.
+   @WebIntegrationTest = @WebAppConfiguration + @IntegrationTest
+
+8. RestTemplate
+    is used to all the RESTful service,
+    it is a utility class that abstracts the lower level details of the HTTP client.
+
+9.  Spring Initializr
+      a drop-in replacement for the STS project wizard,
+      and provides a web UI to configure and generate a Spring Boot project.
+
+10. HATEOAS
+      Hypertext As The Engine Of Application State
+      It is a REST service pattern in which navigation links are provided as part of the payload metadata.
+      The client application determines the state and follows the transition URLs provided as part of the state.
+
+11. HAL
+      Hypertext Application Language
+      HAL browser is a handy API browser for hal+json  data.
+      HAL is a format based on JSON that establishes conventions to represent hyperlinks between resources.
+      HAL helps APIs be more explorable and discoverable.
+
+12. Autoconfiguration,
+      favors convention over configuration
+      it uses "*AutoConfiguration" lexical pattern,
+      where * represents the library.
+
+13. Run the application with '--debug' to see the autoconfiguration report.
+
+14. securing Spring Boot applications with OAuth2
+      firstly, you need to include the OAuth2 dependency
+  14.1 @EnableAuthorizationSever,
+        creates an authorization server with an in-memory repository to store client tokens
+        and provide clients with a username, password, client ID and secret.
+  14.2 @EnableResourceServer,
+        used to access the tokens.
+        This enables a spring security filter that is authenticated via an incoming OAuth2 token
+
+15. @CrossOrigin
+      enables CORS (Cross-Origin Resource Sharing)
+
+16. @Lazy
+      beans annotated with @Lazy will be initialized only when the need arises.
+      it helps to increase the boot startup time.
+
+17. communication between microserviceA and microserviceB should be though "Messaging system"
+    this is done by injecting a "Sender" in microsrviceA and a "Receiver" in microserviceB
+    and let the "Sender" and "Receiver" talk to the "Middleware"
+
+18. Once the application is annotated with @EnableSwagger2,
+    you can visit http://localhost:8080/swagger-ui.html
+    to visit the Swagger log
+
+Applying Microservices Concepts
+1. 
