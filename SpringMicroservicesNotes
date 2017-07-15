@@ -128,4 +128,125 @@ Building Microservices with Spring Boot
     to visit the Swagger log
 
 Applying Microservices Concepts
-1. 
+1. bounded context:
+    DDD (Domain-driven design) defines the concept of a bounded context.
+    a bounded context is a subdomain or subsystem of a larger domain or system that is responsible for performing a particular function.
+
+2. One of the key characteristics of microservices is its support for polyglot architecture.
+
+3. CQRS
+    Command Query Responsibility Segregation
+    It allows browser clients to send requests to services hosted on different domains.
+
+4. Ensure that transaction boundaries are not stretched across microservices.
+   A first class microservice will react upon receiving an event as an input,
+   execute a number of internal functions,
+   and finally send out another event.
+
+5. Communication styles
+  5.1 synchronous style (request-response)
+    5.1.1 advantage
+            there is no shared state or object
+            no other infrastructure dependencies results in fewer overheads
+            in case of error handling,
+            error will be propagated back to the caller immediately,
+            leaving the system in a consistent state,
+            without compromising data integrity
+    5.1.2 disadvantage
+            has scalability limitations
+            add hard dependencies between microservices
+            many of the failure scenarios have to be handled using timeouts and loops
+  5.2 asynchronous style (fire and forget)
+    5.2.1 advantage
+            services are independent,
+            provides higher level of scalability
+    5.2.2 disadvantage
+            has a dependency to an external messaging server.
+            It is complex to handle the fault tolerance of a messaging server.
+
+6. ESB
+    Enterprise Service Buss,
+    it is found in legacy system architectures,
+    but not in microservices
+
+  iPaaS (Integration Platform as a Service)
+    the next generation application integration platform.
+    In typical deployments, iPaaS invokes API gateways to access microservices
+
+7. (i)BPM
+    (Intelligent) Business Process Management
+
+8. Database level segregation is highly demanded.
+   even in services have only a few tables,
+   it may not be worth investing a full instance of a database,
+   a schema level segregation is good enough to start with
+
+9. Transaction boundaries
+    It is appropriate to define transaction boundaries within the microsystem using local transactions.
+    However, distributed global transactions should be avoided in the microservices context.
+
+10. Eventual consistency is a better option than distributed transactions than span across multiple microservices.
+    A classical problem is that of the last room selling scenario in a hotel booking case.
+    What if there is only one room left, and there are multiple customers booking this single available room?
+    A business model change sometimes make this scenario less impactful.
+    We could set an "under booking profile",
+    where the actual number of bookable rooms can go below the actual number of rooms (say, bookable = available - 3) in anticipation of cancellations.
+    Anything in this range will be accepted as "subject to confirmation",
+    and customers will be charged only if payment is confirmed.
+    Bookings will be confirmed in a set time window (synchronous).
+
+11. Service endpoint design consideration
+      service design has two key elements: contract design and protocol design
+  11.1 contract design principles
+        KISS (Keep It Simple Stupid)
+        YAGNI (You Ain't Gonna Need It)
+        CDC (Consumer Driven Contract)
+  11.2 protocol design
+        The HTTP/REST/JSON protocol stack makes building interoperable system very easy and friendly.
+        HATEOS is one of the design patterns emerging for designing progressive rendering and self-service navifations.
+        If the service response times are stringent,
+        then we may choose alternative protocols such as Avro, Protocol Buffers, or Thrift.
+
+12. since microservices should be autonomous,
+    there is a trade-off between adding a dependency versus code duplication
+
+13. API gateway
+      it is a UI service,
+      which acts as a proxy to the backend.
+      exposing a set of consumer-specific APIs.
+
+14. Cross origin request
+  14.1 one approach is to enable all microservices to allow cross origin requests (By using CROS)
+  14.2 a second approach is to use an API gateway as a single trusted domain for the clients
+
+15. With microservics, it is difficult to handle cross-table search, to solve this problem
+  15.1 one approach is to use pre-aggregation to cache the desired data in advance,
+       this will result in data duplication
+  15.2 another approach is to use "batch query",
+       this approach just reduce the query times
+
+16. Service endpoints and communication protocols
+  16.1 Synchronous:
+        based on REST/JSOON or any other protocols such as Avro, Thrift, Protocol Buffers, etc.
+  16.2 Asynchronous:
+        Spring Cloud Streams backed by RabbitMQ, other messaging server, or other messaging style implementations such as ZeroMQ
+
+17. Cluster control and provisioning:
+      Once we have a large number of containers or virtual machines,
+      it is hard to manage and maintain them automatically.
+      Cluster control tools provides a uniform operating environment on top of the containers,
+      and share the available capacity across multiple services.
+      Apache Mesos and Kubernetes are examples of cluster control systems
+
+18. Service registry
+      A service registry provides a runtime environment for services to automatically publish their availability at runtime.
+      A registry will be good source of information to understand the services topology at any point.
+      Eureka from Spring Cloud, Zookeeper, and Etcd are some of the service registry tools available.
+
+19. Data Lake
+      used to combine data stored in different microservices,
+      and perform near real-time analytics.
+      Data integration tools like Spring Cloud Data Flow, Flume, and Kafka are used to consume data.
+      HDFS, Cassandra, and the like are used for storing data.
+
+Microservices Evolution - A Case Study
