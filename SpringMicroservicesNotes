@@ -250,3 +250,13 @@ Applying Microservices Concepts
       HDFS, Cassandra, and the like are used for storing data.
 
 Microservices Evolution - A Case Study
+1. dependencies could be query-based or event-based
+   event-based is better for scalable systems.
+
+2. Payment is typically a disconnected function due to the nature of security constraints such as PCIDSS-like standards
+   The most obvious way to capture a payment is to redirect a browser to a payment page hosted in the payment service
+
+3. SSO
+    Single sign-on
+
+4. 
