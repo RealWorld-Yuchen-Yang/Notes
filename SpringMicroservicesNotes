@@ -441,4 +441,31 @@ Containerizing Microservices with Docker
         a Dockerfile is a build or scripting file that contains instructions to build a Docker image
 
 Managing Dockerized Microservices with Mesos and Marathon
-1.  
+1. Mesos is a distributed OS Core
+
+2. Marathon is  a Framework running on top of Mesos
+   hand used to manage long running processes such as microservices
+
+The Microservices Development Life Cycle
+1. DevOps
+    a lean it model
+
+2. DevOps reduces the gap between the development and operations teams
+   so that it can potentially reduce wastage and improve quality.
+
+3. The trio -- Microservices, Cloud, DevOps
+
+4. Start-ups philosophy
+    have a unit of people not worried about how they achieve things,
+    rather,
+    the focus is on what they want to achieve.
+    Once they have a product in place
+
+5. The Agile practice
+    software is delivered in an incremental, iterative way,
+    using the principles put forth in the Agile manifesto
+    the following is 4 key points that Agile software development teams should focus on
+    5.1 individual and interaction over processes and tools
+    5.2 working software over comprehensive documentation
+    5.3 customer collaboration over contract negotiation
+    5.4 responding to change over following a plan
