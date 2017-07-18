@@ -259,4 +259,186 @@ Microservices Evolution - A Case Study
 3. SSO
     Single sign-on
 
-4. 
+Scaling Microservices with Spring Cloud
+1. What is Spring Cloud
+    Spring Cloud project is an umbrella project from the Spring team that implements a set of common patterns required by distributed systems,
+    as a set of easy-to-use Java Spring libraries.
+    It is not a cloud solution.
+    Rather it provides a number of capabilities that are essential when developing applications targeting cloud development that adhere to the Twelve-Factor application principles.
+  1.1 Spring Cloud
+        a developer kit for developing Internet-scale Spring Boot applications
+  1.2 Cloud Foundry
+        an open-source PaaS for building, deploying and scaling applications.
+
+2. Spring Cloud capabilities
+  2.1 Distributed configuration
+        The distributed configuration management module is to externalize and centralize microservice configuration parameters.
+    2.1.1 Spring Cloud Config
+            externalized configuration server with Git or SVN as the backing repository
+            it is just a Spring Boot application
+    2.1.2 Spring Cloud Bus
+            provide support for propagating configuration changes to multiple subscribers.
+    2.1.3 Zookeeper, HashiCorp's Consul
+            used for distributed configuration management
+
+  2.2 Routing
+        an API gateway component,
+        primarily used similar to a reverse proxy that forwards requests from consumers to service providers.
+        it can also perform software-based routing and filtering
+    2.2.1 Zuul
+
+  2.3 Load balancing
+        route requests to available servers using a variety of load balancing algorithms
+    2.3.1
+      Ribbon
+
+  2.4 Service registration and discovery
+        programmatically register services with a repository when a service is available and ready to accept traffic.
+    2.4.1 Eureka
+    2.4.2 Zookeeper
+    2.4.3 Consul
+
+  2.5 Service-to-service calls
+    2.5.1 Spring Cloud Feign
+            offers a declarative approach for making RESTful service-to-service calls in a synchronized way.
+
+  2.6 Circuit breaker
+        implements the circuit breaker pattern
+        the circuit breaker breaks the circuit
+        when it encounters failures in the primary service
+        by diverting traffic to another temporary fallback service.
+        It also automatically reconnects back to the primary service when the service is back to normal
+        It finally provides a monitoring dashboard for monitoring the service state changes.
+    2.6.1 Spring Cloud Hystrix and Hystrix Dashboard
+
+  2.7 Global locks, leadership election and cluster state
+        used for cluster management and coordination
+    2.7.1 Spring Cloud Cluster project
+            implements this capability by using Redis, Zookeeper and Consul
+
+  2.8 Security
+        externalized authorization
+    2.8.1 OAuth2
+            offers SSO (Single Sign-On) capabilities
+
+  2.9 Big data support
+    2.9.1 Spring Cloud Streams and Spring Cloud Data Flow
+
+  2.10 Distributed tracing
+        helps to thread and correlate transitions that are spanned across multiple microservices
+    2.10.1 Spring Cloud Sleuth
+            provides an abstraction on top of various distributed tracing mechanisms,
+            such as Zipkin and HTrace with the support of a 64-bit ID.
+
+  2.11 Distributed messaging
+    2.11.1 Kafka
+    2.11.2 Redis
+    2.11.3 RabbitMQ
+
+  2.12 Cloud support
+        offers various connectors, integration mechanisms and abstraction on top of different cloud providers,
+        such as Cloud Foundry and AWS
+
+3.OSS (Open Source Software)
+
+4. Cloud Stream works on the concept of a source and a sink.
+  4.1 source,
+        represents the sender perspective of the messaging
+  4.2 sink,
+        represents the receiver perspective of the messaging
+
+5. With Eureka
+    remember to wait for 40 to 50 seconds before starting the next service.
+    This will ensure the dependent services are registered and are available before we start a new service
+
+Autoscaling Microservices
+1. Consumers use the Eureka client to look up the Eureka server to identify the available instances of a target service.
+   The Ribbon client uses this server list to load-balance between the available microservice instances
+
+2. Autoscaling
+    an approach to automatically scaling out instances based on the resource usage to meet the SLAs by replicating the services to be scaled.
+    It is also called "elasticity" or "dynamic resource provisioning and deprovisioning"
+
+3. Autoscaling approaches
+  3.1 resource constrains
+  3.2 during specific time periods
+  3.3 message queue length
+  3.4 business parameters
+  3.5 predicative autoscaling
+
+4. The life cycle manager service is nothing but another Spring Boot application
+
+Logging and Monitoring Microservices
+1. Log store
+    a log store is the place where all log messages are stored for real-time analysis, trending and so on.
+    Typically, a log store is a NoSQL database, such as HDFS, capable of handling large data volumes.
+
+2. Benefit of centralized logging approach
+    there is no local I/O or blocking disk writes.
+    It also does not use the local machine's disk space.
+
+3. log contents
+  3.1 context, typically is
+    3.1.1 timestamp
+    3.1.2 IP address
+    3.1.3 user information
+    3.1.4 process details (service, class, functions, etc.)
+    3.1.5 log type
+    3.1.6 classification
+
+  3.2 message,
+        typically is plain and simple free text information
+
+  3.3 correlation ID,
+        used to establish the link between service calls,
+        so that calls spanning microservices can be traced.
+
+4. A typical architecture used for stream processing is a combination of Flume and Kafka together with
+   either Storm or Spark Streaming
+   Log4j has Flume appenders,
+   which are useful to collect log messages.
+   These messages are pushed into distributed Kafka message queues.
+   The stream processors collect data from Kafka and process them on the fly before sending it to Elasticsearch and other log stores.
+
+5. ELK stack
+    the most commonly used architecture for custom log management is a combination of
+    Elasticsearch (real-time data store),
+    Logstash (shipper)
+    Kibana (dashboard)
+    e.g.
+      Microservices (Logback/Log4j appenders) --> Logstash --> Elasticsearch <-- Kibana
+
+Containerizing Microservices with Docker
+1. Container
+    Containers provide private spaces on top of the operating system.
+    This technique is also called operating system virtualization.
+    In this approach,
+    the kernel of the operating system provides isolated virtual spaces.
+    Each of these virtual spaces is called a container or virtual engine (VE).
+    Containers allow processes to run on an isolated environment on top of the host operating system.
+
+2. virtual machines vs containers.
+  2.1 virtual machines operate at a much lower level,
+      provides hardware virtualization
+      a VM is an isolated unit with an embedded operating system. (Guest OS)
+  2.2 replicate the whole operating system,
+      heavy in nature
+  2.3 container share certain parts of the host kernel and operating system.
+      containers provide an isolated execution environment directly on top of the host operating system.
+
+3. Docker
+    Docker is a platform to build, ship, and run lightweight containers based on Linux kernels.
+
+4. Docker concepts
+  4.1 Docker images
+        read-only copy of the operating system libraries, the application, and its libraries.
+  4.2 Docker containers
+        Docker containers are the running instances of a Docker image.
+  4.3 Docker registry
+        the Docker registry is a central place where Docker images are published and download from.
+        The URL https://hub.docker.com is the central registry provided by Docker
+  4.4 Dockerfile
+        a Dockerfile is a build or scripting file that contains instructions to build a Docker image
+
+Managing Dockerized Microservices with Mesos and Marathon
+1.  
