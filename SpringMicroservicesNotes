@@ -481,4 +481,27 @@ The Microservices Development Life Cycle
     considered as the next evolution of CD,
     by integrating automatic release processes into the CD pipeline.
 
-9. 
+9. automated sanity test
+    (one type of functional test)
+    make sure that all the basic things are working
+
+10. automated acceptance test
+      similar to functional test cases.
+
+11. Exploratory testing
+      a manual testing approach taken by testers or business users to validate the specific scenarios that they think automated tools may not capture.
+
+12. A/B testing, canary testing, and blue-green testing
+      when moving applications to production, the above tests are applied.
+  12.1 A/B testing,
+        primarily used to review the effectiveness of a change
+        and how the market reacts to the change.
+  12.2 Canary testing,
+        release is moving a new product or feature to a certain community
+        before fully rolling out to all customers.
+  12.3 Blue-green testing,
+        a deployment strategy from an IT point of view,
+        to test the new version of a service
+
+13. staging
+      is a preproduction state of the product
