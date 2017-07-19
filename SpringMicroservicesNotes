@@ -469,3 +469,16 @@ The Microservices Development Life Cycle
     5.2 working software over comprehensive documentation
     5.3 customer collaboration over contract negotiation
     5.4 responding to change over following a plan
+
+6. MVP (Minimum Viable Product)
+
+7. CD (Continuous Delivery)
+    it is considered as the next evolution of CI (Continuous Integration),
+    which adds QA cycles into the integration pipeline and makes the software ready to release to production.
+    A manual action is required to move it to production.
+
+8. Continuous deployment
+    considered as the next evolution of CD,
+    by integrating automatic release processes into the CD pipeline.
+
+9. 
