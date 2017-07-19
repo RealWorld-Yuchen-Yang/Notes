@@ -1,0 +1,137 @@
+Getting Started
+1. Redis (REmote DIctionary Server)
+    is a NoSQL (Not only SQL) advanced key-value data store.
+
+2. $ redis-server, starts the redis server
+
+3. $ redis-cli, starts the redis command line interface
+      after starting the cli,
+      we can interact with Redis server with commands
+      it is mainly used for debugging
+      3.1 SET key value
+      3.2 GET key
+      3.3 HELP cmd
+      3.4 KEYS pattern, returns all stored keys that match a pattern
+
+4. Node.js comes with a package manager called NPM (Node Package Manager),
+   it is responsible for managing and installing all Node.js dependencies and libraries.
+   All Node.js examples in this book require the library redis, which can be installed with NPM
+   $ cd /Users/yuchenyang/Documents/GitProjects/RedisProject
+   $ npm install redis
+
+5. $node XXX.js,
+    "node", is Node.js interpreter, it is used to run the XXX.js file
+
+6. Redis data types
+  6.1 Strings
+    6.1.1 a String can behave as an integer, float, text string, or bitmap based on its value and the commands used.
+    6.1.2 use cases:
+      6.1.2.1 cache mechanisms,
+                commands include: GET. SET, MSET (multiple set), MGET
+      6.1.2.2 cache with automatic expiration
+                commands include: SETEX, EXPIRE, EXPIREAT
+                Help Command: TTL key, returns one of the following
+                  a positive integer: amount of seconds a given key has left to live
+                  -2: if the key is expired or does not exist
+                  -1: if the key exists but has no expiration time set
+      6.1.2.3 counting
+                commands include: INCR, INCRBY, DECR, DECRBY, INCRFLOATBY
+  6.2 Lists
+    6.2.1 Lists can be used as a simple collection, stack, or queue
+    6.2.2 use cases:
+      6.2.2.1 event queue
+      6.2.2.2 storing most recent user posts
+      6.2.2.3 Commands
+                LPUSH listName value, inserts data at the beginning of a list
+                RPUSH listName value, inserts data at the end of a list
+                LLEN listName, returns the length of a list
+                LINDEX listName index, returns the element in a given index
+                  Note: list starts from left, ends in right
+                        front index is positive, end index is negative
+                LRANGE listName, returns an array
+                LPOP, RPOP, BRPOP, BLPOP (means block left pop)
+
+  6.3 Hashes
+    6.3.1 hashes are great for storing objects
+    6.3.2 commands
+            HSET hashName key value,
+            HMSET(hash multiple set),
+            HINCRBY key value number,
+            HINCRFBYFLOAT,
+            HDEL hashName key value, delete key-value pair
+            HGETALL hashName, returns an array of all field/value pairs in a hash
+            HSCAN, is a better alternative of HGETALL,
+                   it returns a cursor and the Hash fields with their values in chunks.
+                   HSCAN needs to be executed until the returned cursor is 0,
+                   in order to retrieve all the fields in a Hash
+            HKEYS hashName,
+            HVALS hashName
+
+7. Redis is single threaded,
+   which means that it always executes one command at a time.
+
+Advanced Data Types
+1. Sets
+  1.1 use cases
+    1.1.1 Data filtering
+    1.1.2 Data grouping
+    1.1.3 membership checking (checking whether a user is on a blacklist)
+  1.2 commands
+        SADD setName values,
+        SINTER set1 set2 ..., returns the intersection array of the two sets
+        SDIFF set1 set2 ..., returns members uniquely exists in set1
+        SUNION set1 set2 ...,
+        SRANDMEMBER setName, return a random member of the set
+        SREM setName value,   removes and returns members from a set
+        SCARD setName returns the number of members in a set
+        SMEMBERS setName, returns an array with all members of a set
+
+2. Sorted Sets
+  2.1 Sorted Set is very similar to a Set,
+      but each element of a Sorted Set has an associated score.
+  2.2 use cases
+    2.2.1 build a real time waiting list for customer service
+    2.2.2 show a leaderboard of a massive online game that displays the top players,
+          users with similar scores,
+          or the scores of your friends.
+    2.2.3 build an autocomplete system using millions of words
+  2.3 commands
+        ZADD sortedSet score value
+        ZRANGE, ZRANGEBYLEX, ZRANGEBYSCORE, ZREVRANGE, ZREVRANGEBYLEX, ZREVRANGEBYSCORE
+          Note,
+            ZRANGE, return elements lowest -> highest
+            ZREVRANGE, return elements highest -> lowest
+        ZREM sortedSet value, removes the value
+        ZSCORE,
+        ZRANK,
+        ZREVRANK
+
+3. Bitmaps
+  3.1 Bitmap is not a real data type in Redis,
+      under the hood, it is a string,
+      bitmap is a sequence of 0 an 1,
+      bitmap indices are referred to as "offsets"
+      bitmap can be used in analytics
+  3.2 commands
+        SETBIT bitMap offest 0/1, give a value to a Bitmap offset (0|1)
+        GETBIT bitMap offset
+        BITCOUNT, returns the number of bits marked as 1 in a Bitmap
+        BITOP operation destinationKey bitMap1 bitMap2,
+
+4. HyperLogLogs
+  4.1 HyperLogLogs is not actually a real data type in Redis.
+      it is an algorithm that uses randomization in order to provide a very good approximation of the number of unique elements that exist in a set.
+      it runs in O(1) time complexity
+      its underlying data type is String
+  4.2 commands
+        PFADD hyperLogLogsName string1 string2 ...,
+        PFCOUNT hyperLogLogs1 hyperLogLogs2 ..., returns the number of unique elements
+        PFMERGE destinationKey hyperLogLogs1 hyperLogLogs2 ..., merge logs into destinationKey log
+        Note: PF (Philippe Flajolet, the author of the algorithm)
+  4.3 use cases
+    4.3.1 counting the number of unique users who visited a website
+    4.3.2 counting the number of distinct terms that were searched for on your website on a specific date or time
+    4.3.3 counting the number of distinct hashtags that were used by a user
+    4.3.4 counting the distinct words that appear in a book
+
+Time Series
