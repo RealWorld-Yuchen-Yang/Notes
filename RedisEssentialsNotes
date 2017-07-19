@@ -135,3 +135,13 @@ Advanced Data Types
     4.3.4 counting the distinct words that appear in a book
 
 Time Series
+1. FLUSHALL, removes all of the data from Redis.
+
+2. we can optimize Strings by using Hashes.
+   Small Hashes are encoded in a different data structure, called a ziplist.
+   This structure is memory optimized.
+   There are two conditions for a Hash to be encoded as a ziplist
+   2.1 It must have fewer fields than the threshold Set in the configuration
+       hash-max-ziplist-entiries, (default is 512)
+   2.2 No field value can be bigger than
+       hash-max-ziplist-value, (default is 64 bytes)
