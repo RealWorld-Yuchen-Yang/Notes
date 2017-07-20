@@ -282,4 +282,39 @@ Common Pitfalls
 6. should choose appropriate persistence strategy
 
 Security Techniques
-1. 
+1. Redis's security mechanism is based on plain-text password,
+   Redis does not implement ACL (Access Control List)
+
+2. Obfuscating/disabling critical commands
+    critical commands are FLUSHDB, FLUSHALL, CONFIG, KEYS, SAVE, etc.
+    obfuscating command means renaming the command to a not well-known name
+    by using "rename-command"
+    e.g.
+      rename-command FLUSHDB e0cc96ad2eab73c2c347011806a76b73
+
+3. Run Redis on the loopback interface,
+   In a scenario where a web application and the redis-server are running on the same machine,
+   you should bind redis-server to the loopback interface (127.0.0.1),
+   rather than a publicly accessible network interface
+
+4. "iptable" program in Linux is a standard firewall.
+   it defines network filters to control traffic input/output
+     INPUT, this chain handles all packets that are addressed to your server
+     OUTPUT, this chain contains the rules for the traffic created by your server
+     FORWARD, this chain allows you to configure your server to route request to other machines
+   Modification to the iptable rules are saved in memory,
+   and they live until the next reboot or until iptable is restarted.
+   To cause the modifications to persist,
+   execute the program "iptables-save"
+
+5. AWS (Amazon Web Services)
+
+6. VPC (Virtual Private Cloud)
+    a VPC is a pool of on-demand resources that run on a public cloud
+    The resources are virtually isolated from different users of the different users of the same public cloud
+    only machines on the same VPC can reach each other
+
+7. many services that do not implement SSL encryption can take advantage of "stunnel".
+   Redis can be combined with stunnel to encrypt all client-server communication.
+
+8. 
