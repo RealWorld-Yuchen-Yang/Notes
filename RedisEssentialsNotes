@@ -145,3 +145,141 @@ Time Series
        hash-max-ziplist-entiries, (default is 512)
    2.2 No field value can be bigger than
        hash-max-ziplist-value, (default is 64 bytes)
+
+Commands
+1. Pub/Sub
+    1.1 commands
+          PUBLISH,
+          SUBSCRIBE,
+          UNSUBSCRIBE,
+          PSUBSCRIBE, (Pattern Subscribe) pattern is the glob-style pattern
+          PUNSUBSCRIBE, (Pattern Unsubscribe
+          PUBSUB subcommands, introspects the state of the Redis Pub/Sub system.
+                              subcommands include
+                                CHANNELS, returns all active channels (at least one subscriber)
+                                NUMSUB, returns the number of clients connected to channels via the SUBSCRIBE command
+                                NUMPAT, returns the number of clients connected to channels via the PSUBSCRIBE command
+
+    1.2 Once a Redis client executes the command SUBSCRIBE or PSUBSCRIBE,
+        it enters the subscribe mode and stops accepting commands,
+        except for the commands SUBSCRIBE, PSUBSCRIBE, UNSUBSCRIBE, PUNSUBSCRIBE
+
+2. Transactions
+  2.1 definition: a transaction in Redis is a sequence of commands executed in order and atomically.
+  2.2 commands
+        MULTI, marks the beginning of a transaction
+        EXEC, marks the end of a transaction
+        DISCARD, prevent a transaction from being executed
+        WATCH, implements an optimistic lock on a group of keys,
+               marks keys as being watched,
+               so that EXEC executes the transaction only if the keys being watched were not changed.
+               otherwise return a null reply and the operation needs to be repeated.
+        UNWATCH, remove keys from watch list
+  2.3 unlike in traditional SQL databases, transactions in Redis are not rolled back if they produce failure
+
+3. Pipelines
+  3.1 definition: a pipeline is a way to send multiple commands together to the Redis server
+                  without waiting for individual replies
+  3.2 RTT (Round Trip Time), the time taken for a Redis client to send a command and obtain a reply from the Redis server.
+  3.3 Redis recommands sent in a pipeline must be independent.
+      they run sequentially in the server (the order is preserved),
+      but they do not run as a trasnaction.
+      pipeline can save a lot of network time,
+
+4. Missellaneous commands
+  4.1 INFO,
+        returns all Redis server statics
+  4.2 DBSIZE
+        returns the number of existing keys in a Redis server
+  4.3 DEBUG SEGFAULT
+        crashes the Redis server process by performing an invalid memory access.
+  4.4 MONITOR
+        shows all the commands processed by the Redis server in real time.
+        (helpful for debugging)
+  4.5 CLIENT LIST
+  4.6 CLIENT SETNAME, used only for debugging
+  4.7 CLIENT KILL ip|id|type
+  4.8 FLUSHALL, deletes all keys from Redis
+  4.9 RANDOMKEY, returns a random existing key name
+  4.10 EXPIRE key second,
+        key will be deleted after the specified amount of seconds
+        negative timeoout will delete the key instantaneously
+       EXPIREAT key UnixTimestamp
+  4.11 TTL, returns the remaining time to live in seconds
+       PTTL, return the remaining time to live in milliseconds
+  4.12 PERSIST key,
+        remove the existing timeout of a given key.
+        return 1 if the timeout is removed
+               0 if the key had no timeout
+  4.13 SET key seconds value, SETEX = SET + EXPIRE
+  4.14 EXISTS key,
+        returns 1 if key exists
+                0 if key does not exist
+  4.15 PING
+        returns "PONG" if client-server communication is clear
+  4.16 MIGRATE host port key destination-db timeout [COPY] [REPLACE], moves a given key to a destination Redis server
+  4.17 SELECT [0,15], changes the current database that the client is conneected to
+                      it is not recommended to use multiple databases with redis
+                      a better approach would be to use multiple redis-server processes rather than a single one,
+                      so as to exploit multiple CPU cores.
+  4.18 AUTH mySecret, authorize a client to connect to Redis
+                      if authorization is enabled on the Redis server,
+                      clients are allowed to run commands only after executing the AUTH command with the right authorization key.
+  4.19 SCRIPT KILL, terminate non-write Lua script
+       SHUTDOWN NOSAVE, terminate write Lua script
+  4.20 SHUTDOWN, stops all clients, cause data to persist if enabled, and shuts down the Redis server
+  4.21 OBJECT ENCODING key, returns the encoding used by a given key
+  4.22 Data type optimizations
+        all data types can use different encodings to save memory or improve performance.
+        data types will use different encodings based on thresholds defined in the Redis server configuration
+        in "redis.conf" file or by using CLI
+    4.22.1 String
+      4.22.1.1 int, string is represented by a 64-bit signed integer
+      4.22.1.2 embstr, strings with fewer than 40 bytes
+      4.22.1.3 raw, strings with more than 40 bytes
+    4.22.2 List
+      4.22.2.1 ziplist, used when listSize <= list-max-ziplist-entries
+      4.22.2.2 linkedlist, used when listSize > list-max-ziplist-entries
+    4.22.3 Set
+      4.22.3.1 intset, used when setSize <= set-max-initset-entries
+      4.22.3.2 hashtable, used when setSize > set-max-initset-entries
+    4.22.4 Hash
+      4.22.4.1 ziplist, used when (hashSize <= hash-max-ziplist-entries && hashValue <= hash-max-ziplist-value)
+      4.22.4.2 hashtable, used when (hashSize > hash-max-ziplist-entries || hashValue <= hash-max-ziplist-value)
+    4.22.5 Sorted Set
+      4.22.5.1 ziplist, used when (sortedSetSize <= set-max-ziplist-entries && sortedSetValue <= zset-max-ziplist-value)
+      4.22.5.2 skiplist and hashtable (sortedSetSize > set-max-ziplist-entries || sortedSetValue > zset-max-ziplist-value)
+
+Common Pitfalls
+1. bitmap will not always save space,
+   when trying to come up with an optimization approach,
+   it is better to use a benchmark tool.
+
+2. it is better to use multiple server processes acting on a single database,
+   instead of on multiple databases
+   Redis is single threaded anyway
+
+3. It is good practice to use namespaces when defining your keys in Redis,
+   in order to avoid key name collisions,
+   and to organize your keys based on your application section or area.
+   In Redis, key's naming convention is to the solution
+   syntax:
+    namespace:keyName
+
+4. reduce OS's swappiness
+  4.1 swappiness to choose
+    4.1.1 use a swappiness of 0 (entirely disable swapping) when your data always fits into the RAM
+    4.1.2 use a swappiness of 1 (minimum amount of swapping) when you are not sure
+  4.2 how to disable swapping
+    4.2.1 disable swapping once
+            sysctl -w vm.swappiness=0
+    4.2.2 permanent disable
+            in /etc/sysctl.conf, vm.swappiness=0
+
+5. Redis should not use more tahn 50 percent of the available memory when any backup strategy is enabled.
+   Make sure that you set up alarms for Redis memory usage.
+
+6. should choose appropriate persistence strategy
+
+Security Techniques
+1. 
