@@ -317,4 +317,126 @@ Security Techniques
 7. many services that do not implement SSL encryption can take advantage of "stunnel".
    Redis can be combined with stunnel to encrypt all client-server communication.
 
-8. 
+Scaling Redis
+1. Redis provides two mechanisms to deal with persistence
+  1.1 RDB (Redis Database)
+  1.2 AOF (Append-only File)
+
+2. RDB is great for backups and disaster recovery,
+   because it allows you to save an RDB file every hour, day week, or month. depending on your needs
+
+3. The command SAVE creates an RDB immediately,
+   but it should be avoided,
+   because it  blocks the Redis server during snapshot creation.
+   The command BGSAVE (background save) should be used instead.
+
+4. fork
+    a child process
+
+5. "save" directive syntax, which is in the dbfilename (default is dump.rdb)
+    save numberOfSeconds numberOfChanges
+
+6. RDB is not a 100% guaranteed data recovery approach
+
+7. AOF (Append-only File)
+    when AOF is enabled,
+    every time Redis receives a command that changes the dataset,
+    it will append that command to the AOF.
+
+8. RDB versus AOF
+    RDB and AOF can be enabled at the same time.
+    If both files exist, Redis will load AOF first,
+    because of its durability guarantees.
+    Strategies:
+  8.1 If your application does not need persistence, disable RDB and AOF
+  8.2 If your application has tolerance to data loss, use RDB
+  8.3 If your application requires fully durable persistence, use both RDB and AOF
+
+
+
+9. Replication
+    Replication means that while you write to Redis instance (usually referred to as the master),
+    it will ensure that one or more instances (usually referred to as slaves) become exact copies of the master
+
+10. Replicas are widely used for scalability purpose,
+    so that all read operations are handled by replicas,
+    and the master only write operations.
+    Data redundancy is another reason for having multiple replicas.
+
+11. The automatic failover feature is the core of Redis Sentinel.
+
+12. The command "SLAVEOF NO ONE" converts a slave into a master instance,
+    and it should be used in a failover scenario.
+
+13. Partitioning
+      In the context of Redis,
+  13.1 (more popular) horizontal partitioning
+        distribute keys (distribute each set entirely) across different Redis instances.
+  13.2 vertical partitioning
+        distribute key values across different Redis instances
+
+  13.3 different horizontal partitioning strategies
+    13.3.1 Range partitioning
+            create ranges of keys and distribute them to different Redis instances.
+    13.3.2 Hash partitioning
+            a little more elaborate than range partitioning.
+            it does not have the range partitioning method's downside of uneven data partitioning
+    13.3.3 Presharding
+            helps to deal with the problem of adding/replacing nodes over time with hashing.
+            This means pre-partitioning the data to a high extent,
+            so that the host list size never changes.
+            The idea is to create more Redis instanes,
+            reuse the existing servers,
+            and launch more instances on different ports.
+    13.3.4 Consistent hashing
+            a kind of hashing that remaps only a small portion of the data to different servers
+            when the list of Redis changes
+            (only K/n keys, where K is the number of keys and n is the number of servers)
+    13.3.5 Tagging
+            a technique of ensuring that keys are stored on the same server.
+            choose a convention for your key names and add a prefix or suffix.
+            Then decide how to route that key based on the added prefix or suffix.
+            The convention in the Redis community is to add a tag to a key name inside curly braces
+            (that is, keyName{tag})
+  13.4 cache v.s. Data store
+    13.4.1 Redis is used as a cache
+              use consistence hashing
+    13.4.2 Redis is used as a datastore
+              consider Redis Cluster or a solution that ensures
+              that data is replicated across nodes and that every instance (or a master instance) knows how to route the query to the right instance
+  13.5 twenproxy
+        configure twemproxy to enable sharding across multiple servers without having to write any code.
+
+Redis Cluster and Redis Sentinel (Collective Intelligence)
+1. Sentinel's goal is to provide reliable automatic failover in a master/slave topology without sharding data.
+   Cluster's goal is to distribute data across different Redis instances and perform automatic failover if any problem happens to any master instance
+
+2. The CAP theorem
+    Most distributed systems are generally analyzed using the CAP theorem,
+    which states that a distributed system cannot ensure all of the following
+  2.1 Consistency
+        a read operation is guaranteed to return the most recent write
+  2.2 Availability
+        any operation is guaranteed to receive a response saying whether it has succeed or failed.
+  2.3 Partition tolerance
+        the system continues to operate when a network partition occurs.
+  Note: network partitions are unavoidable in a distributed system,
+        so it should ensure either consistency or availability,
+        that is,
+        either CP or AP
+
+3. Redis Sentinel
+    Redis Sentinel is a distributed system designed to automatically promote a Redis slave to master if the existing master fails.
+    The most common architecture contains an installation of one Sentinel for each Redis server.
+    Sentinel is a separate process from the Redis server,
+    and it listens on its own port.
+
+4. Redis Cluster
+    Redis Cluster was designed to automatically shard data across different Redis instances,
+    providing some degree of availability during network partitions.
+
+5. when configuring Redis Cluster
+   a safe and cost-effective option is to have spare slaves for some masters in the cluster.
+   In this way, if anything happens to a master with only one slave, the slave is promoted to master.
+   Then one of the spare slaves will become a slave of the new master
+   
