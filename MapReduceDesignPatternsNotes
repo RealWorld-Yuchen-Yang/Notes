@@ -1,0 +1,48 @@
+Design Patterns and MapReduce
+1. The map tasks generally,
+   load, parse, transform and filter data.
+   The reduce tasks are responsible for
+   handling a subset of the map task output.
+
+2. map job phases
+  2.1 record reader
+        it passes the data to the mapper in the form of a key/value pair.
+        usually the key in this context is positional information,
+        and the value is the chunk of data that composes a record.
+  2.2 mapper
+        user-provided code is executed on each key/value pair from the record reader,
+        so as to produce the intermediate pairs.
+        Note:
+           the semantics of the user-provided code varies on the purpose of the mapper job
+  2.3 combiner
+        an optional localized reducer,
+        group data in the map phase,
+        which can reduce data to be passed via the internet
+  2.4 partitioner
+        takes the intermediate key/value pairs from the mapper/combiner,
+        and split them up into shards,
+        one shard per reducer.
+        usually key/value pairs with the same key is partitioned together.
+        it is achieved by: key.hashCode()%(#reducers)
+        the partitioned data is written to the local file system for each map task and waits to be pulled by its respective reducer.
+  2.5 output: intermediate keys and values, which are sent to the reducer
+
+3. reduce job phases
+  3.1 shuffle and sort
+        this step takes the output files written by all of the partitioners and downloads them to the local machine of the reducers
+        these individual data pieces are then sorted by key into one larger data list
+        this step is taken care of by the framework
+  3.2 reducer
+        takes the grouped data as input
+        run a reduce function once per key grouping
+  3.3 output format
+        translates the final key/value pair from the reduce function and writes it out to a file by a record writer.
+        data is written out to HDFS.
+        Note:
+          anything we pass to context.write will get written out to a file.
+          each reducer will create one file,
+          so if you want to coalesce them together,
+          you will have to write a post-processing step to concatenate them.
+
+Summarization Patterns
+1. 
