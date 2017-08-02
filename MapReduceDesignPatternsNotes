@@ -82,4 +82,9 @@ Filtering Patterns
 1. Filtering
 2. Bloom filtering
 3. Top Ten
+  3.1 Structure
+        this pattern utilizes both the mapper and the reducer.
+        The mapper will find their local top K,
+        then all of the top K sets will compete for the final top K in the reducer
+        you will only need one reducer  
 4. Distinct
