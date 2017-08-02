@@ -45,4 +45,41 @@ Design Patterns and MapReduce
           you will have to write a post-processing step to concatenate them.
 
 Summarization Patterns
-1. 
+1. Numerical summarizations
+  1.1 applicability:
+    1.1.1 when you are dealing with numerical data or counting
+    1.1.2 when data can be grouped by specific fields
+  1.2 known uses
+    1.2.1 word count
+    1.2.2 record count
+    1.2.3 min/max/count
+    1.2.4 average/median/standard/deviation
+
+2. inverted index
+  2.1 applicability:
+        inverted indexes should be used when quick search query responses are required.
+        The results of such a query can be preprocessed and ingested into a database
+  2.2 consequences:
+        the final output is a set of part files that
+        contain a mapping of field value to a set of unique IDs of records containing the associated field value
+        that is <fieldContent, Collection<ID>>
+  2.3 example:
+        Wikipedia reference inverted index
+
+3. counting with counters
+  3.1 description
+        this pattern utilizes the MapReduce framework's counters utility
+        to calculate a global sum entirely on the map side without producing any output
+  3.2 structure
+        the mapper processes each input record at a time to increment counters based on certain criteria.
+        the counters are then aggregated by the TaskTrackers running the tasks
+        and incrementally reported to the JobTracker for overall aggregation upon job success.
+        Note:
+          this job is map only,
+          there is no combiner, partitioner, or reducer required.
+
+Filtering Patterns
+1. Filtering
+2. Bloom filtering
+3. Top Ten
+4. Distinct
