@@ -1,0 +1,289 @@
+1. ActiveMQ, RabbitMQ, Kafka comparisions
+  1.1 ActiveMQ
+    1.1.1 消息重发机制：
+            我们可以在brokerUrl中配置“redelivery”策略， 比如当一条消息处理异常时，
+            broker端可以重发的最大次数， 这与REDELIVERED_ACK_TYPE互相协调
+            当消息需要broker重发时，
+            consumer会首先在本地的”deliveredMessage队列（Consumer已经接受但还未确认的消息队列）中删除它，
+            然后向broker发送“REDELIVERED_ACK_TYPE”类型确认命令，
+            broker将会把指令中指定的消息重新添加到pendingQueue（亟待发送给consumer的消息队列）中，
+            直到适合的时机， 再次push给client
+    1.1.2 高效的消费模型：
+            当consumer消费信息的速率高于producer生产信息的速率时:
+              批量的获取消息（prefetch)， 并延迟确认（optimizeACK）
+              prefetchSize一般要设置的比较小， 这样可以保证load被均衡的分配给consumer的
+            当consumer消费信息的速率远小于producer生产信息的速率时：
+              1）部署多个consumer
+              2) 使用较小的prefetch
+    1.1.3 consumer消费消息的风格有两种： 同步、异步
+      1.1.3.1 同步 consumer.receive()
+              同步调用时， 在消息从receive方法返回之前， 就已经使用ACK，
+              因此如果consumer端没有处理成功，
+              此消息将会丢失
+      1.1.3.2 异步 messageListener
+              异步调用时，
+              消息确认是在onMessage方法返回之后，
+              如果onMessage方法异常， 会导致消息重发
+              broker每次redeliver消息的时候都会在消息中保存一个redeliverCounter计数器，
+              如果消息发送的次数达到阈值，
+              consumer会发送ACK_TYPE为POSION_ACK_TYPE确认指令，
+              这就导致broker端认为此消息无法消费，
+              此消息将会被删除或者迁移到”dead letter"中
+
+
+  1.2 RabbitMQ
+  1.3 Kafka
+    1.3.1 the most important factor about Kafka over ActiveMQ is the throughput
+    1.3.2 additionally, it supports relatively long term persistence of message to support a wide variety of consumers
+          partitioning of the message stream across servers and consumers,
+          and functionality for loading data into Apache Hadoop for offline, batch processing
+    1.3.3 is Kafka suitable for zero loss messaging system?
+      1.3.3.1 messages sent by a producer to a particular topic partition will be appended in the order they are sent
+      1.3.3.2 for a topic with replication factor N, it will tolerate up to N-1 server failures without losing any messages committed to the log
+
+2. Immutable objects are intrinsically thread safe
+   A strategy for defining immutable objects:
+  2.1 do not provide "setter" method,
+       here "setter" means methods that modify fields or objects referred to by fields
+  2.2 make all fields "final" and "private"
+  2.3 Do not allow subclass to override methods.
+      the simplest way to do this is to declare the class as final.
+      A more sophisticated approach is to make the constructor "private" and construct instances in factory methods.
+  2.4 if the instance fields include references to mutable objects,
+      do not allow those objects to be changed.
+    2.4.1 do not provide methods that modify the mutable objects
+    2.4.2 do not share reference to the original mutable objects.
+          never store references to external, mutable objects passed to the constructor.
+          if necessary, create copies and store references to the copies
+          similarly, create copies of your internal mutable objects when necessary to avoid returning the originals in your methods.
+
+3. Atomic Variables
+    the java.util.concurrent.atomic package defines classes that support atomic operations on single variables.
+    all classes have get and set methods that work like reads and writes on volatile variables.
+    that is, a set has a happens-before relationship with any subsequent get on the same variable.
+    The atomic compareAndSet method also has these memory consistency features,
+    as do the simple atomic arithmetic methods that apply to integer atomic variables.
+    these atomic variables provide atomic methods better than "synchronized methods"
+
+4. Garbage collection
+  4.1 garbage collection phases in one GC
+    4.1.1 Mark
+          starts from root node of your application(main),
+          walks the object graph,
+          marks objects that are reachable as live
+    4.1.2 Delete/sweep
+          delete unreachable objects
+    4.1.3 compacting:
+          compact the memory by moving around the objects and marking the allocation contiguous than fragmented
+
+  4.2 Generational GC concepts
+        heap is divided into young and old generations
+    4.2.1 young generation
+      4.2.1.1 Eden space
+                where objects are firstly Created
+      4.2.1.2 multiple survivor spaces
+                when eden space is full,
+                a minorGC is called,
+                which copies reachable objects to the survivor space
+                and increase their survived generation by 1.
+                at a second time, the eden space and the first survivor space are all examined,
+                and the still reachable objects are copied to the current survivor space.
+              Note: minorGC is triggered by "whether the eden space is nearly full"
+    4.2.2 Old (Tenured) generation
+            if an object survived a few minorGCs,
+            which is defined by:
+            "whether the total minorGC reaches the threshold"
+            -XX:MaxTenuringThreshold
+            such objects are copied over to the old generation
+
+            Note:
+              1. both the minorGC and the majorGC are stop the world GC
+                 the difference is that,
+                 minorGC happens only on the young generation section of the heap,
+                 majorGC happens on the entire heap, not just the young/old generation part of the heap
+              2. majorGC is triggered by whether the old gene ration is nearly full
+
+  4.3 Garbage collectors
+    4.3.1 serial collector
+            basic garbage collector that runs in single thread,
+            can be used for basic applications
+
+    4.3.2 concurrent collector (CMS concurrent Mark Sweep GC)
+            a thread that performs GC along with application execution as the application runs.
+            does not wait for the old generation to be full
+            Stops the world only during mark/re-mark, not in "sweep or compacting"
+            when to use:
+              1) there is more memory
+              2) there is high number of CPUs
+              3) application demands short pauses
+
+    4.3.3 parallel collector
+            use multiple CPUs to perform GC.
+            multiple threads doing mark/sweep/compacting.
+            does not kick in until heap is full/near-full.
+            "stops-the-world" when it run
+            when to use:
+              1) there is less memory
+              2) there lesser number of CPUs
+              3) application demands high throughput and can withstand pauses
+
+    4.3.4 G1 collector (Garbage first collector)
+            heap is divided into multiple sections (which does not matter whether they are eden/survivor/old generation)
+            GC are call on such sections who has the most garbage.
+            It dynamically selects a set of region to act as young generation in next GC cycle.
+            Benefits:
+              1) more predictable GC pauses
+              2) low pauses with fragmentation
+              3) parallelism and concurrency together
+              4) better heap utilization
+
+  4.4 Selecting Garbage collector
+      Option                            Description
+      -XX:+UseSerialGC        single-threaded gc on young and old generation.
+                              to be used only on small heaps
+      -XX:+UseParallelGC      young generation use parallel gc.
+                              old generation use single-threaded gc
+      -XX:+UseParallelOldGC   both young and old generations have multi-threaded GC
+      -XX:+UseParNewGC        Multi-threaded young generation gc
+      -XX:+UseConcMarkSweepGC Enables concurrent collector. Autoenable ParNewGC by default
+      -XX:+UseG1GC            use G1
+
+5. HashTable vs HashMap vs ConcurrentHashMap and all kinds of Map implementations
+  5.1 java.util.HashTable
+    5.1.1 legacy associative array implementation
+    5.1.2 all methods are "thread-safe",
+          for "synchronized" keyword is used on every public methods
+    5.1.3 low efficiency
+  5.2 java.util.HashMap
+    5.2.1 map implementation that satisfies most of the basic use cases
+    5.2.2 not thread-safe
+    5.2.3 need to use "synchronized" operations when manipulating from multiple threads (concurrent adds/removes/iteerations)
+    5.2.4 it allows to insert "null keys"
+    5.2.5 iterations is not guaranteed in order
+  5.3 java.util.LinkedHashMap
+    5.3.1 very similar to HashMap
+    5.3.2 iteration is guaranteed in "insertion order"
+    5.3.3 maintains separate doubly linkedlist of all entries that is kept in entry insertion order
+  5.4 java.util.TreeMap
+    5.4.1 Implementation of SortedMap and NavigableMap interfaces
+    5.4.2 iteration is guaranteed in "natural sorted" order of "keys"
+    5.4.3 either the keys should implement "Comparable" interface
+          or we need to provide an explicit Comparator in the constructor
+    5.4.4 Red-black tree based implementation.
+          NavigableMap interface provides methods that can return closes match to the key (floorEntry())
+  5.5 java.util.IdentityHashMap
+    5.5.1 Uses identity to store and retrieve key values
+    5.5.2 uses reference equality,
+          which means r1==r2 rather than r1.equals(r2)
+          for hashing, System.identityHashCode(givenKey) is invoked
+          rather than givenKey.hashCode()
+    5.5.3 Used in serialization/deep copying or your key is "Class" object or interned strings.
+          memory footprint comparatively smaller than a hashmap as there are no Entry/Node created
+  5.6 java.util.EnumMap
+    5.6.1 EnumMap<K extends Enum<K>, V>
+    5.6.2 for use with enum type keys,
+          all of the keys in an enum map must come from a single enum type that is specified, explicitly or implicitly when the map is created
+    5.6.3 Iterator does not fail fast
+    5.6.4 Null keys are not permitted, not synchronized
+  5.7 java.util.WeakHashMap
+    5.7.1 elements in a weak hashmap can be reclaimed by the garbage collector if there are no other strong references to the object.
+          this makes them useful for caches/lookup storage
+    5.7.2 keys inserted gets wrapped in java.lang.ref.WeakReference
+          Note: WeakReference means
+                if the only reference to an object is the hashmap's key,
+                CG can collect such objects once called
+    5.7.3 useful only if the desired lifetime of cache entries is determined by external references to the key, no the value
+  5.8 Collections.synchronizedMap(aMap)
+    5.8.1 a convenient "decorator" to create fully synchronized map
+    5.8.2 return type is Collections.SynchronizedMap
+          it wraps around passed map instance and marks all APIs as synchronized,
+          effectively making it similar to HashTable
+    5.8.3 performance-wise is similar to java.util.hashTable, which is bad
+  5.9 java.util.concurrent.ConcurrentHashMap
+    5.9.1 supports "full concurrency during retrieval"
+          which means retrieval operations do not block even if adds are running concurrently (mostly)
+    5.9.2 reads can be fast,
+          while writes requires a lock.
+          write lock is acquired at granular level.
+          whole table is not locked,
+          only segments are locked.
+          so a very rare chance of read waiting on write to complete
+    5.9.3 Iterations do not throw concurrent modification exception (with in the same thread)
+    5.9.4 can be used in cases where a lot of concurrent addition happens followed by or concurrent reads later on
+    5.9.5 Null key not allowed.
+          If map.get(null) returns null,
+          it is not sure if null is not mapped or if null is mapped to a null value.
+          In a non-concurrent map,
+          we could use contains(),
+          but in a concurrent map,
+          values can change between API calls.
+    5.9.6 operations not atomic,
+          which means compound operations should be synchronized or use other means to make it atomic
+
+6. How HashMap is implemented in Java
+  6.1 hashing:
+        transformation of a string of characters(TEXT) to a shorted fixed-length value that represents original string.
+        a shorter value helps in indexing and faster searches.
+        In java, every object has a method "public int hashCode()" that return a hash value for given object
+  6.2 if two objects are the same, they should have the same hashCode
+      if two objects' hashCode is the same, they are not necessarily the same object
+  6.3 HashMap low level structures
+    6.3.1 It contains an array of Nodes,
+          default value is 16 nodes
+    6.3.2 each Node is a node in a linkedList
+          and it structure is as follows:
+          Node<K,V>{
+            int hash; //this is the value of key.hashCode(),
+                      //the actual place in which linkedList the node is stored in
+                      //is calculated by index = hash & (n-1),
+                      //n is the size of the first level array
+            K key;
+            V value;
+            Node<K,V> next;//whenever key collision happens, the next field of such indexed linkedlist node is populated
+          }
+    6.3.3 how the put-in value is retrieved.
+      6.3.3.1 by using the key,
+              we get the hashCode of the key,
+              and use it to calculate the index of the linkedlist.
+      6.3.3.2 inside a particular linkedlist
+              we compare the desired key and its hashCode together with the key and hashCode information store in the listNode
+
+7. java.lang.String
+  7.1 objects backed by char array
+  7.2 immutable (means thread-safe and hashcode is cached) and final
+  7.3 strings are cached in the string pool (part of the method area)
+      if you create two string with "STRING" syntax, they point to the same string
+      if you explicitly declare a new String("STRING"), an new object is allocated
+      if you explicitly declare a new Stirng("STRING").intern(),  then the object is cached/point to Strings already cached
+  7.4 string's "+" concatenation syntax is translated to StringBuilder.append() by Java compiler
+
+8. JVM architecture
+  8.1 class loader
+      has 3 phase
+    8.1 load
+          bootstrap class loader (rt.jar) ->
+            extension class loader (jre/lib/ext) ->
+              application class loader (CLASSPATH, -cp)
+    8.2 link
+      8.2.1 verify
+              verify that the loaded byte code is valid java byte code
+      8.2.2 prepare
+              memories are allocated to the class variables
+              class variables are set to default value
+      8.2.3 resolve
+              all symbolic references (Strings) are resolved
+              ClassNotFoundException can be thrown from this phase
+    8.3 initialize
+          class variables are initialized to user specified values
+  8.2 runtime data areas
+    8.2.1 method area (stores class data), heap (stores objects) are shared by threads
+    8.2.2 each thread has its own java stack (java.lang.StackOverflowError can be thrown),
+          pc registers (pointers to the next instruction to be executed), native method stacks
+  8.3 execution engine
+    8.3.1 interpreter,
+            interprets the code and executes it
+    8.3.2 hotspot profiler,
+            which is just a monitor
+    8.3.3 JIT compiler
+            it caches the interpreted machine code and directly executes them
+    8.3.4 GC
