@@ -324,6 +324,35 @@
 12. when Object#wait() is invoked,
     the thread releases the lock and suspends the execution
 
+13. 类加载的双亲委派模型， 以及Tomcat中的类加载顺序
+  13.1 类加载的双亲委派模型
+        如果一个类加载器收到类加载请求，
+        它不会自己去尝试加载这个类，
+        而是把这个请求委派给父类加载器去完成。
+        只有父类加载器无法完成这个请求时，
+        子类加载器才会尝试自己加载。
+        这样做的好处是， 可以防止用户自定义的类先被加载， 从而覆盖基础类
+  13.2 JVM中类加载器的顺序
+    13.2.1 BootstrapClassLoader
+    13.2.2 ExtClassLoader
+    13.2.3 AppClassLoader
+    13.2.4 CustomClassLoader
+            Note: 如果到最底层的类加载器都没有找到希望加载的类， 便会抛出ClassNotFoundException
+  13.3 Tomcat中的类加载顺序
+    13.3.1 Bootstrap 引导类加载器， 加载JVM启动所需要的类， 以及标准扩展类
+           location： jre/lib/ext
+    13.3.2 System 系统类加载器， 加载Tomcat启动的类，如bootstrap.jar
+           location: CATALINA_HOME/bin, 通常在catalina.sh中指定
+    13.3.3 webapp 应用类加载器，
+      13.3.3.1 WEB-INF/classes
+      13.3.3.2 WEB-INF\lib下的包,
+    13.3.4 Common 通用类加载器， 加载Tomcat使用以及应用通用的一些类
+             location: CATALINA_HOME/lib, 如servlet-api.jar
+
+    Note:
+      如果想要在Web应用间共享一些Jar包， 不仅需要将公共包放在Tomcat的lib下，
+      还要删除Web应用lib中的包
+
 
 ************************************************************************************
 有待解决的问题
