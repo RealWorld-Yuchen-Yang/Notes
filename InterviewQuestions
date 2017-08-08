@@ -399,18 +399,94 @@
 ************************************************************************************
 有待解决的问题
 ************************************************************************************
-    3. deepCopy无向图
-    4. 二叉树最大路径和
-    5. spring transaction declaration and isolation level
-    6. redis datatype
-    7. proportionally generate random number
-    8. binary search
-    9. hibernate 和 mybatis区别
-    10. 多线程， volatile 用途及底层实现
+3. deepCopy无向图
+4. 二叉树最大路径和
+5. spring transaction declaration and isolation level
+6. redis datatype
+7. proportionally generate random number
+8. binary search
+9. hibernate 和 mybatis区别
+10. 多线程， volatile 用途及底层实现
 
 
-    12. Java Memory Model
+12. Java Memory Model
 
-    14. Long l1 = new Long(XXX) 声明的 对象与直接赋值的Long l2 = XXX 声明的对象是否一样
-    15. 如何异步返回表， 并将表进行合并
-    16. 分库分表
+14. Long l1 = new Long(XXX) 声明的 对象与直接赋值的Long l2 = XXX 声明的对象是否一样
+15. 如何异步返回表， 并将表进行合并
+16. 分库分表
+17.current versions
+  17.1 Spring 4
+  17.2 Hibernate 5.0.12
+  17.3 Struts 2
+  17.4 Mybatis 3
+
+18. WeakReference与SoftReference的联系与区别
+  18.1 WeakReference与SoftReference都可以存储对象的实例引用
+  18.2 WeakReference
+        是弱引用，
+        这个类通常用于在某处保存对象引用，
+        而又不干扰该对象被GC。
+        通常用于Debug， 内存监视工具程序中。
+  18.3 SoftReference
+        是强引用，
+        它保存的对象实例，
+        只有在JVM即将OutOfMemory才会被GC，
+        这个特性使得它特别适合设计对象Cache，
+        我们希望被缓存的对象最好始终常驻内存， 但如果JVM内存吃紧， 为了不发生OutOfMemoryError导致系统崩溃，
+        必要的时候也允许JVM回收Cache的内存，
+        待后续合适的时机再把数据重新Load到Cache中， 这样可以使系统设计的更具有弹性
+
+19. Java's Exception inheritance
+    java.lang.Object
+      ->Throwable
+        ->Errors
+        ->Exceptions
+          ->RuntimeException
+          ->Exception
+  19.1 Errors
+        非正常的错误，合理的程序不应该try-catch Errors
+  19.2 Unchecked Exceptions:
+    19.2.1 Error与RuntimeException
+    19.2.2 Unchecked Exception通常指本不应该发生的异常，
+           发生在运行时期， 具有不确定性， 主要由程序逻辑问题所引起
+           如： ArrayIndexOutOfBoundException, ClassCastException
+           从语言本身的角度， 程序不应该catch这类异常， 出现这类错误， 程序就应该立即停止
+    19.2.3 RuntimeException
+
+  19.3 Checked Exceptions:
+    19.3.1 Exception
+    19.3.2 它仅仅是程序运行的一种条件， 而非严重错误，鼓励去catch这类异常
+           这类exception通常由外部环境引起，而非程序本身错误，
+           如: 没有文件的读写权限 （IOException)
+
+  19.4 try{} 里有一个 return 语句，那么紧跟在这个 try 后的 finally{} 里的 code 会不会被执行，什么时候被执行，在 return 前还是后?
+    19.4.1 会执行，在方法返回调用者前执行。
+    19.4.2 Java 允许在 finally 中改变返回值的做法是不好的，
+           因为如果存在 finally 代码块，try 中的 return 语句不会立马返回调用者，
+           而是记录下返回值待 finally 代码块执行完毕之后再向调用者返回其值，
+           然后如果在 finally 中修改了返回值，这会对程序造成很大的困扰
+    19.4.3 只有在try里面使用System.exit(0)来退出JVM的情况下， finally才不会被执行
+
+  19.5 Java Compiler要求方法必须声明抛出可能发生的Checked Exception,
+       但是并不要求必须声明抛出未被捕获的RuntimeException
+
+  19.6 不要将异常处理用于正常的控制流
+       （良好的API不应该强迫它的调用者为了正常的控制流而使用异常）
+
+20. Thread.sleep() 与 Object#wait()
+  20.1 Thread.sleep()在没有synchronized关键字的情况下也会运行
+       Object#wait()必须在synchronized的作用域及临界区下运行， 否则会报IllegalMonitorStateException
+  20.2 Thread.sleep()不会释放共享资源的锁，
+       Object#wait()会释放共享资源的锁
+
+21. lock与synchronized的区别
+      公平锁： 由等待时间最长的线程先进入共享资源
+      非公平锁： 多个线程抢一个钥匙
+  21.1 lock
+    lock是对象级别的锁 （也叫程序级别的锁）
+    可以自己定义 Lock lock = new ReentrantLock(true);//true 表示创建的是公平锁
+    Condition condition = lock.newCondition();//condition 是lock的一个封装类， 里面封装了await()和signalAll(), 和lock锁配套使用
+  21.2 synchronized
+    synchronized是jvm级别的非公平锁， 我们无法把控
+
+    Java 内存溢出（java.lang.OutOfMemoryError）的常见情况和处理方式总结 http://outofmemory.cn/c/java-outOfMemoryError
