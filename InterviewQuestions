@@ -490,3 +490,14 @@
     synchronized是jvm级别的非公平锁， 我们无法把控
 
     Java 内存溢出（java.lang.OutOfMemoryError）的常见情况和处理方式总结 http://outofmemory.cn/c/java-outOfMemoryError
+
+22. 学习sql
+23. java对integer，long的缓存，
+      Long l1 = 9;
+      Long l2 = 9;
+      l1 == l2， 因为他们都指向缓存
+24. dubbo 架构
+25. cookie and redis
+26. 复习Spring
+27. 复习数据结构， 二叉树的广度优先搜索
+28. 翻转LinkedList
