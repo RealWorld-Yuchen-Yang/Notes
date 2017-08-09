@@ -1,0 +1,338 @@
+Note: the role and ps of my MySql is: root/root
+1. Create, Use and Drop database
+  1.1 create
+        CREATE DATABASE sample;
+  1.2 use
+        USE sample;
+  1.3 drop
+        DROP DATABASE sample;
+
+2. Its better to type SQL keywords in Capital letters
+
+3. Data types
+  3.1 Numeric Fields
+    3.1.1 Bigint(really big values)
+    3.1.2 Int (big values)
+    3.1.3 Smallint (-32768, 32767)
+    3.1.4 Tinyint (0, 255)
+    3.1.5 Decimal(m,d),
+            m: maximum number of digits [1, 65]
+            d: number of digits right to the decimal point [0, min(30,m)]
+    3.1.6 Numeric (Same as Decimal)
+    3.1.7 Float(m,d)
+            m: display length
+            d: represents decimals, (optional)
+  3.2 Date and Time
+    3.2.1 Datetime (YYYY-MM-DD HH:MM:SS)
+    3.2.2 Date (YYYY-MM-DD)
+    3.2.3 Time (HH:MM:SS)
+    3.2.4 Year (YYYY)
+  3.3 Character Data Type
+    3.3.1 Char(m)
+    3.3.2 Varchar(m)
+    3.3.3 Text (to store large amount of text)
+  3.4 For storing images
+    Blob (Binary Large Object)
+
+4. Types of Constraints
+  4.1 Not Null
+  4.2 Default, if while populating a table you miss giving a column some value, the default value will be used
+  4.3 Unique
+  4.4 Primary Key, equals "Not Null"+"Unique"
+  4.5 Foreign Key
+  4.6 Check Constraint
+
+5. Create Table statement
+    three things should be considered:
+  5.1 Name the table
+  5.2 Define the columns
+  5.3 Mention data types of columns
+  5.4 Syntax:
+        CREATE TABLE table_name(
+          col1 datatype1,
+          col2 datatype2,
+          .
+          .
+          .
+          PRIMARY KEY(colPrimary)
+        );
+  5.5 Sample:
+        CREATE TABLE employee(
+          id int primary key,
+          name varchar(30),
+          dob datetime,
+          email varchar(40)
+        );
+  5.6 DESC table_name, MySql's statement for describing the table
+
+6. Creating tables from other tables
+  6.1 Syntax
+        CREATE TABLE new_table_name AS
+        SELECT [col1, col2, ...]
+        FROM existing_table_name
+        [WHERE];
+
+7. Remove table from database
+  7.1 Syntax:
+        DROP TABLE table_name;
+  7.2 how to confirm whether the table has been removed:
+        SHOW TABLES;
+        DESC removed_table_name; //will fail
+
+8. Inserting Data Into Tables
+  8.1 the INSERT query is used to insert data in a table
+    8.1.1 specify the columns in which data is to be stored
+          Syntax:
+            INSERT INTO table_name (col1, col2, ...)
+            VALUES (val1, val2, ...);
+          Example:
+            INSERT INTO employee (id,name,dob,email)
+            VALUES (1901,'yuchen','1991-04-19 06:15:50','yangyuchen@email.com');
+          Verification: by using SELECT statement
+            SELECT * FROM table_name;
+
+    8.1.2. if you do not specify the columns
+          you have to make sure that
+          the order in which data is placed in the INSERT statement
+          is the same as the order in which the target Fields exist in the Table
+          Syntax:
+            In this case, the "()" after the INSERT INTO table_name is omitted
+
+9. Populating One Table Using Another
+    requirement:
+      the source table needs to have Fields that can be used to populate the current table
+      e.g.  the two tables must be compatible
+  9.1 Syntax:
+        INSERT INTO current_table_name [(col1, col2, ...)]
+        SELECT col1, col2, ...
+        FROM source_table_name
+        [WHERE condition];
+
+10. SELECT query
+  10.1 Syntax:
+        SELECT col1, col2, ...
+        FROM table_name;
+
+11. Operators
+  11.1 useage
+        there are used with WHERE clause,
+        so as to limit the number of rows obtained in the output
+  11.2 Arithmetic operators:
+        (+,-,*,/,%)
+  11.3 Comparison operators:
+        (=,<>,<,>,=,<=,>=)
+  11.4 Logical Operators:
+        (ALL, AND, BETWEEN, IN (VALUE_COLLECTION), LIKE 'PATTERN' (Note: % is the wild card), OR, IS NULL)
+        example1:
+          SELECT *
+          FROM employee
+        example1: AND demo
+          WHERE age>=30 AND salary<=25000;
+        example2: IN demo
+          WHERE age IN (28,30,36);
+        example3: BETWEEN-AND demo
+          WHERE age BETWEEN 29 AND 48;
+        example4: ALL demo
+          WHERE age < ALL (SELECT age FROM employee WHERE salary > 2000);
+
+12. the WHERE clause
+  12.1 usage
+    12.1.1 to include a condition while fetching data from table (used in SELECT clauses)
+    12.1.2 It is used to join multiple tables
+    12.1.3 it can also be used in UDPATE, DELETE queries
+
+13. UPDATE queries,
+  13.1 It is used to update records in tables
+       you generally use the UDPATE query with the WHERE clause
+  13.2 syntax:
+        UPDATE table_name
+        SET col1=val1, col2=val2, ...
+        [WHERE condition];
+
+14. DELETE queries,
+  14.1 it is used to delete records in tables
+  14.2 similar to UPDATE, DELETE is also mostly used with WHERE clauses
+  14.3 syntax:
+        DELETE FROM table_name
+        [WHERE condition];
+
+15. LIKE operator
+  15.1 %, substitution for 0, 1, many characters
+  15.2 _, stands for a character/number
+  15.3 syntax:
+        SELECT column-list
+        FROM table_name
+        [WHERE col LIKE '_XXX%'];
+
+16. the TOP and LIMIT clauses
+  16.1 the TOP (neither Oracle, MySql supports) clause is used to fetch the top N number of records through a query from a table
+       syntax:
+        SELECT TOP x column-list
+        FROM table_name
+        [WHERE condition];
+
+  16.2 Not all databases support the TOP clause
+  16.3 Oracle supports ROWNUM
+       MySql uses LIMIT
+        syntax:
+          SELECT column-list
+          FROM table_name
+          [WHERE condition]
+          LIMIT n;
+
+17. the ORDER BY clause
+      syntax:
+        SELECT column_list
+        FROM table_name
+        [WHERE condition]
+        [ORDER BY col1, col2, ...][ASC/DESC];//
+    Note:
+      1) default is ASC
+      2) after ORDER BY, no column is lost
+
+18. the GROUP BY clause
+  18.1 it is used to arrange identical data in groups
+  18.2 used with SELECT query
+  18.3 GROUP BY must always follow the WHERE clause and must precede the ORDER BY clause
+  18.4 syntax:
+        SELECT column-list
+        FROM table_name
+        WHERE condition
+        [GROUP BY column]
+        [ORDER BY column];
+  18.5 COUNT(*) function can be used with GROUP BY to count the number of items in each group
+        example:
+          SELECT subject, COUNT(*)
+          FROM tutorial
+          GROUP BY subject;
+        Note: that in SELECT and in GROUP BY, the properties are the same, which is subject
+  18.6 SUM(*) function can also be used with GROUP BY, to sum the value of the group
+
+19. DISTINCT keyword
+      syntax:
+        SELECT DISTINCT col
+        FROM table_name;
+
+20. Aliasing through AS clause
+      usage: used to offer the result's columns different names
+      example:
+        SELECT col1 AS col1_alias, col2 AS col2_alias, ...
+        FROM table1_name AS table1_alias
+        JOIN table2_name AS table2_alias;
+        ON table2_alias.table2_foreignKey=table1_alias.primaryKey;
+
+21. SQL JOIN
+      even though the example in 20 is a formal way of writing JOIN,
+      but the preferred way is not to use JOIN,
+      instead we use WHERE clause
+      example:
+        SELECT t.id, t.title, t.duration
+        ti.views, ti.likes, ti.shares
+        FROM tutorial AS T, tutorial_info AS ti
+        WHERE t.id=ti.tutorial_id
+
+22. using GROUP BY clause with SQL JOIN
+    example:
+      SELECT t.subject, SUM(ti.view) AS 'Total Views',
+      SUM(ti.likes) AS 'Total Likes'
+      FROM tutorial AS t
+      JOIN tutorial_info AS ti
+      ON t.id=ti.tutorial_id
+      GROUP BY t.subject;
+
+23. MySql supports LEFT/RIGHT JOIN, but not the full outer join
+
+24. functions
+      Note: functions can be nested!!!
+            e.g. ROUND(AVG(ti.likes))
+  24.1 Numeric functions
+    24.1.1 ABS(NUM)
+    24.1.2 ROUND(NUM, #digitsAfterDecimalPoint)
+    24.1.3 AVG(COL)
+    24.1.4 DIV, MOD
+         syntax:
+            SELECT col1 DIV/MOD col2;
+    24.1.5 CEIL(NUM), return the next larger integer
+    24.1.6 FLOOR(NUM), return the next smaller integer
+    24.1.7 EXP(NUM), e^NUM
+    24.1.8 LOG(NUM), LOG10(NUM)
+    24.1.9 POW(NUM1, NUM2), NUM1^NUM2
+    24.1.10 GREATEST(NUM_LIST), returns the largest number
+    24.1.11 LEAST(NUM_LIST), returns the smallest number
+    24.1.12 RADIANS(DEGREE), transfer degree into radians
+    24.1.13 SQRT(NUM)
+    24.1.14 TRUNCATE(NUM, #digitsAfterDecimalPoint)
+              e.g. TRUNCATE(24.5234553252, 2) will return 24.52
+    24.1.15 RAND(), returns a random number
+  24.2 String functions
+    24.2.1 CONCAT(STR1, STR2)
+           or
+           SELECT CONCAT(col1, col2, STR1, STR2, ...), Note: this operates on each row
+    24.2.2 UPPER(STR), LOWER(STR)
+    24.2.3 TRIM(STR), removes white spaces on both sides of a string
+    24.2.4 SUBSTR(STR, OFFSET, #chars)
+           RGITH(STR, #charsFromRight)
+           LEFT(STR, #charsFromLeft)
+    24.2.5 LENGTH(STR), returns the length of memory the STR occupies
+           CHAR_LENGTH(STR), returns the actual number of chars in the STR
+    24.2.6 INSERT(ORIGINAL_STR, OFFSET, #CHARS_TO_BE_INSERTED, RESOURCE_STR)
+    24.2.7 REPEAT(STR,#)
+    24.2.8 REPLACE(ORIGINAL_STR, STR_TO_BE_REPLACED, STR_TO_BE_INSERTED)
+    24.2.9 REVERSE(STR)
+    24.2.10 STRCMP(STR1, STR2), string compare, returns -1/0/1
+  24.3 Date and Time functions
+    24.3.1 ADDDATE(ORIGINAL_DATE, INTERVAL num [DAY|MONTH|YEAR])
+           SUBDATE(ORIGINAL_DATE, INTERVAL num [DAY|MONTH|YEAR])
+           Note: date format is 'YYYY-MM-DD'
+    24.3.2 CURDATE()
+           CURTIME()
+           NOW(), this returns the CURDATE() + CURTIME()
+    24.3.3 DAYNAME(DATE), this will return which day of the week is the passed in date
+    24.3.4 MAKEDATE(YEAR,DAY), Note: the DAY represents the number of days of that year, this returns YYYY-MM-DD
+    24.3.5 MONTTHNAME(DATE), returns the name of the month
+    24.3.6 TIMEDIFF(DATE_TIME1, DATE_TIME2), returns a TIME value (HH:MM:SS)
+    24.3.7 TIME_TO_SEC(TIME)
+    24.3.8 UNIX_TIMESTAMP(), returns the current Unix time
+
+25. Views
+  25.1 views are virtual tables,
+       which can be created by giving a SQL query a name
+       syntax:
+        CREATE VIEW view_name
+        SQL;
+
+        after the creation of the view, you can just use it as a normal table
+
+  25.2 insert data into views
+       syntax:
+        INSERT INTO view_name
+        VALUES(val1, val2, ...);
+       Note:
+        1) if you insert rows in the view,
+           they will also be inserted into the underlying table
+        2) if you do not want rows violate the view's constraints to be silently inserted into the underlying table
+           you had better add the "WITH CHECK OPTION" at the end of view creation
+   25.3 UPDATE/DELETE rows in a view
+   25.4 Delete the entire view, similar to deleting a table
+        syntax:
+          DROP VIEW view_name;
+
+26. TRUNCATE TABLE table_name;//delete the data of a table
+
+27. subqueries
+      used to get an intermediate query result which will be used in the outer query
+      example:
+        SELECT id, name FROM employee
+        WHERE salary=(SELECT MAX(salary) FROM employee);
+
+28. ALTER TABLE command,
+      used to change the structure of a table
+  28.1 ADD field
+       syntax:
+        ALTER TABLE table_name ADD field dataType;
+  28.2 DROP field
+       syntax:
+        ALTER TABLE table_name DROP field;
+  28.3 MODIFY field
+       syntax:
+        ALTER TABLE table_name field newDataType constraints;
