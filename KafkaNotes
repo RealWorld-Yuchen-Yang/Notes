@@ -1,0 +1,141 @@
+1. A Kafka cluster primarily has five main components:
+  1.1 Topic:
+        A topic is a category or feed name to which messages are published by the message producers.
+        In Kafka, topics are partitioned and each partition is represented by the ordered immutable sequence of messages.
+        A Kafka cluster maintains the partitioned log for each topic.
+        Each message in the partition is assigned a unique sequential ID called the offset.
+
+  1.2 Broker:
+        A Kafka cluster consists of one or more servers
+        where each one may have one or more server processes running
+        and is called the broker.
+        Topics are created within the context of broker processes.
+
+  1.3 Zookeeper:
+        ZooKeeper serves as the coordination interface between the Kafka broker and consumers.
+        brokers use Zookeeper to get the state information
+        and consumers use Zookeeper to track message offsets
+
+  1.4 Producers:
+        Producers publish data to the topics by choosing the appropriate partition within the topic.
+        For load balancing, the allocation of messages to the topic partition can be done in a round-robin fashion or using a custom defined function.
+
+  1.5 Consumer: Consumers are the applications or processes that subscribe to topics and process the feed of published messages
+
+2. All the message partitions are assigned a unique sequential number called the offset,
+   which is used to identify each message within the partition.
+   Each partition is optionally replicated across a configurable number of servers for fault tolerance.
+
+3. In Kafka topics,
+   every partition is mapped to a logical log file that is represented as a set of segment files of equal sizes.
+   Every partition is an ordered, immutable sequence of messages.
+   each time a message is published to a partition,
+   the broker appends the message to the last segment file.
+   These segment files are flushed to disk after configurable numbers of messages have been published, messages are made available to the consumers for consumption
+
+4. All the message partitions are assigned a unique sequential number called offset,
+   which is used to identify each message within the partition.
+   Each partition is optionally replicated across a configurable number of servers for fault tolerance
+
+5. each partition available on either of the servers acts as the leader and has 0 or more servers acting as followers.
+   here the leader is responsible for handling all read and write requests for the partition
+   while the followers asynchronously replicate data from the leader.
+
+6. Kafka dynamically maintains a set of in-sync replicas (ISR) that are caught-up to the leader
+   and always persist the latest ISR set to ZooKeeper.
+   If the leader fails, one of the followers (in-sync replicas) will automatically become the new leader.
+
+7. A message within a topic is consumed by a single process (consumer) within the consumer group
+   If the requirement is such that a single message to be consumed by multiple consumers,
+   all these consumers need to be kept in different consumer groups.
+
+8. consumers always consume messages from a particular partition sequentially
+   and consumers also acknowledge (ACK) the broker of the message offset.
+   This ACK implies that the consumer has consumed all prior messages.
+   Consumers issue an asynchronous pull request containing the offset of the message to be consumed to the broker and get the buffer of bytes
+
+9. In line with Kafka's design,
+   brokers are stateless,
+   which means the message state of any consumed message in maintained within the message consumer.
+   Kafka broker does not maintain a record of what is consumed by whom.
+
+10. Kafka defines the time-based SLA (service level agreement) as a message retention policy.
+    In line with this policy,
+    a message will be automatically deleted if it has been retained in the broker longer than the defined SLA period.
+    This message retention policy empowers consumers to deliberately rewind to an old offset and re-consume data.
+
+11. Ways of message delivery
+  11.1 Messages are never redelivered but may be lost
+  11.2 Messages may be redelivered but never lost
+  11.3 Messages are delivered once and only once
+
+12. When publishing, a message is committed to the log.
+    If a producer experience a network error while publishing, it can never be sure if this error happened before or after the message was committed.
+    Once committed, the message will not be lost as long as either of the brokers that replicate the partition to which this message was written remains available.
+    (That is message will not be lost as long as it is successfully written into a broker)
+    For guaranteed message publishing,
+    configurations such as getting acknowledgements and waiting time for messages being committed are provided at the producer's end.
+
+13. From the consumer point-of-view, replicas have exactly the same log with the same offsets,
+    and the consumer controls its position in this log.
+    For consumers,
+    Kafka guarantees that the message will be delivered at least once by reading, processing and saving offset information to the log message.
+    If the consumer process crashes after processing messages, but before saving their position,
+    another consumer process takes over the topic partition and may receive the first few messages,
+    which are already processed.
+
+14. Log compaction ensures
+  14.1 Ordering of messages is always maintained.
+  14.2 messages will have sequential offsets and the offsets never changes
+
+15. Kafka provides longer retention of messages even after consumption,
+    allowing consumers to re-consume, if required.
+
+16. Unlike most messaging systems, where metadata of the consumed messages are kept at the server level,
+    in Kafka the state of the consumed messages is maintained at the consumer level,
+    This address issues of 1) losing messages due to failure, 2) multiple deliveries of the same message
+
+17. By default,
+    consumers store state in ZooKeeper
+
+18. Kafka does not have any concept of a master and treats all the brokers as peers.
+    This approach facilitates addition and removal of a Kafka broker at any point
+    as the metadata of brokers are maintained in ZooKeeper and shared with consumers
+
+19. producers have option to choose between asynchronous or synchronous mode to send message to a broker
+  19.1 producer -> broker synchronous:
+
+  19.2 producer -> broker asynchronous:
+
+20. The decision about how the message is partitioned is taken by the producer,
+    and the broker stores the messages in the same order as they arrive.
+
+21. replication guarantees that the message will be published and consumed even in the case of broker failure.
+    In replication, each partition of a message has n replicas and can afford n-1 failures to guarantee message delivery.
+
+22. Out of the n replicas,
+    one replica acts as the lead replica for the rest of the replicas.
+    ZooKeeper keeps the information about the lead replica and the current follower in-sync replicas (ISR)
+
+23. each replica stores its part of the message in local logs and offsets.
+    and is periodically synced to the disk.
+
+24. Kafka replication modes
+  24.1 synchronous replication
+    24.1.1 producer identifies the lead replica and publish the message
+    24.1.2 as soon as the message is published,
+           it is written to the log of the lead replica
+    24.1.3 all the followers of the lead start pulling the message
+           (by using a single channel, the order of message is ensured)
+    24.1.4 each follower replica sends an acknowledgement (ACK) to the lead replica once the message is written to its respective logs.
+    24.1.5 Once replications are complete and all expected acknowledgement (ACK) are received,
+           the lead replica sends an acknowledgement (ACK) to the producer
+    (ACK流程： 1. follower replica ACK lead replica: all expected replication is done, 2. lead replica ACK producer: publication is done)
+
+  24.2 asynchronous replication
+    The only difference in this mode is that,
+    as soon as a lead replica writes the message to its local log,
+    it sends the acknowledgement to the message client.
+    and does not wait for acknowledgements from follower replicas
+    downside is that it does not ensure message delivery in case of a broker failure.
+    

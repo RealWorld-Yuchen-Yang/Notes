@@ -67,3 +67,49 @@ Zookeeper Basics
      the result of an operation submitted will be processed first.
 
 17. In general, it is not a good idea to mix synchronous and asynchronous calls.
+**************************************************************************************
+1. Apache Kafka uses Zookeeper to detect crashes, to implement topic discovery, and to maintain production and consumption state for topics
+
+2. Zookeeper servers manages critical application data related to coordination.
+   However it is not for bulk storage.
+   for bulk storage, you can either use db or distributed file system.
+
+3. To implement a master-worker system, we must resolve 3 problems:
+  3.1 master crashes
+  3.2 worker crashes
+  3.3 communication failure
+        3.3.1 Zookeeper enables clients to say that some data in the Zookeeper state is ephemeral.
+        3.3.2 Zookeeper ensemble requires that clients periodically notify that they are alive.
+              If a client fails to notify the ensemble in a timely manner,
+              then all ephemeral state belonging to this client is deleted.
+
+4. requirement for master-worker architecture
+  4.1 master election
+        elect a master to assign tasks to workers
+  4.2 crash detection
+        master must be able to detect worker's crash/disconnect
+  4.3 group membership management
+        the master must be able to figure out which workers are available to execute tasks.
+  4.4 metadata membership management
+        the master and workers must be able to store assignment and execution status in a reliable manner.
+
+5. Zookeeper has been designed with mostly consistency and availability in mind.
+   it also provides read-only capability in the presence of network failure.
+
+6. Watches and notifications in Zookeeper
+    Instead of client polling,
+    Zookeeper clients register with Zookeeper to receive notification of changes to znodes.
+    watch: used by client to receive znode changes. it is a one time use
+
+7. notifications preserve the order of updates the client observes.
+
+8. Zookeeper server is responsible for declaring "session expiration"
+   client is not able declare session expiration.
+   if network partition happens, which lead to the client in connecting state,
+   the client will remain in that state, for it can not tell if the session has expired.
+   however, client can deliberately close the session.
+
+9. ZooKeeper was designed to store coordination data:
+    status information,
+    configuration,
+    location information, and so on.

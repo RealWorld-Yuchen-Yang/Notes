@@ -501,3 +501,18 @@
 26. 复习Spring
 27. 复习数据结构， 二叉树的广度优先搜索
 28. 翻转LinkedList
+29. Spring 中Interceptor 与filter的区别，联系， 应用场合
+30. 为什么wait(), notify()和notifyAll() 被定义在Object类里？
+    Java的每个对象都有一个锁（monitor, 也可以视为监视器), 并且wait(), notify()等方法用于等待对象的锁或者通知其他线程对象的监视器可用。
+    在Java的线程中， 并没有可供任何对象使用的锁和同步器，
+    这就是为什么这些方法是Object类的一部分，
+    这样Java的每个类都有用于线程间通信的基本方法
+
+31. 为什么wait(), notify()和notifyAll()必须在同步方法或者同步块中被调用？
+      当一个线程需要调用对象的wait()方法时，这个线程必须拥有该对象的锁， 接着它就会释放该对象的锁， 并进入等待状态， 直到其他线程调用这个对象上的notify()方法
+      同样， 当一个线程需要调用对象的notify()方法时， 它会释放这个对象的锁， 以便其他在等待的线程可以得到这个对象的锁
+      所以：
+        wait(): means wait for object's lock, use it, and release it
+        notify(): means notify other another waiting thread, that the current thread has released the Object's lock
+
+32. 
