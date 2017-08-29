@@ -1,0 +1,17 @@
+Introduction
+1. Hive provides an SQL dialect, called Hive Query Language (HiveQL or just HQL)
+   It is used for querying data stored in a Hadoop cluster.
+
+2. The biggest limitation is that Hive does not provide record-level update, insert, nor delete.
+
+3. Hive does not provide transactions, which is the crucial feature of OLTP (Online Transaction Processing)
+
+4. OLAP's online means "short in response time"
+   Hive is closer to being an OLAP tool, but less responsive.
+
+5. If you need OLTP features for large-scale data,
+   you should consider using a NoSQL database,
+   Examples include HBase, a NoSQL database integrated with Hadoop,
+   Casandra, and DynamoDB, if you are using Amazon's Elastic MapReduce (EMR) or Elastic Compute Cloud (EC2)
+
+p30 Java Versus Hive
