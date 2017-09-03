@@ -1,0 +1,31 @@
+Data Mining Notes
+Data Warehousing and Online Analytical Processing
+1. Differences between Operational Database Systems and Data Warehouses
+  1.1 OLTP (Online transaction processing), traditional RDBMS
+        is customer-oriented
+  1.2 OLAP (Online analytical processing)
+        is market-oriented
+
+2. OLAP Operations
+  2.1. Roll-up
+    performs aggregation on a data cube.
+    either by climbing up a concept hierarchy for a dimension or by dimension reduction
+
+  2.2. Drill-down
+      navigates from less detailed data to more detailed data.
+      drill-down can be realized by either stepping down a concept hierarchy for a dimension
+      or introducing additional dimensions
+
+  2.3. Slice and dice:
+      the slice operation performs a selection on one dimension of the given cube, resulting in a subcube
+      the dice operation defines a subcube by performing a selection on two or more dimensions
+
+  2.4. Pivot
+        also called rotate,
+        is a visualization operation,
+        that rotates the data axes in view to provide an alternative data presentation
+
+3. three kinds of data warehouse applications:
+  3.1 information processing
+  3.2 analytical processing
+  3.3 data mining

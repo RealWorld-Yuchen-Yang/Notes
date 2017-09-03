@@ -1,0 +1,12 @@
+1. to configure tomcat max request size:
+    /Users/yuchenyang/Documents/Tomcat-apache-tomcat-7.0.70/webapps/manager/WEB-INF
+
+2. Tomcat's location:
+    /Users/yuchenyang/Documents/Tomcat-apache-tomcat-7.0.70/
+
+3. Tomcat manager's username: admin, ps: password
+   which is defined in
+   /Users/yuchenyang/Documents/Tomcat-apache-tomcat-7.0.70/conf/tomcat-users.xml
+
+4. after deployment, use browser to access http://localhost:8080/cboard/login.do
+   Default login username and passwor: admin/root123
