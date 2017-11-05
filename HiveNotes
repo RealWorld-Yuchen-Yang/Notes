@@ -1,17 +1,11 @@
-Introduction
-1. Hive provides an SQL dialect, called Hive Query Language (HiveQL or just HQL)
-   It is used for querying data stored in a Hadoop cluster.
+HiveNotes
+1. 使用LEFT JOIN做多表串联时， 最好在join的地方加入 "ON 判断条件“， 而不是在where语句中定义判定条件， 因为这样可以防止大表的产生， 显著提高效率
 
-2. The biggest limitation is that Hive does not provide record-level update, insert, nor delete.
+2. 当想要导入一个表中的所有域以及某个表的部分域时， 可以用 表名.*的形式引入想要所有域的表
 
-3. Hive does not provide transactions, which is the crucial feature of OLTP (Online Transaction Processing)
+3. I can set Hive session properties directly from HUE
 
-4. OLAP's online means "short in response time"
-   Hive is closer to being an OLAP tool, but less responsive.
+4. partition by （字段 类型）应该写在表的最后面
 
-5. If you need OLTP features for large-scale data,
-   you should consider using a NoSQL database,
-   Examples include HBase, a NoSQL database integrated with Hadoop,
-   Casandra, and DynamoDB, if you are using Amazon's Elastic MapReduce (EMR) or Elastic Compute Cloud (EC2)
-
-p30 Java Versus Hive
+5. 修改下方存储表的路径：
+    语句  alter  ${table_name} set location ${hdfs_path},后续大家遇到路径有问题的，用此命令重指定即可
