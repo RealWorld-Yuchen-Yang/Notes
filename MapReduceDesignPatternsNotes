@@ -86,5 +86,19 @@ Filtering Patterns
         this pattern utilizes both the mapper and the reducer.
         The mapper will find their local top K,
         then all of the top K sets will compete for the final top K in the reducer
-        you will only need one reducer  
+        you will only need one reducer
+
+        for the mapper, it process all input records and stores them in a TreeMap.
+        the default ordering of a TreeMap is ascending,
+        if there are more than ten records in our TreeMap,
+        the first element can be removed.
 4. Distinct
+  4.1 mapper
+    Because each reducer is presented with a unique key and a set of values associated with that key,
+    in order to produce a distinctive value,
+    we simply need to set our key to whatever we are trying to gather a distinct set of.
+  4.2 reducer
+    the grunt work of building a distinct set of values is handled by the MapReduce framework.
+    each reducer is given a unique key and a set of null values.
+    These values are ignored and the input key is written to the file system with a null value.
+5.
